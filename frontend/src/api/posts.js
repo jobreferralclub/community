@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/posts'; // Or replace with deployed backend
+const API_URL = import.meta.env.VITE_API_PORT + '/api/posts'; // Or replace with deployed backend
 
 export async function fetchPosts() {
   const res = await fetch(API_URL);
