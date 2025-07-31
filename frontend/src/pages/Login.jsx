@@ -1,29 +1,133 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
-import * as FiIcons from 'react-icons/fi';
-import { useAuthStore } from '../store/authStore';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import SafeIcon from "../common/SafeIcon";
+import * as FiIcons from "react-icons/fi";
+import { useAuthStore } from "../store/authStore";
+import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const { FiMail, FiLock, FiEye, FiEyeOff } = FiIcons;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [isSignup, setIsSignup] = useState(false);
+  const [userType, setUserType] = useState("jobseeker");
+  const [formError, setFormError] = useState("");
+
   const { login } = useAuthStore();
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const userId = params.get("token");
+
+    const fetchUser = async () => {
+      try {
+        const googleRes = await fetch(
+          `http://localhost:5001/api/google-user-info/${userId}`
+        );
+        const googleUser = await googleRes.json();
+
+        if (!googleRes.ok)
+          throw new Error(googleUser?.error || "Google auth failed");
+
+        // Send Google user data to backend to store/lookup
+        const response = await fetch("http://localhost:5001/api/users/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: googleUser.email,
+            name: googleUser.name,
+          }),
+        });
+
+        const finalUser = await response.json();
+        if (!response.ok)
+          throw new Error(finalUser?.error || "User fetch failed");
+
+        login({
+          ...finalUser,
+          role: "jobseeker",
+          avatar:
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          points: 2450,
+          badges: ["Top Referrer", "Community Helper", "Mentor"],
+          tier: "premium",
+        });
+
+        toast.success("Logged in with Google");
+        navigate("/");
+      } catch (err) {
+        toast.error("Google login failed");
+        console.error(err);
+      }
+    };
+
+    if (userId) {
+      fetchUser();
+    }
+  }, [location.search, login, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock login - in real app, this would authenticate with backend
-    login({
-      id: '1',
-      name: 'Alex Johnson',
-      email: formData.email,
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      points: 2450,
-      badges: ['Top Referrer', 'Community Helper', 'Mentor'],
-      tier: 'premium'
-    });
+
+    const url = isSignup
+      ? "http://localhost:5001/api/users"
+      : "http://localhost:5001/api/users/login";
+
+    const payload = isSignup
+      ? {
+          name: "Alex Johnson", // optional: could use formData.name
+          email: formData.email,
+          password: formData.password,
+        }
+      : {
+          email: formData.email,
+          password: formData.password,
+        };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        throw new Error("Invalid server response");
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Request failed");
+      }
+
+      login({
+        ...data,
+        role: userType,
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        points: 2450,
+        badges: ["Top Referrer", "Community Helper", "Mentor"],
+        tier: "premium",
+      });
+
+      toast.success(isSignup ? "Signup successful!" : "Login successful!");
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      const message = error?.message || "Something went wrong";
+      setFormError(message);
+      toast.error(message);
+    }
+  };
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:5001/api/auth/google";
   };
 
   return (
@@ -34,30 +138,53 @@ const Login = () => {
         className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
       >
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="w-16 h-16 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">JR</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">JobReferral.Club</h1>
-          <p className="text-gray-600 mt-2">Welcome back to your community</p>
+          <p className="text-gray-600 mt-1">
+            {isSignup
+              ? "Create your account"
+              : "Welcome back to your community"}
+          </p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Toggle Role */}
+        <div className="flex justify-center gap-4 mb-6">
+          {["jobseeker", "referrer"].map((role) => (
+            <button
+              key={role}
+              onClick={() => setUserType(role)}
+              className={`px-4 py-1 text-sm font-medium rounded-full border ${
+                userType === role
+                  ? "bg-primary-600 text-white border-primary-600"
+                  : "text-gray-600 border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {role === "jobseeker" ? "Job Seeker" : "Referrer"}
+            </button>
+          ))}
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
             <div className="relative">
               <SafeIcon
                 icon={FiMail}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
               />
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your email"
                 required
               />
@@ -65,48 +192,75 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <div className="relative">
               <SafeIcon
                 icon={FiLock}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
               />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your password"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <SafeIcon icon={showPassword ? FiEyeOff : FiEye} className="w-5 h-5" />
+                <SafeIcon
+                  icon={showPassword ? FiEyeOff : FiEye}
+                  className="w-5 h-5"
+                />
               </button>
             </div>
+            {formError && (
+              <p className="text-sm text-red-600 mt-1">{formError}</p>
+            )}
           </div>
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700"
           >
-            Sign In
+            {isSignup ? "Create Account" : "Sign In"}
           </motion.button>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 text-center">
-            Demo: Use any email/password to continue
-          </p>
+        {/* Google Login */}
+        <div className="mt-4">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </button>
         </div>
+
+        {/* Toggle Login/Signup */}
+        <p className="text-center text-sm text-gray-600 mt-6">
+          {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+          <button
+            onClick={() => setIsSignup(!isSignup)}
+            className="text-primary-600 hover:underline font-medium"
+          >
+            {isSignup ? "Login here" : "Sign up here"}
+          </button>
+        </p>
       </motion.div>
     </div>
   );
