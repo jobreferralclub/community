@@ -15,10 +15,28 @@ const Login = () => {
   const [userType, setUserType] = useState("jobseeker");
   const [formError, setFormError] = useState("");
 
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyDomain, setSelectedCompanyDomain] = useState("");
+  const [showCompanySearch, setShowCompanySearch] = useState(false);
+  const [selectedCompanyName, setSelectedCompanyName] = useState("");
+
+
   const { login } = useAuthStore();
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (userType === "referrer" && isSignup) {
+      fetch("http://localhost:5001/api/companies")
+        .then((res) => res.json())
+        .then((data) => setCompanies(data))
+        .catch((err) => {
+          console.error("Failed to fetch companies", err);
+          toast.error("Failed to load companies");
+        });
+    }
+  }, [userType, isSignup]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -169,25 +187,89 @@ const Login = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
+          {/* Company Search (for Referrers in Signup mode) */}
+          {userType === "referrer" && isSignup && (
+            <div className="relative mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company Name
+              </label>
+              <input
+                type="text"
+                onFocus={() => setShowCompanySearch(true)}
+                onChange={(e) => {
+                  const search = e.target.value.toLowerCase();
+                  const filtered = allCompanies.filter((c) =>
+                    c.name.toLowerCase().includes(search)
+                  );
+                  setCompanies(filtered);
+                }}
+                placeholder="Search your company"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+              {selectedCompanyName && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Selected Company:{" "}
+                  <span className="font-medium text-gray-800">
+                    {selectedCompanyName}
+                  </span>
+                </p>
+              )}
+              {showCompanySearch && companies.length > 0 && (
+                <ul className="absolute bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-48 overflow-y-auto shadow-md z-20">
+                  {companies.map((company) => (
+                    <li
+                      key={company._id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        const domain = company.domain.replace(/^@/, "");
+                        setSelectedCompanyDomain(domain);
+                        setSelectedCompanyName(company.name);
+                        setShowCompanySearch(false);
+                        setFormData({
+                          ...formData,
+                          email: `@${domain}`,
+                        });
+                      }}
+                    >
+                      {company.name}{" "}
+                      <span className="text-sm text-gray-400">
+                        ({company.domain})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Email Field */}
+          <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
-            <div className="relative">
+            <div className="relative flex items-center">
               <SafeIcon
                 icon={FiMail}
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
               />
               <input
-                type="email"
-                value={formData.email}
+                type="text"
+                value={formData.email.split("@")[0] || ""}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setFormData({
+                    ...formData,
+                    email: `${e.target.value}@${selectedCompanyDomain}`,
+                  })
                 }
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-28 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your email"
                 required
               />
+              {selectedCompanyDomain && (
+                <span className="absolute right-4 text-gray-500 text-sm pointer-events-none select-none">
+                  @{selectedCompanyDomain}
+                </span>
+              )}
             </div>
           </div>
 
