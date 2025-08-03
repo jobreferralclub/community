@@ -10,24 +10,29 @@ const { FiMail, FiLock, FiEye, FiEyeOff } = FiIcons;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [isSignup, setIsSignup] = useState(false);
-  const [userType, setUserType] = useState("jobseeker");
   const [formError, setFormError] = useState("");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const [companies, setCompanies] = useState([]);
   const [selectedCompanyDomain, setSelectedCompanyDomain] = useState("");
   const [showCompanySearch, setShowCompanySearch] = useState(false);
   const [selectedCompanyName, setSelectedCompanyName] = useState("");
 
-
   const { login } = useAuthStore();
-
   const navigate = useNavigate();
   const location = useLocation();
 
+  const searchParams = new URLSearchParams(location.search);
+  const roleParam = searchParams.get("role") || "member";
+
   useEffect(() => {
-    if (userType === "referrer" && isSignup) {
+    if (["recruiter", "tpo"].includes(roleParam) && isSignup) {
       fetch("http://localhost:5001/api/companies")
         .then((res) => res.json())
         .then((data) => setCompanies(data))
@@ -36,61 +41,61 @@ const Login = () => {
           toast.error("Failed to load companies");
         });
     }
-  }, [userType, isSignup]);
+  }, [roleParam, isSignup]);
 
+  // Handle Google OAuth callback
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const userId = params.get("token");
+    const token = searchParams.get("token");
+    const roleFromUrl = searchParams.get("role") || roleParam;
 
-    const fetchUser = async () => {
+    const fetchGoogleUser = async () => {
+      if (!token) return;
+      
+      setIsGoogleLoading(true);
       try {
         const googleRes = await fetch(
-          `http://localhost:5001/api/google-user-info/${userId}`
+          `http://localhost:5001/api/auth/google-user-info/${token}`
         );
-        const googleUser = await googleRes.json();
+        const userData = await googleRes.json();
 
-        if (!googleRes.ok)
-          throw new Error(googleUser?.error || "Google auth failed");
+        if (!googleRes.ok) {
+          throw new Error(userData?.error || "Google authentication failed");
+        }
 
-        // Send Google user data to backend to store/lookup
-        const response = await fetch("http://localhost:5001/api/users/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: googleUser.email,
-            name: googleUser.name,
-          }),
-        });
-
-        const finalUser = await response.json();
-        if (!response.ok)
-          throw new Error(finalUser?.error || "User fetch failed");
-
+        // Store user data in auth store (userId will be persisted as token)
         login({
-          ...finalUser,
-          role: "jobseeker",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          _id: userData._id,
+          name: userData.name,
+          email: userData.email,
+          role: roleFromUrl,
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
           points: 2450,
           badges: ["Top Referrer", "Community Helper", "Mentor"],
           tier: "premium",
+          isGoogleUser: true
         });
 
-        toast.success("Logged in with Google");
-        navigate("/");
-      } catch (err) {
-        toast.error("Google login failed");
-        console.error(err);
+        toast.success("Successfully logged in with Google!");
+        
+        // Clean up URL and redirect
+        navigate("/", { replace: true });
+        
+      } catch (error) {
+        console.error("Google login error:", error);
+        toast.error(error.message || "Google login failed");
+        // Clean up URL on error
+        navigate("/login", { replace: true });
+      } finally {
+        setIsGoogleLoading(false);
       }
     };
 
-    if (userId) {
-      fetchUser();
-    }
-  }, [location.search, login, navigate]);
+    fetchGoogleUser();
+  }, [location.search, login, navigate, roleParam]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
 
     const url = isSignup
       ? "http://localhost:5001/api/users"
@@ -98,9 +103,10 @@ const Login = () => {
 
     const payload = isSignup
       ? {
-          name: "Alex Johnson", // optional: could use formData.name
+          name: formData.name,
           email: formData.email,
           password: formData.password,
+          accountRole: roleParam,
         }
       : {
           email: formData.email,
@@ -114,12 +120,7 @@ const Login = () => {
         body: JSON.stringify(payload),
       });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (err) {
-        throw new Error("Invalid server response");
-      }
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data?.error || "Request failed");
@@ -127,9 +128,8 @@ const Login = () => {
 
       login({
         ...data,
-        role: userType,
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        role: roleParam,
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
         points: 2450,
         badges: ["Top Referrer", "Community Helper", "Mentor"],
         tier: "premium",
@@ -139,14 +139,42 @@ const Login = () => {
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
-      const message = error?.message || "Something went wrong";
-      setFormError(message);
-      toast.error(message);
+      const errorMessage = error?.message || "Something went wrong";
+      setFormError(errorMessage);
+      toast.error(errorMessage);
     }
   };
+
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5001/api/auth/google";
+    // Include role parameter in Google auth URL
+    const googleAuthUrl = `http://localhost:5001/api/auth/google?role=${roleParam}`;
+    window.location.href = googleAuthUrl;
   };
+
+  // Show loading state during Google authentication
+  if (isGoogleLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center"
+        >
+          <div className="w-16 h-16 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
+            />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Completing Google Sign In...
+          </h2>
+          <p className="text-gray-600">Please wait while we set up your account.</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
@@ -168,27 +196,37 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Toggle Role */}
-        <div className="flex justify-center gap-4 mb-6">
-          {["jobseeker", "referrer"].map((role) => (
-            <button
-              key={role}
-              onClick={() => setUserType(role)}
-              className={`px-4 py-1 text-sm font-medium rounded-full border ${
-                userType === role
-                  ? "bg-primary-600 text-white border-primary-600"
-                  : "text-gray-600 border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              {role === "jobseeker" ? "Job Seeker" : "Referrer"}
-            </button>
-          ))}
-        </div>
-
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Company Search (for Referrers in Signup mode) */}
-          {userType === "referrer" && isSignup && (
+          {/* Name Field (Signup only) */}
+          {isSignup && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiIcons.FiUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      name: e.target.value,
+                    })
+                  }
+                  className="w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your full name"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Company Search (for recruiter/tpo) */}
+          {["recruiter", "tpo"].includes(roleParam) && isSignup && (
             <div className="relative mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Company Name
@@ -198,7 +236,7 @@ const Login = () => {
                 onFocus={() => setShowCompanySearch(true)}
                 onChange={(e) => {
                   const search = e.target.value.toLowerCase();
-                  const filtered = allCompanies.filter((c) =>
+                  const filtered = companies.filter((c) =>
                     c.name.toLowerCase().includes(search)
                   );
                   setCompanies(filtered);
@@ -243,36 +281,57 @@ const Login = () => {
           )}
 
           {/* Email Field */}
-          <div className="mt-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
-            <div className="relative flex items-center">
-              <SafeIcon
-                icon={FiMail}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-              />
-              <input
-                type="text"
-                value={formData.email.split("@")[0] || ""}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    email: `${e.target.value}@${selectedCompanyDomain}`,
-                  })
-                }
-                className="w-full pl-10 pr-28 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter your email"
-                required
-              />
-              {selectedCompanyDomain && (
+            {roleParam === "recruiter" && selectedCompanyDomain ? (
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiMail}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="text"
+                  value={formData.email.split("@")[0] || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      email: `${e.target.value}@${selectedCompanyDomain}`,
+                    })
+                  }
+                  className="w-full pl-10 pr-28 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your email"
+                  required
+                />
                 <span className="absolute right-4 text-gray-500 text-sm pointer-events-none select-none">
                   @{selectedCompanyDomain}
                 </span>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiMail}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      email: e.target.value,
+                    })
+                  }
+                  className="w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            )}
           </div>
 
+          {/* Password Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -337,7 +396,10 @@ const Login = () => {
         <p className="text-center text-sm text-gray-600 mt-6">
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
-            onClick={() => setIsSignup(!isSignup)}
+            onClick={() => {
+              setIsSignup(!isSignup);
+              setFormError("");
+            }}
             className="text-primary-600 hover:underline font-medium"
           >
             {isSignup ? "Login here" : "Sign up here"}

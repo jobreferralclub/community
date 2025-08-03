@@ -22,6 +22,7 @@ const Settings = () => {
   const [newCompany, setNewCompany] = useState({ name: "", domain: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState([]);
 
   const tabs = [
     { id: "profile", name: "Profile", icon: FiUser },
@@ -35,7 +36,23 @@ const Settings = () => {
       name: "Registered Companies",
       icon: FiIcons.FiBriefcase,
     },
+    { id: "users", name: "Users", icon: FiIcons.FiUsers },
   ];
+
+  React.useEffect(() => {
+    fetchCompanies();
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/users");
+      const data = await res.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -80,6 +97,29 @@ const Settings = () => {
       fetchCompanies(); // Refresh list after deletion
     } catch (error) {
       console.error("Error deleting company:", error);
+    }
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      const res = await fetch(
+        `http://localhost:5001/api/users/${userId}/role`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ role: newRole }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to update role");
+
+      // Refresh users
+      fetchUsers();
+    } catch (error) {
+      console.error("Role update failed:", error);
+      alert("Failed to update user role");
     }
   };
 
@@ -738,6 +778,73 @@ const Settings = () => {
     );
   };
 
+  const renderUsers = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
+      >
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">All Users</h3>
+
+        {users.length === 0 ? (
+          <p className="text-gray-600">No users found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                    Name
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                    Email
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                    Role
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                    Joined
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {users.map((user) => (
+                  <tr key={user._id}>
+                    <td className="px-4 py-2 text-sm text-gray-800">
+                      {user.name}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {user.email}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600 capitalize">
+                      <select
+                        value={user.accountRole}
+                        onChange={(e) =>
+                          handleRoleChange(user._id, e.target.value)
+                        }
+                        className="p-1 border border-gray-300 rounded text-sm"
+                      >
+                        {["member", "admin", "recruiter", "tpo"].map((role) => (
+                          <option key={role} value={role}>
+                            {role}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-500">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </motion.div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -780,6 +887,7 @@ const Settings = () => {
           {activeTab === "api" && renderAPI()}
           {activeTab === "data" && renderData()}
           {activeTab === "companies" && renderCompanies()}
+          {activeTab === "users" && renderUsers()}
         </div>
       </div>
     </div>

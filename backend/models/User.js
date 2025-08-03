@@ -15,7 +15,13 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6 // or any minimum length you prefer
+    minlength: 6
+  },
+  accountRole: {
+    type: String,
+    enum: ['member', 'recruiter', 'TPO', 'admin'],
+    default: 'member',
+    required: true
   },
   createdAt: {
     type: Date,

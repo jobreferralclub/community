@@ -20,16 +20,26 @@ passport.use(
         async (accessToken, refreshToken, profile, done) => {
             try {
                 let user = await User.findOne({ googleId: profile.id });
-                if (!user) {
-                    // Generate random 16-character password
-                    const randomPassword = crypto.randomBytes(12).toString("hex");
 
-                    user = await User.create({
-                        googleId: profile.id,
-                        name: profile.displayName,
-                        email: profile.emails[0].value,
-                        password: randomPassword, // hashed automatically if you have a pre-save hook
-                    });
+                if (!user) {
+                    // Check if there's an existing user with the same email
+                    user = await User.findOne({ email: profile.emails[0].value });
+
+                    if (user) {
+                        // Link the existing account with Google
+                        user.googleId = profile.id;
+                        await user.save();
+                    } else {
+                        // Create new user
+                        const randomPassword = crypto.randomBytes(12).toString("hex");
+
+                        user = await User.create({
+                            googleId: profile.id,
+                            name: profile.displayName,
+                            email: profile.emails[0].value,
+                            password: randomPassword,
+                        });
+                    }
                 }
                 done(null, user);
             } catch (err) {
