@@ -1,13 +1,14 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
-import * as FiIcons from 'react-icons/fi';
-import { useAuthStore } from '../store/authStore';
+import React from "react";
+import { motion } from "framer-motion";
+import SafeIcon from "../common/SafeIcon";
+import * as FiIcons from "react-icons/fi";
+import { useAuthStore } from "../store/authStore";
 
-const { FiMenu, FiBell, FiSearch, FiMessageSquare, FiAward } = FiIcons;
+const { FiMenu, FiBell, FiSearch, FiMessageSquare, FiAward, FiLogOut } =
+  FiIcons;
 
 const Header = ({ onMenuClick }) => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   return (
     <motion.header
@@ -44,7 +45,9 @@ const Header = ({ onMenuClick }) => {
           {/* Points */}
           <div className="hidden sm:flex items-center space-x-2 bg-secondary-50 px-3 py-1 rounded-full">
             <SafeIcon icon={FiAward} className="w-4 h-4 text-secondary-600" />
-            <span className="text-sm font-medium text-secondary-700">{user.points} pts</span>
+            <span className="text-sm font-medium text-secondary-700">
+              {user.points} pts
+            </span>
           </div>
 
           {/* Notifications */}
@@ -55,20 +58,36 @@ const Header = ({ onMenuClick }) => {
 
           {/* Messages */}
           <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <SafeIcon icon={FiMessageSquare} className="w-5 h-5 text-gray-600" />
+            <SafeIcon
+              icon={FiMessageSquare}
+              className="w-5 h-5 text-gray-600"
+            />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary-500 rounded-full"></span>
           </button>
 
-          {/* Profile */}
-          <div className="flex items-center space-x-3">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-200"
-            />
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+          {/* Profile with dropdown */}
+          <div className="relative group">
+            <div className="flex items-center space-x-3 cursor-pointer">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-primary-200"
+              />
+              <div className="hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+              </div>
+            </div>
+
+            {/* Dropdown on hover */}
+            <div className="absolute right-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
+              <button
+                onClick={logout}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+              >
+                <SafeIcon icon={FiLogOut} className="w-4 h-4" />
+                Log out
+              </button>
             </div>
           </div>
         </div>

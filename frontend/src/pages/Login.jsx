@@ -1,30 +1,180 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
-import * as FiIcons from 'react-icons/fi';
-import { useAuthStore } from '../store/authStore';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import SafeIcon from "../common/SafeIcon";
+import * as FiIcons from "react-icons/fi";
+import { useAuthStore } from "../store/authStore";
+import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const { FiMail, FiLock, FiEye, FiEyeOff } = FiIcons;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const { login } = useAuthStore();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [isSignup, setIsSignup] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompanyDomain, setSelectedCompanyDomain] = useState("");
+  const [showCompanySearch, setShowCompanySearch] = useState(false);
+  const [selectedCompanyName, setSelectedCompanyName] = useState("");
+
+  const { login } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const roleParam = searchParams.get("role") || "member";
+
+  useEffect(() => {
+    if (["recruiter", "tpo"].includes(roleParam) && isSignup) {
+      fetch("http://localhost:5001/api/companies")
+        .then((res) => res.json())
+        .then((data) => setCompanies(data))
+        .catch((err) => {
+          console.error("Failed to fetch companies", err);
+          toast.error("Failed to load companies");
+        });
+    }
+  }, [roleParam, isSignup]);
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const token = searchParams.get("token");
+    const roleFromUrl = searchParams.get("role") || roleParam;
+
+    const fetchGoogleUser = async () => {
+      if (!token) return;
+      
+      setIsGoogleLoading(true);
+      try {
+        const googleRes = await fetch(
+          `http://localhost:5001/api/auth/google-user-info/${token}`
+        );
+        const userData = await googleRes.json();
+
+        if (!googleRes.ok) {
+          throw new Error(userData?.error || "Google authentication failed");
+        }
+
+        // Store user data in auth store (userId will be persisted as token)
+        login({
+          _id: userData._id,
+          name: userData.name,
+          email: userData.email,
+          role: roleFromUrl,
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          points: 2450,
+          badges: ["Top Referrer", "Community Helper", "Mentor"],
+          tier: "premium",
+          isGoogleUser: true
+        });
+
+        toast.success("Successfully logged in with Google!");
+        
+        // Clean up URL and redirect
+        navigate("/", { replace: true });
+        
+      } catch (error) {
+        console.error("Google login error:", error);
+        toast.error(error.message || "Google login failed");
+        // Clean up URL on error
+        navigate("/login", { replace: true });
+      } finally {
+        setIsGoogleLoading(false);
+      }
+    };
+
+    fetchGoogleUser();
+  }, [location.search, login, navigate, roleParam]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock login - in real app, this would authenticate with backend
-    login({
-      id: '1',
-      name: 'Alex Johnson',
-      email: formData.email,
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      points: 2450,
-      badges: ['Top Referrer', 'Community Helper', 'Mentor'],
-      tier: 'premium'
-    });
+    setFormError("");
+
+    const url = isSignup
+      ? "http://localhost:5001/api/users"
+      : "http://localhost:5001/api/users/login";
+
+    const payload = isSignup
+      ? {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          accountRole: roleParam,
+        }
+      : {
+          email: formData.email,
+          password: formData.password,
+        };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Request failed");
+      }
+
+      login({
+        ...data,
+        role: roleParam,
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        points: 2450,
+        badges: ["Top Referrer", "Community Helper", "Mentor"],
+        tier: "premium",
+      });
+
+      toast.success(isSignup ? "Signup successful!" : "Login successful!");
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      const errorMessage = error?.message || "Something went wrong";
+      setFormError(errorMessage);
+      toast.error(errorMessage);
+    }
   };
+
+  const handleGoogleLogin = () => {
+    // Include role parameter in Google auth URL
+    const googleAuthUrl = `http://localhost:5001/api/auth/google?role=${roleParam}`;
+    window.location.href = googleAuthUrl;
+  };
+
+  // Show loading state during Google authentication
+  if (isGoogleLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center"
+        >
+          <div className="w-16 h-16 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-6 h-6 border-2 border-white border-t-transparent rounded-full"
+            />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Completing Google Sign In...
+          </h2>
+          <p className="text-gray-600">Please wait while we set up your account.</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
@@ -34,79 +184,227 @@ const Login = () => {
         className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
       >
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="w-16 h-16 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">JR</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900">JobReferral.Club</h1>
-          <p className="text-gray-600 mt-2">Welcome back to your community</p>
+          <p className="text-gray-600 mt-1">
+            {isSignup
+              ? "Create your account"
+              : "Welcome back to your community"}
+          </p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name Field (Signup only) */}
+          {isSignup && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiIcons.FiUser}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      name: e.target.value,
+                    })
+                  }
+                  className="w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your full name"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Company Search (for recruiter/tpo) */}
+          {["recruiter", "tpo"].includes(roleParam) && isSignup && (
+            <div className="relative mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company Name
+              </label>
+              <input
+                type="text"
+                onFocus={() => setShowCompanySearch(true)}
+                onChange={(e) => {
+                  const search = e.target.value.toLowerCase();
+                  const filtered = companies.filter((c) =>
+                    c.name.toLowerCase().includes(search)
+                  );
+                  setCompanies(filtered);
+                }}
+                placeholder="Search your company"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+              {selectedCompanyName && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Selected Company:{" "}
+                  <span className="font-medium text-gray-800">
+                    {selectedCompanyName}
+                  </span>
+                </p>
+              )}
+              {showCompanySearch && companies.length > 0 && (
+                <ul className="absolute bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-48 overflow-y-auto shadow-md z-20">
+                  {companies.map((company) => (
+                    <li
+                      key={company._id}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        const domain = company.domain.replace(/^@/, "");
+                        setSelectedCompanyDomain(domain);
+                        setSelectedCompanyName(company.name);
+                        setShowCompanySearch(false);
+                        setFormData({
+                          ...formData,
+                          email: `@${domain}`,
+                        });
+                      }}
+                    >
+                      {company.name}{" "}
+                      <span className="text-sm text-gray-400">
+                        ({company.domain})
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email Address
             </label>
-            <div className="relative">
-              <SafeIcon
-                icon={FiMail}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-              />
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
+            {roleParam === "recruiter" && selectedCompanyDomain ? (
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiMail}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="text"
+                  value={formData.email.split("@")[0] || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      email: `${e.target.value}@${selectedCompanyDomain}`,
+                    })
+                  }
+                  className="w-full pl-10 pr-28 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your email"
+                  required
+                />
+                <span className="absolute right-4 text-gray-500 text-sm pointer-events-none select-none">
+                  @{selectedCompanyDomain}
+                </span>
+              </div>
+            ) : (
+              <div className="relative flex items-center">
+                <SafeIcon
+                  icon={FiMail}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                />
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      email: e.target.value,
+                    })
+                  }
+                  className="w-full pl-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            )}
           </div>
 
+          {/* Password Field */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <div className="relative">
               <SafeIcon
                 icon={FiLock}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
               />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Enter your password"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <SafeIcon icon={showPassword ? FiEyeOff : FiEye} className="w-5 h-5" />
+                <SafeIcon
+                  icon={showPassword ? FiEyeOff : FiEye}
+                  className="w-5 h-5"
+                />
               </button>
             </div>
+            {formError && (
+              <p className="text-sm text-red-600 mt-1">{formError}</p>
+            )}
           </div>
 
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700"
           >
-            Sign In
+            {isSignup ? "Create Account" : "Sign In"}
           </motion.button>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 text-center">
-            Demo: Use any email/password to continue
-          </p>
+        {/* Google Login */}
+        <div className="mt-4">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </button>
         </div>
+
+        {/* Toggle Login/Signup */}
+        <p className="text-center text-sm text-gray-600 mt-6">
+          {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+          <button
+            onClick={() => {
+              setIsSignup(!isSignup);
+              setFormError("");
+            }}
+            className="text-primary-600 hover:underline font-medium"
+          >
+            {isSignup ? "Login here" : "Sign up here"}
+          </button>
+        </p>
       </motion.div>
     </div>
   );
