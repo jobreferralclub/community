@@ -73,6 +73,25 @@ router.delete('/', async (req, res) => {
     }
 });
 
+// GET /api/users/:id/role
+router.get("/:id/role", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const user = await User.findById(id).select("accountRole");
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ role: user.accountRole });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+
 // PATCH /api/users/:id/role http://localhost:5001/api/users
 router.patch("/:id/role", async (req, res) => {
     const { id } = req.params;

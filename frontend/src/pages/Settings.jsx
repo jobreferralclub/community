@@ -24,6 +24,8 @@ const Settings = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState([]);
 
+  const role = useAuthStore((state) => state.role);
+
   const tabs = [
     { id: "profile", name: "Profile", icon: FiUser },
     { id: "notifications", name: "Notifications", icon: FiBell },
@@ -37,6 +39,14 @@ const Settings = () => {
       icon: FiIcons.FiBriefcase,
     },
     { id: "users", name: "Users", icon: FiIcons.FiUsers },
+  ];
+
+  const adminOnly = [
+    'Integrations',
+    'API Access',
+    'Data & Export',
+    'Registered Companies',
+    'Users',
   ];
 
   React.useEffect(() => {
@@ -861,6 +871,7 @@ const Settings = () => {
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
             <nav className="space-y-2">
               {tabs.map((tab) => (
+                adminOnly.includes(tab.name) && role !== 'admin' ? null : (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -873,6 +884,7 @@ const Settings = () => {
                   <SafeIcon icon={tab.icon} className="w-5 h-5" />
                   <span className="font-medium">{tab.name}</span>
                 </button>
+                )
               ))}
             </nav>
           </div>

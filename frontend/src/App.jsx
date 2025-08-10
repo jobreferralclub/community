@@ -25,12 +25,44 @@ import { useAuthStore } from "./store/authStore";
 import AuthCallback from "./pages/AuthCallback";
 
 function AppWrapper() {
-  const { user, userId, login } = useAuthStore();
+  const { user, userId, login, setRole } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
+  // ✅ Get user role only if there is a token
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!userId || userId.trim() === "") return; // Exit early if no token
+
+      try {
+        const res = await fetch(
+          `http://localhost:5001/api/users/${userId}/role`,
+          {
+            headers: {
+              Authorization: `Bearer ${userId}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch user role");
+          return;
+        }
+
+        const data = await res.json();
+        console.log("User role:", data.role);
+
+        // Store in Zustand
+        setRole(data.role);
+      } catch (err) {
+        console.error("Error fetching role:", err);
+      }
+    };
+
+    fetchUserRole();
+  }, [userId, setRole]);
 
   const searchParams = new URLSearchParams(location.search);
   const tokenFromURL = searchParams.get("token");
@@ -42,9 +74,10 @@ function AppWrapper() {
     if (tokenFromURL && !userId) {
       // Store token as userId in the auth store
       login({ _id: tokenFromURL });
-      
+
       // Clean up URL by removing token parameter
-      const cleanUrl = window.location.pathname + window.location.hash.split('?')[0];
+      const cleanUrl =
+        window.location.pathname + window.location.hash.split("?")[0];
       window.history.replaceState({}, document.title, cleanUrl);
     }
   }, [tokenFromURL, userId, login]);
