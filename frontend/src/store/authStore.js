@@ -1,16 +1,20 @@
+// store/authStore.js
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export const useAuthStore = create(
   persist(
     (set, get) => ({
-      userId: null, // persist this as token
-      user: null,   // full user info in memory (not persisted)
+      userId: null, // persisted
+      user: null,   // full user (not persisted)
+      role: null,   // user role (not persisted)
+
+      setRole: (role) => set({ role }),
 
       login: (userData) => {
         set({
-          userId: userData._id, // save only ID as token
-          user: userData,       // full user (not persisted)
+          userId: userData._id,
+          user: userData,
         });
       },
 
@@ -18,6 +22,7 @@ export const useAuthStore = create(
         set({
           userId: null,
           user: null,
+          role: null,
         });
       },
 
@@ -27,9 +32,9 @@ export const useAuthStore = create(
         })),
     }),
     {
-      name: 'token', // localStorage key will be "token"
+      name: 'token', // localStorage key
       getStorage: () => localStorage,
-      partialize: (state) => ({ userId: state.userId }), // Only persist userId
+      partialize: (state) => ({ userId: state.userId }), // persist only token
     }
   )
 );

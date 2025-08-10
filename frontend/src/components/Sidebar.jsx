@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
+import { useAuthStore } from '../store/authStore'; // adjust the path
 
 const {
   FiHome, FiUsers, FiBarChart3, FiMail, FiVideo, FiAward,
@@ -10,12 +11,14 @@ const {
 } = FiIcons;
 
 const Sidebar = ({ open, setOpen }) => {
+  const role = useAuthStore((state) => state.role);
+
   const menuItems = [
     { name: 'Dashboard', icon: FiHome, path: '/' },
     { name: 'Community', icon: FiUsers, path: '/community' },
     { name: 'Analytics', icon: FiBarChart3, path: '/analytics' },
     { name: 'Email Broadcast', icon: FiMail, path: '/email' },
-    { name: 'Video Hub', icon: FiVideo, path: '/videos' },
+    { name: 'Events', icon: FiVideo, path: '/videos' },
     { name: 'Gamification', icon: FiAward, path: '/gamification' },
     { name: 'Monetization', icon: FiDollarSign, path: '/monetization' },
     { name: 'Coaching', icon: FiCalendar, path: '/coaching' },
@@ -23,13 +26,27 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Settings', icon: FiSettings, path: '/settings' },
   ];
 
+  // Allowed menu items for admin
+  const adminOnly = [
+    'Dashboard',
+    'Analytics',
+    'Email Broadcast',
+    'Gamification',
+    'Monetization',
+    'Coaching',
+    'Course Builder',
+  ];
+
+  // Filter menu based on role
+  const filteredMenu = role === 'admin'
+    ? menuItems
+    : menuItems.filter(item => !adminOnly.includes(item.name)); // Non-admins see other sections
+
   return (
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
-      className={`${
-        open ? 'w-64' : 'w-20'
-      } bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
+      className={`${open ? 'w-64' : 'w-20'} bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
@@ -52,9 +69,7 @@ const Sidebar = ({ open, setOpen }) => {
           >
             <SafeIcon 
               icon={FiChevronLeft} 
-              className={`w-5 h-5 text-gray-600 transition-transform ${
-                !open ? 'rotate-180' : ''
-              }`} 
+              className={`w-5 h-5 text-gray-600 transition-transform ${!open ? 'rotate-180' : ''}`} 
             />
           </button>
         </div>
@@ -62,7 +77,7 @@ const Sidebar = ({ open, setOpen }) => {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => (
+        {filteredMenu.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
