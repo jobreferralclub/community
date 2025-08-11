@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose  from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
   title: String,
@@ -22,7 +22,13 @@ const PostSchema = new mongoose.Schema({
     type: String,
     enum: ['job-posting', 'success-story', 'discussion'],
     default: 'discussion'
+  },
+  community: {
+    type: String,
+    required: true,       // Optional, if you want to enforce a community
+    enum: ['analyst', 'operations', 'human-resource', 'marketing', 'general'] // example communities
   }
 });
+
 
 export default mongoose.model('Post', PostSchema);

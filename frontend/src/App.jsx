@@ -188,7 +188,29 @@ function AppWrapper() {
                   >
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
-                      <Route path="/community" element={<Community />} />
+                      <Route path="/community">
+                        <Route index element={<Community />} />
+
+                        {/* India sub-communities */}
+                        <Route
+                          path="in/operations"
+                          element={<Community/>}
+                        />
+                        <Route path="in/program" element={<Community/>} />
+                        <Route path="in/product" element={<Community/>} />
+                        <Route path="in/marketing" element={<Community/>} />
+                        <Route path="in/account" element={<Community/>} />
+
+                        {/* US sub-communities */}
+                        <Route
+                          path="us/operations"
+                          element={<Community/>}
+                        />
+                        <Route path="us/program" element={<Community/>} />
+                        <Route path="us/product" element={<Community/>} />
+                        <Route path="us/marketing" element={<Community/>} />
+                        <Route path="us/account" element={<Community/>} />
+                      </Route>
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/email" element={<EmailBroadcast />} />
                       <Route path="/videos" element={<VideoHub />} />
