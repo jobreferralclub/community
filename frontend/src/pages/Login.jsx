@@ -40,7 +40,7 @@ const Login = () => {
   // Fetch companies list (for recruiter, tpo roles)
   useEffect(() => {
     if (["recruiter", "tpo"].includes(roleParam) && isSignup) {
-      fetch("http://localhost:5001/api/companies")
+      fetch(`${import.meta.env.VITE_API_PORT}/api/companies`)
         .then((res) => res.json())
         .then((data) => setCompanies(data))
         .catch((err) => {
@@ -61,7 +61,7 @@ const Login = () => {
       setIsGoogleLoading(true);
       try {
         const googleRes = await fetch(
-          `http://localhost:5001/api/auth/google-user-info/${token}`
+          `${import.meta.env.VITE_API_PORT}/api/auth/google-user-info/${token}`
         );
         const userData = await googleRes.json();
 
@@ -75,7 +75,7 @@ const Login = () => {
           name: userData.name,
           email: userData.email,
           role: roleFromUrl,
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          avatar: "/default-avatar.jpg",
           points: 2450,
           badges: ["Top Referrer", "Community Helper", "Mentor"],
           tier: "premium",
@@ -99,7 +99,7 @@ const Login = () => {
   const handleSendOtp = async () => {
     setOtpLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/send-otp", {
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/auth/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email }),
@@ -122,7 +122,7 @@ const Login = () => {
   const handleVerifyOtp = async () => {
     setOtpLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/api/auth/verify-otp", {
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: formData.email, otp }),
@@ -153,8 +153,8 @@ const Login = () => {
     }
 
     const url = isSignup
-      ? "http://localhost:5001/api/users"
-      : "http://localhost:5001/api/users/login";
+      ? `${import.meta.env.VITE_API_PORT}/api/users`
+      : `${import.meta.env.VITE_API_PORT}/api/users/login`;
 
     const payload = isSignup
       ? {
@@ -200,7 +200,7 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    const googleAuthUrl = `http://localhost:5001/api/auth/google?role=${roleParam}`;
+    const googleAuthUrl = `${import.meta.env.VITE_API_PORT}/api/auth/google?role=${roleParam}`;
     window.location.href = googleAuthUrl;
   };
 

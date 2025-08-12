@@ -56,7 +56,7 @@ const Settings = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/users");
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/users`);
       const data = await res.json();
       setUsers(data);
     } catch (error) {
@@ -66,7 +66,7 @@ const Settings = () => {
 
   const fetchCompanies = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/companies");
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/companies`);
       const data = await res.json();
       setCompanies(data);
     } catch (error) {
@@ -79,7 +79,7 @@ const Settings = () => {
     if (!newCompany.name || !newCompany.domain) return;
     try {
       setIsSubmitting(true);
-      await fetch("http://localhost:5001/api/companies", {
+      await fetch(`${import.meta.env.VITE_API_PORT}/api/companies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCompany),
@@ -101,7 +101,7 @@ const Settings = () => {
       return;
 
     try {
-      await fetch(`http://localhost:5001/api/companies/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_PORT}/api/companies/${id}`, {
         method: "DELETE",
       });
       fetchCompanies(); // Refresh list after deletion
@@ -113,7 +113,7 @@ const Settings = () => {
   const handleRoleChange = async (userId, newRole) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/users/${userId}/role`,
+        `${import.meta.env.VITE_API_PORT}/api/users/${userId}/role`,
         {
           method: "PATCH",
           headers: {

@@ -38,7 +38,7 @@ function AppWrapper() {
 
       try {
         const res = await fetch(
-          `http://localhost:5001/api/users/${userId}/role`,
+          `${import.meta.env.VITE_API_PORT}/api/users/${userId}/role`,
           {
             headers: {
               Authorization: `Bearer ${userId}`,
@@ -89,7 +89,7 @@ function AppWrapper() {
         // If we have a userId (token) but no user data in memory, fetch user data
         if (userId && !user) {
           const response = await fetch(
-            `http://localhost:5001/api/users/${userId}`,
+            `${import.meta.env.VITE_API_PORT}/api/users/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${userId}`,

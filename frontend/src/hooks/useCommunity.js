@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
-const API_BASE = 'http://localhost:5001/api'; // or your live server URL
+const API_BASE = `${import.meta.env.VITE_API_PORT}/api`; // or your live server URL
 
 export const useCommunity = () => {
   const [posts, setPosts] = useState([]);
