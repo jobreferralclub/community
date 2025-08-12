@@ -420,6 +420,7 @@ const Login = () => {
             )}
           </div>
 
+<<<<<<< Updated upstream
           {/* OTP Section (Signup only) */}
           {isSignup && (
             <div className="space-y-3">
@@ -470,6 +471,8 @@ const Login = () => {
           )}
 
 
+=======
+>>>>>>> Stashed changes
           {/* Create Account / Sign up button*/}
           <motion.button
             whileHover={{ scale: 1.02 }}
