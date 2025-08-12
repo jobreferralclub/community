@@ -24,6 +24,12 @@ const Login = () => {
   const [showCompanySearch, setShowCompanySearch] = useState(false);
   const [selectedCompanyName, setSelectedCompanyName] = useState("");
 
+  // OTP States
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+
   const { login } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,6 +37,7 @@ const Login = () => {
   const searchParams = new URLSearchParams(location.search);
   const roleParam = searchParams.get("role") || "member";
 
+  // Fetch companies list (for recruiter, tpo roles)
   useEffect(() => {
     if (["recruiter", "tpo"].includes(roleParam) && isSignup) {
       fetch("http://localhost:5001/api/companies")
@@ -50,7 +57,7 @@ const Login = () => {
 
     const fetchGoogleUser = async () => {
       if (!token) return;
-      
+
       setIsGoogleLoading(true);
       try {
         const googleRes = await fetch(
@@ -62,7 +69,7 @@ const Login = () => {
           throw new Error(userData?.error || "Google authentication failed");
         }
 
-        // Store user data in auth store (userId will be persisted as token)
+        // Store user data in auth store
         login({
           _id: userData._id,
           name: userData.name,
@@ -76,26 +83,74 @@ const Login = () => {
         });
 
         toast.success("Successfully logged in with Google!");
-        
-        // Clean up URL and redirect
         navigate("/", { replace: true });
-        
       } catch (error) {
         console.error("Google login error:", error);
         toast.error(error.message || "Google login failed");
-        // Clean up URL on error
         navigate("/login", { replace: true });
       } finally {
         setIsGoogleLoading(false);
       }
     };
-
     fetchGoogleUser();
   }, [location.search, login, navigate, roleParam]);
 
+  // Handle sending OTP
+  const handleSendOtp = async () => {
+    setOtpLoading(true);
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        setIsOtpSent(true);
+      } else {
+        toast.error(data.error || "Failed to send OTP");
+      }
+    } catch (error) {
+      toast.error("Error sending OTP");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Handle verifying OTP
+  const handleVerifyOtp = async () => {
+    setOtpLoading(true);
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, otp }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        setIsOtpVerified(true);
+      } else {
+        toast.error(data.error || "Invalid OTP");
+      }
+    } catch (error) {
+      toast.error("Error verifying OTP");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  // Handle login/signup submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
+
+    // For signup, only allow if OTP is verified
+    if (isSignup && !isOtpVerified) {
+      setFormError("Please verify your email via OTP to proceed.");
+      return;
+    }
 
     const url = isSignup
       ? "http://localhost:5001/api/users"
@@ -121,7 +176,6 @@ const Login = () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data?.error || "Request failed");
       }
@@ -146,7 +200,6 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // Include role parameter in Google auth URL
     const googleAuthUrl = `http://localhost:5001/api/auth/google?role=${roleParam}`;
     window.location.href = googleAuthUrl;
   };
@@ -367,11 +420,63 @@ const Login = () => {
             )}
           </div>
 
+          {/* OTP Section (Signup only) */}
+          {isSignup && (
+            <div className="space-y-3">
+              {/* If not sent, show send-otp button */}
+              {!isOtpSent ? (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={handleSendOtp}
+                  className="w-full bg-primary-100 text-primary-700 py-2 rounded-lg font-medium border border-primary-200 hover:bg-primary-200"
+                  disabled={otpLoading || !formData.email}
+                >
+                  {otpLoading ? "Sending OTP..." : "Send OTP to Email"}
+                </motion.button>
+              ) : (
+                // After sending, show OTP input and verify button
+                !isOtpVerified && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter OTP"
+                      required
+                      className="w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      className="w-1/3 bg-primary-600 text-white py-2 rounded-lg font-medium hover:bg-primary-700"
+                      disabled={otpLoading || !otp}
+                    >
+                      {otpLoading ? "Verifying..." : "Verify OTP"}
+                    </motion.button>
+                  </div>
+                )
+              )}
+              {/* Success Message */}
+              {isOtpVerified && (
+                <p className="text-sm text-green-700">
+                  Email verified! You may proceed to sign up.
+                </p>
+              )}
+            </div>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700"
+            className={`w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 ${
+              isSignup && !isOtpVerified ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isSignup && !isOtpVerified}
           >
             {isSignup ? "Create Account" : "Sign In"}
           </motion.button>
@@ -399,6 +504,9 @@ const Login = () => {
             onClick={() => {
               setIsSignup(!isSignup);
               setFormError("");
+              setOtp("");           // Reset OTP states on toggling
+              setIsOtpSent(false);
+              setIsOtpVerified(false);
             }}
             className="text-primary-600 hover:underline font-medium"
           >

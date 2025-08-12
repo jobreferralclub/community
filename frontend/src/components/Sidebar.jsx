@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import SafeIcon from "../common/SafeIcon";
@@ -22,9 +22,14 @@ const {
 const Sidebar = ({ open, setOpen }) => {
   const role = useAuthStore((state) => state.role);
   const [openSubMenu, setOpenSubMenu] = React.useState(null);
+  const [openRegion, setOpenRegion] = React.useState(null);
 
   const handleToggleSubMenu = (menuName) => {
     setOpenSubMenu(openSubMenu === menuName ? null : menuName);
+  };
+
+  const handleToggleRegion = (regionName) => {
+    setOpenRegion(openRegion === regionName ? null : regionName);
   };
 
   const menuItems = [
@@ -32,18 +37,37 @@ const Sidebar = ({ open, setOpen }) => {
     {
       name: "Community",
       icon: FiUsers,
-      path: "/community",
       children: [
-        { name: "Operations and Supply Chain Management - India", path: "/community/in/operations" },
-        { name: "Program and Project Management - India", path: "/community/in/program" },
-        { name: "Product Management - India", path: "/community/in/product" },
-        { name: "Marketing Management - India", path: "/community/in/marketing" },
-        { name: "Sales and Account Management - India", path: "/community/in/account" },
-        { name: "Operations and Supply Chain Management - US", path: "/community/us/operations" },
-        { name: "Program and Project Management - US", path: "/community/us/program" },
-        { name: "Product Management - US", path: "/community/us/product" },
-        { name: "Marketing Management - US", path: "/community/us/marketing" },
-        { name: "Sales and Account Management - US", path: "/community/us/account" },
+        {
+          name: "India",
+          children: [
+            { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
+            { name: "Program and Project Management", path: "/community/in/program" },
+            { name: "Product Management", path: "/community/in/product" },
+            { name: "Marketing Management", path: "/community/in/marketing" },
+            { name: "Sales and Account Management", path: "/community/in/account" },
+            { name: "Category and Vendor Management", path: "/community/in/category" },
+            { name: "Finance", path: "/community/in/finance" },
+            { name: "Human Resources", path: "/community/in/hr" },
+            { name: "Analytics", path: "/community/in/analyst" },
+            { name: "Strategy and Consulting", path: "/community/in/strategy" },
+          ],
+        },
+        {
+          name: "United States",
+          children: [
+            { name: "Operations and Supply Chain Management", path: "/community/us/operations" },
+            { name: "Program and Project Management", path: "/community/us/program" },
+            { name: "Product Management", path: "/community/us/product" },
+            { name: "Marketing Management", path: "/community/us/marketing" },
+            { name: "Sales and Account Management", path: "/community/us/account" },
+            { name: "Category and Vendor Management", path: "/community/us/category" },
+            { name: "Finance", path: "/community/us/finance" },
+            { name: "Human Resources", path: "/community/us/hr" },
+            { name: "Analytics", path: "/community/us/analyst" },
+            { name: "Strategy and Consulting", path: "/community/us/strategy" },
+          ],
+        },
       ],
     },
     { name: "Analytics", icon: FiBarChart3, path: "/analytics" },
@@ -56,7 +80,6 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Settings", icon: FiSettings, path: "/settings" },
   ];
 
-  // Allowed menu items for admin
   const adminOnly = [
     "Dashboard",
     "Analytics",
@@ -67,11 +90,10 @@ const Sidebar = ({ open, setOpen }) => {
     "Course Builder",
   ];
 
-  // Filter menu based on role
   const filteredMenu =
     role === "admin"
       ? menuItems
-      : menuItems.filter((item) => !adminOnly.includes(item.name)); // Non-admins see other sections
+      : menuItems.filter((item) => !adminOnly.includes(item.name));
 
   return (
     <motion.div
@@ -115,7 +137,7 @@ const Sidebar = ({ open, setOpen }) => {
         {filteredMenu.map((item) => (
           <div key={item.name}>
             <NavLink
-              to={item.path}
+              to={item.path || "#"}
               onClick={(e) => {
                 if (item.children) {
                   e.preventDefault();
@@ -152,27 +174,53 @@ const Sidebar = ({ open, setOpen }) => {
               )}
             </NavLink>
 
-            {/* Submenu items */}
+            {/* First-level submenu (Community → Regions) */}
             {item.children && openSubMenu === item.name && open && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
-                className="ml-10 mt-1 space-y-1"
+                className="ml-6 mt-1 space-y-1"
               >
-                {item.children.map((sub) => (
-                  <NavLink
-                    key={sub.name}
-                    to={sub.path}
-                    className={({ isActive }) =>
-                      `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                        isActive
-                          ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
-                          : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
-                      }`
-                    }
-                  >
-                    {sub.name}
-                  </NavLink>
+                {item.children.map((region) => (
+                  <div key={region.name}>
+                    <button
+                      onClick={() => handleToggleRegion(region.name)}
+                      className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      {region.name}
+                      <SafeIcon
+                        icon={FiChevronLeft}
+                        className={`w-4 h-4 transition-transform ${
+                          openRegion === region.name ? "rotate-90" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Second-level submenu (Regions → Job categories) */}
+                    {region.children && openRegion === region.name && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        className="ml-6 mt-1 space-y-1"
+                      >
+                        {region.children.map((sub) => (
+                          <NavLink
+                            key={sub.name}
+                            to={sub.path}
+                            className={({ isActive }) =>
+                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                isActive
+                                  ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
+                                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                              }`
+                            }
+                          >
+                            {sub.name}
+                          </NavLink>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
                 ))}
               </motion.div>
             )}
