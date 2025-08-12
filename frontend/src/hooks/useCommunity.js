@@ -56,7 +56,7 @@ export const useCommunity = () => {
       const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.name }) // or user._id
+        body: JSON.stringify({ userId: userId })
       });
       if (!res.ok) throw new Error('Failed to toggle like');
       const data = await res.json();
@@ -134,7 +134,7 @@ export const useCommunity = () => {
   const checkUserLike = (postId) => {
     try {
       const post = posts.find(p => p._id === postId);
-      return post?.likedBy?.includes(user.name); // or user._id
+      return post?.likedBy?.includes(userId); // or user._id
     } catch {
       return false;
     }

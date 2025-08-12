@@ -469,6 +469,8 @@ const Login = () => {
             </div>
           )}
 
+
+          {/* Create Account / Sign up button*/}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

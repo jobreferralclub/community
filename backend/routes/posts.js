@@ -37,17 +37,33 @@ router.post('/', async (req, res) => {
 router.patch('/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.body; // make sure userId is passed in request body
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
-    post.likes += 1; // always increment by 1
+    const userIndex = post.likedBy.indexOf(userId);
+
+    if (userIndex === -1) {
+      // User has not liked yet → like the post
+      post.likedBy.push(userId);
+      post.likes = post.likedBy.length;
+    } else {
+      // User already liked → unlike the post
+      post.likedBy.splice(userIndex, 1);
+      post.likes = post.likedBy.length;
+    }
 
     await post.save();
     res.json(post);
+
   } catch (error) {
     console.error('Error toggling like:', error);
-    res.status(500).json({ error: 'Failed to like post' });
+    res.status(500).json({ error: 'Failed to toggle like' });
   }
 });
 

@@ -18,6 +18,65 @@ const Community = () => {
     loadPosts(); // 👈 Fetch from backend on mount
   }, [loadPosts]);
 
+  const subCommunities = [
+    {
+      path: '/community/in/operations',
+      title: 'Operations & Supply Chain - India',
+      subtitle: 'Discuss, share, and grow in the world of operations and supply chain management.'
+    },
+    {
+      path: '/community/in/program',
+      title: 'Program & Project Management - India',
+      subtitle: 'Collaborate, learn, and share experiences in program and project management.'
+    },
+    {
+      path: '/community/in/product',
+      title: 'Product Management - India',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+    {
+      path: '/community/in/marketing',
+      title: 'Marketing Management - India',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+    {
+      path: '/community/in/account',
+      title: 'Sales and Account Management - India',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+    {
+      path: '/community/us/operations',
+      title: 'Operations & Supply Chain - US',
+      subtitle: 'Discuss, share, and grow in the world of operations and supply chain management.'
+    },
+    {
+      path: '/community/us/program',
+      title: 'Program & Project Management - US',
+      subtitle: 'Collaborate, learn, and share experiences in program and project management.'
+    },
+    {
+      path: '/community/us/product',
+      title: 'Product Management - US',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+    {
+      path: '/community/us/marketing',
+      title: 'Marketing Management - US',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+    {
+      path: '/community/us/account',
+      title: 'Sales and Account Management - US',
+      subtitle: 'Insights, discussions, and networking for product managers.'
+    },
+  ];
+
+  const currentCommunity =
+    subCommunities.find(c => location.pathname.startsWith(c.path)) || {
+      title: 'Community',
+      subtitle: 'Connect, share, and grow together'
+    };
+
   const filters = [
     { id: 'all', name: 'All Posts', count: posts.length },
     { id: 'job-posting', name: 'Job Postings', count: posts.filter(p => p.type === 'job-posting').length },
@@ -25,15 +84,21 @@ const Community = () => {
     { id: 'discussion', name: 'Discussions', count: posts.filter(p => p.type === 'discussion').length },
   ];
 
-  const filteredPosts = filter === 'all' ? posts : posts.filter(post => post.type === filter);
+  const filteredPosts = posts.filter(post => {
+    const matchesCommunity = currentCommunity.path
+      ? post.community === currentCommunity.title
+      : true;
+    const matchesType = filter === 'all' || post.type === filter;
+    return matchesCommunity && matchesType;
+  });
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Community</h1>
-          <p className="text-gray-600 mt-1">Connect, share, and grow together</p>
+          <h1 className="text-2xl font-bold text-gray-900">{currentCommunity.title}</h1>
+          <p className="text-gray-600 mt-1">{currentCommunity.subtitle}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -70,11 +135,10 @@ const Community = () => {
                 <button
                   key={filterOption.id}
                   onClick={() => setFilter(filterOption.id)}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    filter === filterOption.id
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
                       ? 'bg-primary-100 text-primary-700'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                    }`}
                 >
                   {filterOption.name} ({filterOption.count})
                 </button>
@@ -108,17 +172,24 @@ const Community = () => {
 
       {/* Posts */}
       <div className="space-y-6">
-        {filteredPosts.map((post, index) => (
-          <motion.div
-            key={post._id || post.id} // support both local and backend IDs
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <PostCard post={post} />
-          </motion.div>
-        ))}
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post, index) => (
+            <motion.div
+              key={post._id || post.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <PostCard post={post} />
+            </motion.div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 py-10">
+            No posts to display in this community.
+          </div>
+        )}
       </div>
+
 
       {/* Create Post Modal */}
       {showCreatePost && (

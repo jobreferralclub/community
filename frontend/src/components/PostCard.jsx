@@ -5,6 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import { useCommunity } from '../hooks/useCommunity';
 import CommentModal from './CommentModal';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/authStore';
 
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
@@ -148,7 +149,7 @@ const PostCard = ({ post }) => {
             <div>
               <h4 className="font-semibold text-gray-900">{post.author}</h4>
               <p className="text-sm text-gray-500">
-                {post.timestamp || new Date(post.created_at).toLocaleDateString()}
+                {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
