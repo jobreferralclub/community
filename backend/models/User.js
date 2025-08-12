@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     default: 'member',
     required: true
   },
+  avatar: {
+    type: String, // Store image URL or file path
+    default: null, // Default avatar
+    trim: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

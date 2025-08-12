@@ -4,6 +4,7 @@ import SafeIcon from "../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useCommunity } from "../hooks/useCommunity";
 import { useAuthStore } from "../store/authStore";
+import { formatDistanceToNow } from "date-fns"; // for human-readable dates
 
 const { FiX, FiSend, FiMessageCircle } = FiIcons;
 
@@ -54,17 +55,26 @@ const CommentModal = ({ post, onClose }) => {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center space-x-2">
-            <SafeIcon
-              icon={FiMessageCircle}
-              className="w-5 h-5 text-primary-600"
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0 bg-gray-50">
+          <div className="flex items-center space-x-3">
+            <img
+              src={
+                post.avatar ||
+                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+              }
+              alt={post.author}
+              className="w-10 h-10 rounded-full object-cover"
             />
-            <h2 className="text-lg font-semibold text-gray-900">Comments</h2>
+            <div>
+              <span className="font-semibold text-gray-900 block">{post.author}</span>
+              <span className="text-xs text-gray-500">
+                {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -75,29 +85,13 @@ const CommentModal = ({ post, onClose }) => {
         </div>
 
         {/* Post Preview */}
-        <div className="p-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          <div className="flex items-start space-x-3">
-            <img
-              src={
-                post.avatar ||
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
-              }
-              alt={post.author}
-              className="w-10 h-10 rounded-full object-cover"
-            />
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 truncate">
-                {post.title}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                {post.content}
-              </p>
-            </div>
-          </div>
+        <div className="p-6 border-b border-gray-200 bg-white flex-shrink-0">
+          <h3 className="font-bold text-lg text-gray-900">{post.title}</h3>
+          <p className="text-sm text-gray-700 mt-2">{post.content}</p>
         </div>
 
-        {/* Comments List - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
+        {/* Comments List */}
+        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -108,9 +102,7 @@ const CommentModal = ({ post, onClose }) => {
                 icon={FiMessageCircle}
                 className="w-12 h-12 text-gray-300 mx-auto mb-3"
               />
-              <p className="text-gray-500">
-                No comments yet. Be the first to comment!
-              </p>
+              <p className="text-gray-500">No comments yet. Be the first to comment!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -125,15 +117,18 @@ const CommentModal = ({ post, onClose }) => {
                     className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="bg-gray-100 rounded-lg p-3 relative">
-                      <p className="text-sm font-medium text-gray-900">
-                        {comment.author || "Anonymous User"}
-                      </p>
-                      <p className="text-sm text-gray-700 mt-1">
-                        {comment.content}
-                      </p>
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm relative">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-gray-900">
+                          {comment.author || "Anonymous User"}
+                        </p>
+                        <span className="text-xs text-gray-400">
+                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
 
-                      {/* Delete button for the comment's author */}
+                      {/* Delete button */}
                       {comment.author === user.name && (
                         <button
                           onClick={async () => {
@@ -144,9 +139,9 @@ const CommentModal = ({ post, onClose }) => {
                               );
                             }
                           }}
-                          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xs"
+                          className="absolute bottom-2 right-2 text-gray-400 hover:text-red-500 text-xs"
                         >
-                          Delete
+                          <FiIcons.FiTrash/>
                         </button>
                       )}
                     </div>
@@ -157,40 +152,31 @@ const CommentModal = ({ post, onClose }) => {
           )}
         </div>
 
-        {/* Comment Input - Fixed at bottom */}
-        <div className="p-6 border-t border-gray-200 bg-white flex-shrink-0">
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="flex items-start space-x-3">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Write a comment..."
-                  rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                  disabled={submitting}
-                />
-              </div>
-            </div>
-
-            {/* Button Row */}
-            <div className="flex justify-end">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={!newComment.trim() || submitting}
-                className="flex items-center space-x-2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-600"
-              >
-                <SafeIcon icon={FiSend} className="w-4 h-4" />
-                <span>{submitting ? "Posting..." : "Post"}</span>
-              </motion.button>
-            </div>
+        {/* Comment Input */}
+        <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+          <form onSubmit={handleSubmit} className="flex items-center space-x-3 w-full">
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            />
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Write a comment..."
+              rows={1}
+              className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+              disabled={submitting}
+            />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={!newComment.trim() || submitting}
+              className="flex items-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+            >
+              <SafeIcon icon={FiSend} className="w-4 h-4" />
+            </motion.button>
           </form>
         </div>
       </motion.div>

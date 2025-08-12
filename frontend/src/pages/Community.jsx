@@ -19,6 +19,7 @@ const Community = () => {
   }, [loadPosts]);
 
   const subCommunities = [
+    // India
     {
       path: '/community/in/operations',
       title: 'Operations & Supply Chain - India',
@@ -37,13 +38,40 @@ const Community = () => {
     {
       path: '/community/in/marketing',
       title: 'Marketing Management - India',
-      subtitle: 'Insights, discussions, and networking for product managers.'
+      subtitle: 'Strategies, trends, and discussions for marketing professionals.'
     },
     {
       path: '/community/in/account',
       title: 'Sales and Account Management - India',
-      subtitle: 'Insights, discussions, and networking for product managers.'
+      subtitle: 'Techniques, networking, and advice for sales and account managers.'
     },
+    {
+      path: '/community/in/category',
+      title: 'Category and Vendor Management - India',
+      subtitle: 'Best practices, strategies, and discussions for category and vendor managers.'
+    },
+    {
+      path: '/community/in/finance',
+      title: 'Finance - India',
+      subtitle: 'Finance insights, trends, and professional discussions.'
+    },
+    {
+      path: '/community/in/hr',
+      title: 'Human Resources - India',
+      subtitle: 'HR trends, recruitment strategies, and workplace management.'
+    },
+    {
+      path: '/community/in/analyst',
+      title: 'Analytics - India',
+      subtitle: 'Data analytics discussions, tools, and insights.'
+    },
+    {
+      path: '/community/in/strategy',
+      title: 'Strategy and Consulting - India',
+      subtitle: 'Business strategies, consulting insights, and industry best practices.'
+    },
+
+    // United States
     {
       path: '/community/us/operations',
       title: 'Operations & Supply Chain - US',
@@ -62,14 +90,40 @@ const Community = () => {
     {
       path: '/community/us/marketing',
       title: 'Marketing Management - US',
-      subtitle: 'Insights, discussions, and networking for product managers.'
+      subtitle: 'Strategies, trends, and discussions for marketing professionals.'
     },
     {
       path: '/community/us/account',
       title: 'Sales and Account Management - US',
-      subtitle: 'Insights, discussions, and networking for product managers.'
+      subtitle: 'Techniques, networking, and advice for sales and account managers.'
     },
+    {
+      path: '/community/us/category',
+      title: 'Category and Vendor Management - US',
+      subtitle: 'Best practices, strategies, and discussions for category and vendor managers.'
+    },
+    {
+      path: '/community/us/finance',
+      title: 'Finance - US',
+      subtitle: 'Finance insights, trends, and professional discussions.'
+    },
+    {
+      path: '/community/us/hr',
+      title: 'Human Resources - US',
+      subtitle: 'HR trends, recruitment strategies, and workplace management.'
+    },
+    {
+      path: '/community/us/analyst',
+      title: 'Analytics - US',
+      subtitle: 'Data analytics discussions, tools, and insights.'
+    },
+    {
+      path: '/community/us/strategy',
+      title: 'Strategy and Consulting - US',
+      subtitle: 'Business strategies, consulting insights, and industry best practices.'
+    }
   ];
+
 
   const currentCommunity =
     subCommunities.find(c => location.pathname.startsWith(c.path)) || {
@@ -136,8 +190,8 @@ const Community = () => {
                   key={filterOption.id}
                   onClick={() => setFilter(filterOption.id)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-primary-100 text-primary-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                 >
                   {filterOption.name} ({filterOption.count})

@@ -8,6 +8,7 @@ export const useCommunity = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
+  const userId = user?._id || user?.id; // Adjust based on your auth store
 
   useEffect(() => {
     fetchPosts();
@@ -134,7 +135,7 @@ export const useCommunity = () => {
   const checkUserLike = (postId) => {
     try {
       const post = posts.find(p => p._id === postId);
-      return post?.likedBy?.includes(userId); // or user._id
+      return post?.likedBy?.includes(user._id); // or user._id
     } catch {
       return false;
     }

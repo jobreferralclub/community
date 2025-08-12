@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import SafeIcon from '../common/SafeIcon';
@@ -10,27 +11,41 @@ import { useAuthStore } from '../store/authStore';
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
 const PostCard = ({ post }) => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const postIdFromUrl = queryParams.get('postid');
+
   const [liked, setLiked] = useState(post.likedByUser || false);
   const [showComments, setShowComments] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
   const [commentCount, setCommentCount] = useState(post.comments || 0);
   const { toggleLike } = useCommunity();
+  const { user } = useAuthStore();
+
+  // If postid in URL matches this post, open comments modal
+  useEffect(() => {
+    if (postIdFromUrl && postIdFromUrl === post._id) {
+      setShowComments(true);
+    }
+  }, [postIdFromUrl, post._id]);
 
   useEffect(() => {
-    setLiked(post.likedByUser || false);
+    if (postIdFromUrl && postIdFromUrl === post._id) {
+      setShowComments(true);
+    }
+
+    setLiked(post.likedBy?.includes(user?._id) || false);
     setLikeCount(post.likes || 0);
     setCommentCount(post.comments || 0);
-  }, [post]);
+  }, [post, user?._id, postIdFromUrl, post._id]);
 
   const handleLike = async () => {
     try {
       const wasLiked = liked;
       setLiked(!liked);
       setLikeCount(prev => wasLiked ? prev - 1 : prev + 1);
-      
       await toggleLike(post._id);
     } catch (error) {
-      // Revert optimistic update on error
       setLiked(liked);
       setLikeCount(prev => liked ? prev + 1 : prev - 1);
       console.error('Error toggling like:', error);
@@ -39,10 +54,13 @@ const PostCard = ({ post }) => {
 
   const handleShare = async () => {
     try {
+      // Get the current page's base URL and append postId
+      const postUrl = `${window.location.origin}${window.location.pathname}?postid=${post._id}`;
+
       const shareContent = {
         title: post.title,
         text: `${post.title}\n\n${post.content}`,
-        url: window.location.href
+        url: postUrl
       };
 
       if (navigator.share && navigator.canShare && navigator.canShare(shareContent)) {
@@ -51,24 +69,16 @@ const PostCard = ({ post }) => {
           toast.success('Post shared successfully!');
           return;
         } catch (shareError) {
-          if (shareError.name === 'AbortError') {
-            return;
-          }
+          if (shareError.name === 'AbortError') return;
           console.warn('Web Share API failed:', shareError);
         }
       }
 
-      // Fallback to clipboard
-      const textToShare = `${post.title}\n\n${post.content}\n\nShared from JobReferral.Club\n${window.location.href}`;
-      
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        try {
-          await navigator.clipboard.writeText(textToShare);
-          toast.success('Post content copied to clipboard!');
-        } catch (clipboardError) {
-          console.warn('Clipboard API failed:', clipboardError);
-          fallbackCopyToClipboard(textToShare);
-        }
+      // Fallback: copy text to clipboard
+      const textToShare = `${post.title}\n\n${post.content}\n\nShared from JobReferral.Club\n${postUrl}`;
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(textToShare);
+        toast.success('Post content copied to clipboard!');
       } else {
         fallbackCopyToClipboard(textToShare);
       }
@@ -78,6 +88,7 @@ const PostCard = ({ post }) => {
     }
   };
 
+
   const fallbackCopyToClipboard = (text) => {
     try {
       const textArea = document.createElement('textarea');
@@ -86,41 +97,14 @@ const PostCard = ({ post }) => {
       textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';
       document.body.appendChild(textArea);
-      textArea.focus();
       textArea.select();
-      
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
-      
-      if (successful) {
-        toast.success('Post content copied to clipboard!');
-      } else {
-        throw new Error('Copy command failed');
-      }
+      if (successful) toast.success('Post content copied to clipboard!');
+      else throw new Error('Copy command failed');
     } catch (err) {
       console.error('Fallback copy failed:', err);
-      showManualCopyInstructions(text);
     }
-  };
-
-  const showManualCopyInstructions = (text) => {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50';
-    modal.innerHTML = `
-      <div class="bg-white rounded-xl p-6 max-w-md w-full">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Copy Post Content</h3>
-        <textarea readonly class="w-full p-3 border border-gray-300 rounded-lg h-32 text-sm" onclick="this.select()">${text}</textarea>
-        <div class="flex justify-end mt-4">
-          <button onclick="this.closest('.fixed').remove()" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">Close</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    
-    const textarea = modal.querySelector('textarea');
-    textarea.focus();
-    textarea.select();
-    toast('Please manually copy the selected text', { duration: 3000 });
   };
 
   const getPostTypeColor = (type) => {
@@ -170,13 +154,10 @@ const PostCard = ({ post }) => {
         </div>
 
         {/* Tags */}
-        {post.tags && post.tags.length > 0 && (
+        {post.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-sm hover:bg-gray-200 cursor-pointer transition-colors"
-              >
+              <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-sm">
                 #{tag}
               </span>
             ))}
@@ -190,9 +171,7 @@ const PostCard = ({ post }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLike}
-              className={`flex items-center space-x-2 transition-colors ${
-                liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-              }`}
+              className={`flex items-center space-x-2 transition-colors ${liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'}`}
             >
               <SafeIcon icon={FiHeart} className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
               <span className="text-sm font-medium">{likeCount}</span>
@@ -202,7 +181,7 @@ const PostCard = ({ post }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowComments(true)}
-              className="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors"
+              className="flex items-center space-x-2 text-gray-500 hover:text-blue-600"
             >
               <SafeIcon icon={FiMessageCircle} className="w-5 h-5" />
               <span className="text-sm font-medium">{commentCount}</span>
@@ -212,7 +191,7 @@ const PostCard = ({ post }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleShare}
-              className="flex items-center space-x-2 text-gray-500 hover:text-green-600 transition-colors"
+              className="flex items-center space-x-2 text-gray-500 hover:text-green-600"
             >
               <SafeIcon icon={FiShare2} className="w-5 h-5" />
               <span className="text-sm font-medium">Share</span>
@@ -223,10 +202,7 @@ const PostCard = ({ post }) => {
 
       {/* Comments Modal */}
       {showComments && (
-        <CommentModal
-          post={post}
-          onClose={() => setShowComments(false)}
-        />
+        <CommentModal post={post} onClose={() => setShowComments(false)} />
       )}
     </>
   );

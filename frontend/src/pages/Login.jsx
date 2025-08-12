@@ -35,7 +35,7 @@ const Login = () => {
   const location = useLocation();
 
   const searchParams = new URLSearchParams(location.search);
-  const roleParam = searchParams.get("role") || "member";
+  const roleParam = searchParams.get("accountRole") || "member";
 
   // Fetch companies list (for recruiter, tpo roles)
   useEffect(() => {
@@ -183,7 +183,7 @@ const Login = () => {
       login({
         ...data,
         role: roleParam,
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        avatar: "/default-avatar.jpg",
         points: 2450,
         badges: ["Top Referrer", "Community Helper", "Mentor"],
         tier: "premium",
