@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
-  title: String,
-  content: String,
+  title: { type: String, required: true },
+  content: { type: String, required: true },
   tags: [String],
+  links: [String], // ✅ added in case posts have links
+  imageUrl: { type: String, default: '' }, // ✅ added so uploaded image URL is saved
   author: String,
   avatar: String,
   createdAt: {

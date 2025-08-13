@@ -22,7 +22,6 @@ const PostCard = ({ post }) => {
   const { toggleLike } = useCommunity();
   const { user } = useAuthStore();
 
-  // If postid in URL matches this post, open comments modal
   useEffect(() => {
     if (postIdFromUrl && postIdFromUrl === post._id) {
       setShowComments(true);
@@ -33,7 +32,6 @@ const PostCard = ({ post }) => {
     if (postIdFromUrl && postIdFromUrl === post._id) {
       setShowComments(true);
     }
-
     setLiked(post.likedBy?.includes(user?._id) || false);
     setLikeCount(post.likes || 0);
     setCommentCount(post.comments || 0);
@@ -43,25 +41,19 @@ const PostCard = ({ post }) => {
     try {
       const wasLiked = liked;
       setLiked(!liked);
-      setLikeCount(prev => wasLiked ? prev - 1 : prev + 1);
+      setLikeCount(prev => (wasLiked ? prev - 1 : prev + 1));
       await toggleLike(post._id);
     } catch (error) {
       setLiked(liked);
-      setLikeCount(prev => liked ? prev + 1 : prev - 1);
+      setLikeCount(prev => (liked ? prev + 1 : prev - 1));
       console.error('Error toggling like:', error);
     }
   };
 
   const handleShare = async () => {
     try {
-      // Get the current page's base URL and append postId
       const postUrl = `${window.location.origin}${window.location.pathname}?postid=${post._id}`;
-
-      const shareContent = {
-        title: post.title,
-        text: `${post.title}\n\n${post.content}`,
-        url: postUrl
-      };
+      const shareContent = { title: post.title, text: `${post.title}\n\n${post.content}`, url: postUrl };
 
       if (navigator.share && navigator.canShare && navigator.canShare(shareContent)) {
         try {
@@ -74,7 +66,6 @@ const PostCard = ({ post }) => {
         }
       }
 
-      // Fallback: copy text to clipboard
       const textToShare = `${post.title}\n\n${post.content}\n\nShared from JobReferral.Club\n${postUrl}`;
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(textToShare);
@@ -87,7 +78,6 @@ const PostCard = ({ post }) => {
       toast.error('Failed to share post. Please try again.');
     }
   };
-
 
   const fallbackCopyToClipboard = (text) => {
     try {
@@ -152,6 +142,17 @@ const PostCard = ({ post }) => {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
           <p className="text-gray-700">{post.content}</p>
         </div>
+
+        {/* Image Preview - FIXED STYLES */}
+        {post.imageUrl && (
+          <div className="mb-4 relative overflow-visible">
+            <img
+              src={post.imageUrl}
+              alt="Post attachment"
+              className="block w-full max-h-96 object-contain rounded-lg border border-gray-300"
+            />
+          </div>
+        )}
 
         {/* Tags */}
         {post.tags?.length > 0 && (

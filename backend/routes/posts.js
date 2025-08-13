@@ -7,6 +7,7 @@ const router = express.Router();
 // Get all posts
 router.get('/', async (req, res) => {
   try {
+    // Return newest first
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
@@ -18,6 +19,7 @@ router.get('/', async (req, res) => {
 // Create new post
 router.post('/', async (req, res) => {
   try {
+    // req.body should now include imageUrl from frontend
     const post = new Post({
       ...req.body,
       likes: 0,
@@ -25,6 +27,7 @@ router.post('/', async (req, res) => {
       likedBy: [],
       createdAt: new Date()
     });
+
     const saved = await post.save();
     res.status(201).json(saved);
   } catch (error) {
@@ -37,7 +40,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId } = req.body; // make sure userId is passed in request body
+    const { userId } = req.body;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
@@ -47,13 +50,12 @@ router.patch('/:id/like', async (req, res) => {
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
     const userIndex = post.likedBy.indexOf(userId);
-
     if (userIndex === -1) {
-      // User has not liked yet → like the post
+      // Like
       post.likedBy.push(userId);
       post.likes = post.likedBy.length;
     } else {
-      // User already liked → unlike the post
+      // Unlike
       post.likedBy.splice(userIndex, 1);
       post.likes = post.likedBy.length;
     }
@@ -94,7 +96,7 @@ router.post('/:postId/comments', async (req, res) => {
 
     const savedComment = await comment.save();
 
-    // Increment comment count in post
+    // Increment comment count
     await Post.findByIdAndUpdate(postId, { $inc: { comments: 1 } });
 
     res.status(201).json(savedComment);
@@ -109,7 +111,7 @@ router.delete('/comments/:commentId', async (req, res) => {
   try {
     const { commentId } = req.params;
 
-    // Find the comment first to get its postId
+    // Get comment to know postId
     const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ error: 'Comment not found' });
@@ -118,7 +120,7 @@ router.delete('/comments/:commentId', async (req, res) => {
     // Delete the comment
     await Comment.findByIdAndDelete(commentId);
 
-    // Decrement comment count on the related post
+    // Decrement related post's comment count
     await Post.findByIdAndUpdate(comment.postId, { $inc: { comments: -1 } });
 
     res.json({ message: 'Comment deleted successfully', deleted: comment });
@@ -127,6 +129,5 @@ router.delete('/comments/:commentId', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete comment' });
   }
 });
-
 
 export default router;

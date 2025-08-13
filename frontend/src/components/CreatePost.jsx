@@ -30,13 +30,90 @@ const CreatePost = ({ onClose }) => {
     content: '',
     type: 'discussion',
     tags: [],
+    links: [],
+    imageUrl: '',
     community: currentCommunity ? currentCommunity.title : ''
   });
-  
+
   const [tagInput, setTagInput] = useState('');
+  const [linkInput, setLinkInput] = useState('');
   const { addPost } = useCommunityStore();
   const { user } = useAuthStore();
 
+  // ===== Tag Handling =====
+  const addTag = () => {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tagInput.trim()]
+      }));
+      setTagInput('');
+    }
+  };
+  const removeTag = (tag) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(t => t !== tag)
+    }));
+  };
+
+  // ===== Link Handling =====
+  const addLink = () => {
+    const url = linkInput.trim();
+    try {
+      new URL(url);
+      if (url && !formData.links.includes(url)) {
+        setFormData(prev => ({
+          ...prev,
+          links: [...prev.links, url]
+        }));
+        setLinkInput('');
+      }
+    } catch {
+      alert('Invalid URL');
+    }
+  };
+  const removeLink = (link) => {
+    setFormData(prev => ({
+      ...prev,
+      links: prev.links.filter(l => l !== link)
+    }));
+  };
+
+  // ===== Image Handling (Actual Upload to Backend) =====
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataObj = new FormData();
+    formDataObj.append('image', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/upload', {  // Change to your backend URL
+        method: 'POST',
+        body: formDataObj,
+      });
+      const data = await response.json();
+
+      if (data.success && data.imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: data.imageUrl, // The URL returned from backend
+        }));
+      } else {
+        alert('Image upload failed.');
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert('Could not upload image. Try again.');
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, imageUrl: '' }));
+  };
+
+  // ===== Submission =====
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addPost({
@@ -47,26 +124,10 @@ const CreatePost = ({ onClose }) => {
     onClose();
   };
 
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, tagInput.trim()]
-      });
-      setTagInput('');
-    }
-  };
-
-  const removeTag = (tag) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter(t => t !== tag)
-    });
-  };
-
   return (
     <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <motion.div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900">Create New Post</h2>
@@ -76,6 +137,7 @@ const CreatePost = ({ onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          
           {/* Post Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Post Type</label>
@@ -90,7 +152,7 @@ const CreatePost = ({ onClose }) => {
             </select>
           </div>
 
-          {/* Community - Auto-selected based on URL */}
+          {/* Community */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Community</label>
             <input
@@ -142,11 +204,7 @@ const CreatePost = ({ onClose }) => {
                   placeholder="Add tags..."
                 />
               </div>
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
+              <button type="button" onClick={addTag} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                 Add
               </button>
             </div>
@@ -162,16 +220,68 @@ const CreatePost = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Media Options */}
-          <div className="flex items-center space-x-4 py-3 border-t border-gray-200">
-            <button type="button" className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors">
+          {/* Links */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Links</label>
+            <div className="flex items-center space-x-2 mb-3">
+              <input
+                type="text"
+                value={linkInput}
+                onChange={(e) => setLinkInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addLink())}
+                placeholder="Add link (https://...)"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={addLink}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.links.map(link => (
+                <span key={link} className="flex items-center space-x-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
+                  <a href={link} target="_blank" rel="noopener noreferrer" className="underline">{link}</a>
+                  <button type="button" onClick={() => removeLink(link)} className="hover:bg-primary-200 rounded-full p-1">
+                    <SafeIcon icon={FiX} className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              id="image-upload"
+              style={{ display: 'none' }}
+              onChange={handleImageChange}
+            />
+            <button
+              type="button"
+              onClick={() => document.getElementById('image-upload').click()}
+              className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors"
+            >
               <SafeIcon icon={FiImage} className="w-5 h-5" />
               <span className="text-sm">Add Image</span>
             </button>
-            <button type="button" className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors">
-              <SafeIcon icon={FiLink} className="w-5 h-5" />
-              <span className="text-sm">Add Link</span>
-            </button>
+            {formData.imageUrl && (
+              <div className="mt-3 relative">
+                <img src={formData.imageUrl} alt="Preview" className="w-full rounded-lg border" />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow"
+                >
+                  <SafeIcon icon={FiX} className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
