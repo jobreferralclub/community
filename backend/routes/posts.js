@@ -4,10 +4,12 @@ import Comment from '../models/Comment.js';
 
 const router = express.Router();
 
-// Get all posts
+/**
+ * @route GET /api/posts
+ * @desc Get all posts (newest first)
+ */
 router.get('/', async (req, res) => {
   try {
-    // Return newest first
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
@@ -16,12 +18,39 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Create new post
+/**
+ * @route POST /api/posts
+ * @desc Create a new post
+ */
 router.post('/', async (req, res) => {
   try {
-    // req.body should now include imageUrl from frontend
+    // Destructure and normalize/validate incoming fields
+    let { tags, links, imageUrl, ...rest } = req.body;
+
+    // Ensure tags is always an array of clean strings
+    if (typeof tags === 'string') {
+      tags = tags.split(',').map(t => t.trim()).filter(Boolean);
+    } else if (!Array.isArray(tags)) {
+      tags = [];
+    }
+
+    // Ensure links is always an array of clean strings
+    if (typeof links === 'string') {
+      links = links.split(',').map(l => l.trim()).filter(Boolean);
+    } else if (!Array.isArray(links)) {
+      links = [];
+    }
+
+    // Ensure imageUrl is always a string
+    if (typeof imageUrl !== 'string') {
+      imageUrl = '';
+    }
+
     const post = new Post({
-      ...req.body,
+      ...rest,
+      tags,
+      links,
+      imageUrl,
       likes: 0,
       comments: 0,
       likedBy: [],
@@ -36,7 +65,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Toggle like on a post
+/**
+ * @route PATCH /api/posts/:id/like
+ * @desc Toggle like on a post
+ */
 router.patch('/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
@@ -50,26 +82,29 @@ router.patch('/:id/like', async (req, res) => {
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
     const userIndex = post.likedBy.indexOf(userId);
+
     if (userIndex === -1) {
       // Like
       post.likedBy.push(userId);
-      post.likes = post.likedBy.length;
     } else {
       // Unlike
       post.likedBy.splice(userIndex, 1);
-      post.likes = post.likedBy.length;
     }
+
+    post.likes = post.likedBy.length;
 
     await post.save();
     res.json(post);
-
   } catch (error) {
     console.error('Error toggling like:', error);
     res.status(500).json({ error: 'Failed to toggle like' });
   }
 });
 
-// Get comments for a post
+/**
+ * @route GET /api/posts/:postId/comments
+ * @desc Get comments for a post
+ */
 router.get('/:postId/comments', async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId }).sort({ createdAt: 1 });
@@ -80,7 +115,10 @@ router.get('/:postId/comments', async (req, res) => {
   }
 });
 
-// Add a comment to a post
+/**
+ * @route POST /api/posts/:postId/comments
+ * @desc Add a comment to a post
+ */
 router.post('/:postId/comments', async (req, res) => {
   try {
     const { content, author, avatar } = req.body;
@@ -106,18 +144,19 @@ router.post('/:postId/comments', async (req, res) => {
   }
 });
 
-// Delete a comment
+/**
+ * @route DELETE /api/posts/comments/:commentId
+ * @desc Delete a comment from a post
+ */
 router.delete('/comments/:commentId', async (req, res) => {
   try {
     const { commentId } = req.params;
 
-    // Get comment to know postId
     const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ error: 'Comment not found' });
     }
 
-    // Delete the comment
     await Comment.findByIdAndDelete(commentId);
 
     // Decrement related post's comment count

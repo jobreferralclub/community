@@ -1,13 +1,34 @@
 import mongoose from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  tags: [String],
-  links: [String], // ✅ added in case posts have links
-  imageUrl: { type: String, default: '' }, // ✅ added so uploaded image URL is saved
-  author: String,
-  avatar: String,
+  title: { 
+    type: String, 
+    required: true 
+  },
+  content: { 
+    type: String, 
+    required: true 
+  },
+  tags: {
+    type: [String],
+    default: []
+  },
+  links: {
+    type: [String], // Stores useful resource links
+    default: []
+  },
+  imageUrl: { 
+    type: String, 
+    default: '' // Stores uploaded image URL from backend
+  },
+  author: { 
+    type: String, 
+    default: '' 
+  },
+  avatar: { 
+    type: String, 
+    default: '' 
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -36,5 +57,9 @@ const PostSchema = new mongoose.Schema({
     default: null
   }
 });
+
+// Create index for better search performance on tags & type
+PostSchema.index({ tags: 1 });
+PostSchema.index({ type: 1, createdAt: -1 });
 
 export default mongoose.model('Post', PostSchema);

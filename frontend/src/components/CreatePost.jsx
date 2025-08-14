@@ -42,10 +42,11 @@ const CreatePost = ({ onClose }) => {
 
   // ===== Tag Handling =====
   const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+    const newTag = tagInput.trim();
+    if (newTag && !formData.tags.includes(newTag)) {
       setFormData(prev => ({
         ...prev,
-        tags: [...prev.tags, tagInput.trim()]
+        tags: [...prev.tags, newTag]
       }));
       setTagInput('');
     }
@@ -61,7 +62,7 @@ const CreatePost = ({ onClose }) => {
   const addLink = () => {
     const url = linkInput.trim();
     try {
-      new URL(url);
+      new URL(url); // validate
       if (url && !formData.links.includes(url)) {
         setFormData(prev => ({
           ...prev,
@@ -70,7 +71,7 @@ const CreatePost = ({ onClose }) => {
         setLinkInput('');
       }
     } catch {
-      alert('Invalid URL');
+      alert('Invalid URL. Please include full format like https://example.com');
     }
   };
   const removeLink = (link) => {
@@ -80,7 +81,7 @@ const CreatePost = ({ onClose }) => {
     }));
   };
 
-  // ===== Image Handling (Actual Upload to Backend) =====
+  // ===== Image Handling =====
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -89,7 +90,7 @@ const CreatePost = ({ onClose }) => {
     formDataObj.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/upload', {  // Change to your backend URL
+      const response = await fetch('http://localhost:5000/api/upload', { // Change if needed
         method: 'POST',
         body: formDataObj,
       });
@@ -98,7 +99,7 @@ const CreatePost = ({ onClose }) => {
       if (data.success && data.imageUrl) {
         setFormData(prev => ({
           ...prev,
-          imageUrl: data.imageUrl, // The URL returned from backend
+          imageUrl: data.imageUrl,
         }));
       } else {
         alert('Image upload failed.');
@@ -118,8 +119,8 @@ const CreatePost = ({ onClose }) => {
     e.preventDefault();
     await addPost({
       ...formData,
-      author: user.name,
-      avatar: user.avatar,
+      author: user?.name,
+      avatar: user?.avatar,
     });
     onClose();
   };
@@ -137,7 +138,6 @@ const CreatePost = ({ onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
           {/* Post Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Post Type</label>
@@ -199,12 +199,21 @@ const CreatePost = ({ onClose }) => {
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Add tags..."
                 />
               </div>
-              <button type="button" onClick={addTag} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
                 Add
               </button>
             </div>
@@ -228,7 +237,12 @@ const CreatePost = ({ onClose }) => {
                 type="text"
                 value={linkInput}
                 onChange={(e) => setLinkInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addLink())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addLink();
+                  }
+                }}
                 placeholder="Add link (https://...)"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
@@ -241,7 +255,7 @@ const CreatePost = ({ onClose }) => {
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {formData.links.map(link => (
+              {formData.links.map((link) => (
                 <span key={link} className="flex items-center space-x-1 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm">
                   <a href={link} target="_blank" rel="noopener noreferrer" className="underline">{link}</a>
                   <button type="button" onClick={() => removeLink(link)} className="hover:bg-primary-200 rounded-full p-1">
@@ -286,7 +300,11 @@ const CreatePost = ({ onClose }) => {
 
           {/* Actions */}
           <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
               Cancel
             </button>
             <motion.button

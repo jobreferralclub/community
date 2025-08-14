@@ -143,7 +143,7 @@ const PostCard = ({ post }) => {
           <p className="text-gray-700">{post.content}</p>
         </div>
 
-        {/* Image Preview - FIXED STYLES */}
+        {/* Image Preview */}
         {post.imageUrl && (
           <div className="mb-4 relative overflow-visible">
             <img
@@ -161,6 +161,23 @@ const PostCard = ({ post }) => {
               <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-sm">
                 #{tag}
               </span>
+            ))}
+          </div>
+        )}
+
+        {/* Links */}
+        {post.links?.length > 0 && (
+          <div className="flex flex-col gap-1 mb-4">
+            {post.links.map((link) => (
+              <a
+                key={link}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline break-all text-sm"
+              >
+                {link}
+              </a>
             ))}
           </div>
         )}
