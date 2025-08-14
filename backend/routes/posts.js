@@ -1,5 +1,4 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
 
@@ -7,11 +6,10 @@ const router = express.Router();
 
 /**
  * @route GET /api/posts
- * @desc ====================== GET ALL POSTS ====================== (newest first)
+ * @desc Get all posts (newest first)
  */
 router.get('/', async (req, res) => {
   try {
-    // Return newest first
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
@@ -22,37 +20,39 @@ router.get('/', async (req, res) => {
 
 /**
  * @route POST /api/posts
- * @desc Create a new post
+ * @desc Create a new post (with tags, links, and imageUrl handling)
  */
 router.post('/', async (req, res) => {
   try {
-    // Destructure and normalize/validate incoming fields
     let { tags, links, imageUrl, ...rest } = req.body;
 
-    // Ensure tags is always an array of clean strings
+    // Normalize tags
     if (typeof tags === 'string') {
       tags = tags.split(',').map(t => t.trim()).filter(Boolean);
     } else if (!Array.isArray(tags)) {
       tags = [];
     }
 
-    // Ensure links is always an array of clean strings
+    // Normalize links
     if (typeof links === 'string') {
       links = links.split(',').map(l => l.trim()).filter(Boolean);
     } else if (!Array.isArray(links)) {
       links = [];
     }
 
-    // Ensure imageUrl is always a string
+    // Ensure imageUrl is a string
     if (typeof imageUrl !== 'string') {
       imageUrl = '';
     }
 
     const post = new Post({
-      ...req.body,
+      ...rest,
+      tags,
+      links,
+      imageUrl,
       likes: 0,
-      likedBy: [],
       comments: 0,
+      likedBy: [],
       createdAt: new Date()
     });
 
@@ -66,31 +66,29 @@ router.post('/', async (req, res) => {
 
 /**
  * @route PATCH /api/posts/:id/like
- * @desc ====================== TOGGLE LIKE ======================
+ * @desc Toggle like on a post
  */
 router.patch('/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
     const { userId } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: 'Invalid User ID' });
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
     }
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
-    const userIndex = post.likedBy.findIndex(uid => uid.toString() === userId);
+    const userIndex = post.likedBy.indexOf(userId);
 
     if (userIndex === -1) {
+      // Like
       post.likedBy.push(userId);
     } else {
+      // Unlike
       post.likedBy.splice(userIndex, 1);
     }
-
-    post.likes = post.likedBy.length;
-
-    post.likes = post.likedBy.length;
 
     post.likes = post.likedBy.length;
     await post.save();
@@ -104,7 +102,7 @@ router.patch('/:id/like', async (req, res) => {
 
 /**
  * @route GET /api/posts/:postId/comments
- * @desc ====================== GET COMMENTS ======================
+ * @desc Get comments for a post
  */
 router.get('/:postId/comments', async (req, res) => {
   try {
@@ -118,7 +116,7 @@ router.get('/:postId/comments', async (req, res) => {
 
 /**
  * @route POST /api/posts/:postId/comments
- * @desc ====================== ADD COMMENT ======================
+ * @desc Add a comment to a post
  */
 router.post('/:postId/comments', async (req, res) => {
   try {
@@ -134,6 +132,8 @@ router.post('/:postId/comments', async (req, res) => {
     });
 
     const savedComment = await comment.save();
+
+    // Increment comment count
     await Post.findByIdAndUpdate(postId, { $inc: { comments: 1 } });
 
     res.status(201).json(savedComment);
@@ -145,7 +145,7 @@ router.post('/:postId/comments', async (req, res) => {
 
 /**
  * @route DELETE /api/posts/comments/:commentId
- * @desc ====================== DELETE COMMENT ====================== from a post
+ * @desc Delete a comment from a post
  */
 router.delete('/comments/:commentId', async (req, res) => {
   try {
@@ -157,52 +157,14 @@ router.delete('/comments/:commentId', async (req, res) => {
     }
 
     await Comment.findByIdAndDelete(commentId);
+
+    // Decrement related post's comment count
     await Post.findByIdAndUpdate(comment.postId, { $inc: { comments: -1 } });
 
     res.json({ message: 'Comment deleted successfully', deleted: comment });
   } catch (error) {
     console.error('Error deleting comment:', error);
     res.status(500).json({ error: 'Failed to delete comment' });
-  }
-});
-
-// ====================== DELETE POST ======================
-router.delete('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const deletedPost = await Post.findByIdAndDelete(id);
-    if (!deletedPost) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    await Comment.deleteMany({ postId: id });
-    res.json({ message: 'Post deleted successfully', deleted: deletedPost });
-  } catch (error) {
-    console.error('Error deleting post:', error);
-    res.status(500).json({ error: 'Failed to delete post' });
-  }
-});
-
-// ====================== UPDATE POST ======================
-router.put('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      { ...req.body },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedPost) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    res.json(updatedPost);
-  } catch (error) {
-    console.error('Error updating post:', error);
-    res.status(500).json({ error: 'Failed to update post' });
   }
 });
 
