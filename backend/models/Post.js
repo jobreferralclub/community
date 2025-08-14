@@ -55,6 +55,11 @@ const PostSchema = new mongoose.Schema({
   community: {
     type: String,
     default: null
+  },
+  userId : {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 });
 

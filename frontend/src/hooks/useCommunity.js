@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
-const API_BASE = `${import.meta.env.VITE_API_PORT}/api`; // or your live server URL
+const API_BASE = `${import.meta.env.VITE_API_PORT}/api`;
 
 export const useCommunity = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthStore();
-  const userId = user?._id || user?.id; // Adjust based on your auth store
+  const userId = user?._id || user?.id;
 
   useEffect(() => {
     fetchPosts();
@@ -36,8 +36,11 @@ export const useCommunity = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...postData,
-          author: user.name,
-          avatar: user.avatar
+          author: {
+            id: userId,
+            name: user.name,
+            avatar: user.avatar
+          }
         })
       });
       if (!res.ok) throw new Error('Failed to create post');
@@ -52,16 +55,50 @@ export const useCommunity = () => {
     }
   };
 
+  const updatePost = async (postId, updatedData) => {
+    try {
+      const res = await fetch(`${API_BASE}/posts/${postId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      if (!res.ok) throw new Error('Failed to update post');
+      const data = await res.json();
+      setPosts(prev => prev.map(p => p._id === postId ? data : p));
+      toast.success('Post updated successfully!');
+      return data;
+    } catch (error) {
+      console.error('Error updating post:', error);
+      toast.error('Failed to update post');
+      throw error;
+    }
+  };
+
+  const deletePost = async (postId) => {
+    try {
+      const res = await fetch(`${API_BASE}/posts/${postId}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('Failed to delete post');
+      await res.json();
+      setPosts(prev => prev.filter(p => p._id !== postId));
+      toast.success('Post deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error('Failed to delete post');
+    }
+  };
+
   const toggleLike = async (postId) => {
     try {
       const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userId })
+        body: JSON.stringify({ userId })
       });
       if (!res.ok) throw new Error('Failed to toggle like');
-      const data = await res.json();
-      setPosts(prev => prev.map(p => p._id === postId ? data : p));
+      const updatedPost = await res.json();
+      setPosts(prev => prev.map(p => p._id === postId ? updatedPost : p));
     } catch (error) {
       console.error('Error toggling like:', error);
       toast.error('Failed to update like');
@@ -74,23 +111,26 @@ export const useCommunity = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          postId,
           content,
-          author: user.name,
-          avatar: user.avatar
+          author: {
+            id: userId,
+            name: user.name,
+            avatar: user.avatar
+          }
         })
       });
       if (!res.ok) throw new Error('Failed to add comment');
-      const data = await res.json();
+      const comment = await res.json();
 
+      // Update comment count locally
       setPosts(prev =>
         prev.map(p =>
-          p._id === postId ? { ...p, comments: (p.comments || 0) + 1 } : p
+          p._id === postId ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
         )
       );
 
       toast.success('Comment added!');
-      return data;
+      return comment;
     } catch (error) {
       console.error('Error adding comment:', error);
       toast.error('Failed to add comment');
@@ -121,7 +161,7 @@ export const useCommunity = () => {
 
       setPosts(prev =>
         prev.map(p =>
-          p._id === postId ? { ...p, comments: (p.comments || 0) - 1 } : p
+          p._id === postId ? { ...p, commentsCount: (p.commentsCount || 1) - 1 } : p
         )
       );
 
@@ -135,7 +175,7 @@ export const useCommunity = () => {
   const checkUserLike = (postId) => {
     try {
       const post = posts.find(p => p._id === postId);
-      return post?.likedBy?.includes(user._id); // or user._id
+      return post?.likedBy?.includes(userId);
     } catch {
       return false;
     }
@@ -150,6 +190,8 @@ export const useCommunity = () => {
     getComments,
     deleteComment,
     checkUserLike,
-    refreshPosts: fetchPosts
+    refreshPosts: fetchPosts,
+    updatePost,
+    deletePost
   };
 };

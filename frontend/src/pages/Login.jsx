@@ -158,15 +158,15 @@ const Login = () => {
 
     const payload = isSignup
       ? {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          accountRole: roleParam,
-        }
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        accountRole: roleParam,
+      }
       : {
-          email: formData.email,
-          password: formData.password,
-        };
+        email: formData.email,
+        password: formData.password,
+      };
 
     try {
       const response = await fetch(url, {
@@ -247,6 +247,11 @@ const Login = () => {
               ? "Create your account"
               : "Welcome back to your community"}
           </p>
+          <div className="text-center mt-2">
+            <p className="text-lg font-semibold text-primary-600">
+              {isSignup ? "Sign Up" : "Login"}
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -387,7 +392,7 @@ const Login = () => {
           {/* Password Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              {isSignup ? "Create Password" : "Password"}
             </label>
             <div className="relative">
               <SafeIcon
@@ -475,9 +480,8 @@ const Login = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className={`w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 ${
-              isSignup && !isOtpVerified ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`w-full bg-primary-600 text-white py-3 rounded-lg font-medium hover:bg-primary-700 ${isSignup && !isOtpVerified ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={isSignup && !isOtpVerified}
           >
             {isSignup ? "Create Account" : "Sign In"}

@@ -46,8 +46,17 @@ const Sidebar = ({ open, setOpen }) => {
       icon: FiUsers,
       isSubmenu: true,
       children: [
+        { 
+          name: "Community Hub",
+          children: [
+            { name: "Introductions", path: "/community/introductions" },
+            { name: "Ask the Community", path: "/community/ask-the-community" },
+            { name: "Announcements", path: "/community/announcements" },
+            { name: "Club Guidelines", path: "/community/club-guidelines" },
+          ]
+        },
         {
-          name: "India",
+          name: "India Jobs",
           children: [
             { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
             { name: "Program and Project Management", path: "/community/in/program" },
@@ -62,7 +71,7 @@ const Sidebar = ({ open, setOpen }) => {
           ],
         },
         {
-          name: "United States",
+          name: "United States Jobs",
           children: [
             { name: "Operations and Supply Chain Management", path: "/community/us/operations" },
             { name: "Program and Project Management", path: "/community/us/program" },
@@ -88,6 +97,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Settings", icon: FiSettings, path: "/settings" },
   ];
 
+
   const adminOnly = [
     "Dashboard",
     "Analytics",
@@ -109,8 +119,8 @@ const Sidebar = ({ open, setOpen }) => {
         <button
           onClick={() => handleToggleSubMenu(item.name)}
           className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isCommunityActive()
-              ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
+            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             }`}
         >
           <div className="flex items-center space-x-3">

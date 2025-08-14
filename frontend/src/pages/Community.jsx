@@ -121,6 +121,28 @@ const Community = () => {
       path: '/community/us/strategy',
       title: 'Strategy and Consulting - US',
       subtitle: 'Business strategies, consulting insights, and industry best practices.'
+    },
+
+    // Global
+    {
+      path: '/community/introductions',
+      title: 'Introductions',
+      subtitle: 'New members, introduce yourself and connect with everyone in the community.'
+    },
+    {
+      path: '/community/ask-the-community',
+      title: 'Ask the Community',
+      subtitle: 'Post questions, seek advice, and get answers from the community.'
+    },
+    {
+      path: '/community/announcements',
+      title: 'Announcements',
+      subtitle: 'Stay updated with the latest news and important updates.'
+    },
+    {
+      path: '/community/club-guidelines',
+      title: 'Club Guidelines',
+      subtitle: 'Read the community rules, standards, and participation guidelines.'
     }
   ];
 
@@ -138,13 +160,16 @@ const Community = () => {
     { id: 'discussion', name: 'Discussions', count: posts.filter(p => p.type === 'discussion').length },
   ];
 
-  const filteredPosts = posts.filter(post => {
-    const matchesCommunity = currentCommunity.path
-      ? post.community === currentCommunity.title
-      : true;
-    const matchesType = filter === 'all' || post.type === filter;
-    return matchesCommunity && matchesType;
-  });
+  const filteredPosts = posts
+    .filter(post => {
+      const matchesCommunity = currentCommunity.path
+        ? post.community === currentCommunity.title
+        : true;
+      const matchesType = filter === 'all' || post.type === filter;
+      return matchesCommunity && matchesType;
+    })
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // newest first
+
 
   return (
     <div className="space-y-6">

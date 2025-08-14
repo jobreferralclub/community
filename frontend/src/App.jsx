@@ -137,7 +137,6 @@ function AppWrapper() {
   }, [userId, user, login, authChecked]);
 
   // Show loading spinner while checking authentication
-  // Show loading spinner while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
@@ -187,7 +186,8 @@ function AppWrapper() {
                     transition={{ duration: 0.3 }}
                   >
                     <Routes>
-                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/" element={<Navigate to="/community/introductions" replace />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/community">
                         <Route index element={<Community />} />
 
@@ -214,6 +214,12 @@ function AppWrapper() {
                         <Route path="us/hr" element={<Community />} />
                         <Route path="us/analyst" element={<Community />} />
                         <Route path="us/strategy" element={<Community />} />
+
+                        {/* Global sub-communities */}
+                        <Route path="introductions" element={<Community />} />
+                        <Route path="ask-the-community" element={<Community />} />
+                        <Route path="announcements" element={<Community />} />
+                        <Route path="club-guidelines" element={<Community />} />
                       </Route>
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/email" element={<EmailBroadcast />} />
