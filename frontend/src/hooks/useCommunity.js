@@ -125,11 +125,8 @@ export const useCommunity = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content,
-          author: {
-            id: userId,
-            name: user.name,
-            avatar: user.avatar
-          }
+          author: user.name,   // ✅ string
+          avatar: user.avatar  // ✅ string
         })
       });
       if (!res.ok) throw new Error('Failed to add comment');
