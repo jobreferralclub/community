@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import SafeIcon from "../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useCommunity } from "../hooks/useCommunity";
 import { useAuthStore } from "../store/authStore";
 import { formatDistanceToNow } from "date-fns";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
 
 const { FiX, FiSend, FiMessageCircle, FiImage } = FiIcons;
 
@@ -14,6 +16,11 @@ const CommentModal = ({ post, onClose }) => {
   const [commentImage, setCommentImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const emojiPickerRef = useRef(null);
+  const emojiButtonRef = useRef(null);
+
   const { getComments, addComment, deleteComment } = useCommunity();
   const { user } = useAuthStore();
 
@@ -27,6 +34,33 @@ const CommentModal = ({ post, onClose }) => {
     setComments(data);
     setLoading(false);
   };
+
+  const handleEmojiSelect = (emoji) => {
+    setNewComment((prev) => prev + emoji.native);
+  };
+
+  // ===== Outside Click Handler for Emoji Picker =====
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(e.target) &&
+        !emojiButtonRef.current.contains(e.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    if (showEmojiPicker) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showEmojiPicker]);
 
   // ===== Image Handling =====
   const handleImageChange = async (e) => {
@@ -91,7 +125,7 @@ const CommentModal = ({ post, onClose }) => {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-lg"
+        className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -206,7 +240,7 @@ const CommentModal = ({ post, onClose }) => {
         </div>
 
         {/* Comment Input */}
-        <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+        <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0 relative">
           <form
             onSubmit={handleSubmit}
             className="flex items-center space-x-3 w-full"
@@ -216,7 +250,8 @@ const CommentModal = ({ post, onClose }) => {
               alt={user.name}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
-            <div className="flex-1">
+
+            <div className="flex-1 relative">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
@@ -225,6 +260,7 @@ const CommentModal = ({ post, onClose }) => {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                 disabled={submitting}
               />
+
               {/* Image Preview */}
               {commentImage && (
                 <div className="mt-2 relative w-20">
@@ -244,6 +280,28 @@ const CommentModal = ({ post, onClose }) => {
               )}
             </div>
 
+            {/* Emoji Button */}
+            <div className="relative">
+              <button
+                ref={emojiButtonRef}
+                type="button"
+                onClick={() => setShowEmojiPicker((prev) => !prev)}
+                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <SafeIcon icon={FiIcons.FiSmile} className="w-5 h-5" />
+              </button>
+
+              {showEmojiPicker && (
+                <div
+                  ref={emojiPickerRef}
+                  className="absolute bottom-12 right-0 z-50"
+                >
+                  <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+                </div>
+              )}
+            </div>
+
+            {/* Image Button */}
             <input
               type="file"
               accept="image/*"
@@ -261,6 +319,7 @@ const CommentModal = ({ post, onClose }) => {
               <SafeIcon icon={FiImage} className="w-5 h-5" />
             </button>
 
+            {/* Submit Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
