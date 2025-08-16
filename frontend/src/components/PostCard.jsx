@@ -185,6 +185,48 @@ const PostCard = ({ post }) => {
           <p className="text-gray-700">{post.content}</p>
         </div>
 
+        {/* Image Preview */}
+        {post.imageUrl && (
+          <div className="mb-4 relative overflow-visible">
+            <img
+              src={post.imageUrl}
+              alt="Post attachment"
+              className="block w-full max-h-96 object-contain rounded-lg border border-gray-300"
+            />
+          </div>
+        )}
+
+        {/* Tags */}
+        {post.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-sm"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Links */}
+        {post.links?.length > 0 && (
+          <div className="flex flex-col gap-1 mb-4">
+            {post.links.map((link) => (
+              <a
+                key={link}
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline break-all text-sm"
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div className="flex items-center space-x-6">
