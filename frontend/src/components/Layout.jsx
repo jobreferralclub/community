@@ -9,8 +9,6 @@ const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { location, setLocation } = useAuthStore(); // get setter
 
-  console.log("Current location:", location);
-
   return (
     <>
       <div className="flex h-screen bg-gray-50">

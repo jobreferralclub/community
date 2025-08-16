@@ -52,7 +52,6 @@ function AppWrapper() {
         }
 
         const data = await res.json();
-        console.log("User role:", data.role);
 
         // Store in Zustand
         setRole(data.role);

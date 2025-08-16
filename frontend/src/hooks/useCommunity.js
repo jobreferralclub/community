@@ -118,24 +118,28 @@ export const useCommunity = () => {
     }
   };
 
-  const addComment = async (postId, content) => {
+  const addComment = async (postId, { content, imageUrl }) => {
     try {
       const res = await fetch(`${API_BASE}/posts/${postId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content,
-          author: user.name,   // ✅ string
-          avatar: user.avatar  // ✅ string
-        })
+          imageUrl,              // ✅ include image URL
+          author: user.name,     // string
+          avatar: user.avatar,   // string
+        }),
       });
+
       if (!res.ok) throw new Error('Failed to add comment');
       const comment = await res.json();
 
       // Update comment count locally
-      setPosts(prev =>
-        prev.map(p =>
-          p._id === postId ? { ...p, commentsCount: (p.commentsCount || 0) + 1 } : p
+      setPosts((prev) =>
+        prev.map((p) =>
+          p._id === postId
+            ? { ...p, commentsCount: (p.commentsCount || 0) + 1 }
+            : p
         )
       );
 

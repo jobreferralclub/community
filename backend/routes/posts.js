@@ -186,7 +186,7 @@ router.get('/:postId/comments', async (req, res) => {
  */
 router.post('/:postId/comments', async (req, res) => {
   try {
-    const { content, author, avatar } = req.body;
+    const { content, author, avatar, imageUrl } = req.body;
     const { postId } = req.params;
 
     const comment = new Comment({
@@ -194,6 +194,7 @@ router.post('/:postId/comments', async (req, res) => {
       content,
       author,
       avatar,
+      imageUrl,
       createdAt: new Date()
     });
 

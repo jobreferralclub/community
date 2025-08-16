@@ -23,8 +23,8 @@ const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const role = useAuthStore((state) => state.role);
   const { user } = useAuthStore();
-  const [openSubMenu, setOpenSubMenu] = React.useState(null);
-  const [openRegion, setOpenRegion] = React.useState(null);
+  const [openSubMenu, setOpenSubMenu] = React.useState("Community");
+  const [openRegion, setOpenRegion] = React.useState("Community Hub");
   const currentLocation = useAuthStore((state) => state.location);
 
   const handleToggleSubMenu = (menuName) => {
@@ -192,7 +192,7 @@ const Sidebar = ({ open, setOpen }) => {
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
-      className={`${open ? "w-64" : "w-20"
+      className={`${open ? "w-82" : "w-20"
         } bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
     >
       {/* Header */}

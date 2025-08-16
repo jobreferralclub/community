@@ -6,6 +6,7 @@ const commentSchema = new mongoose.Schema({
   content: String,
   author: String,
   avatar: String,
+  imageUrl: String,
   createdAt: { type: Date, default: Date.now }
 });
 

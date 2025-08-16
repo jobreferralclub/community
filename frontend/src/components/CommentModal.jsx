@@ -4,13 +4,14 @@ import SafeIcon from "../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useCommunity } from "../hooks/useCommunity";
 import { useAuthStore } from "../store/authStore";
-import { formatDistanceToNow } from "date-fns"; // for human-readable dates
+import { formatDistanceToNow } from "date-fns";
 
-const { FiX, FiSend, FiMessageCircle } = FiIcons;
+const { FiX, FiSend, FiMessageCircle, FiImage } = FiIcons;
 
 const CommentModal = ({ post, onClose }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [commentImage, setCommentImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { getComments, addComment, deleteComment } = useCommunity();
@@ -27,15 +28,50 @@ const CommentModal = ({ post, onClose }) => {
     setLoading(false);
   };
 
+  // ===== Image Handling =====
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataObj = new FormData();
+    formDataObj.append("image", file);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        body: formDataObj,
+      });
+      const data = await response.json();
+
+      if (data.success && data.imageUrl) {
+        setCommentImage(data.imageUrl);
+      } else {
+        alert("Image upload failed.");
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      alert("Could not upload image. Try again.");
+    }
+  };
+
+  const removeImage = () => {
+    setCommentImage("");
+  };
+
+  // ===== Submit Comment =====
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim() || submitting) return;
+    if ((!newComment.trim() && !commentImage) || submitting) return;
 
     setSubmitting(true);
     try {
-      const comment = await addComment(post._id, newComment);
+      const comment = await addComment(post._id, {
+        content: newComment,
+        imageUrl: commentImage,
+      });
       setComments((prev) => [...prev, comment]);
       setNewComment("");
+      setCommentImage("");
     } catch (error) {
       console.error("Error adding comment:", error);
     } finally {
@@ -70,9 +106,13 @@ const CommentModal = ({ post, onClose }) => {
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
-              <span className="font-semibold text-gray-900 block">{post.author}</span>
+              <span className="font-semibold text-gray-900 block">
+                {post.author}
+              </span>
               <span className="text-xs text-gray-500">
-                {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                {formatDistanceToNow(new Date(post.createdAt), {
+                  addSuffix: true,
+                })}
               </span>
             </div>
           </div>
@@ -102,7 +142,9 @@ const CommentModal = ({ post, onClose }) => {
                 icon={FiMessageCircle}
                 className="w-12 h-12 text-gray-300 mx-auto mb-3"
               />
-              <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+              <p className="text-gray-500">
+                No comments yet. Be the first to comment!
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -123,10 +165,21 @@ const CommentModal = ({ post, onClose }) => {
                           {comment.author || "Anonymous User"}
                         </p>
                         <span className="text-xs text-gray-400">
-                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(comment.createdAt), {
+                            addSuffix: true,
+                          })}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {comment.content}
+                      </p>
+                      {comment.imageUrl && (
+                        <img
+                          src={comment.imageUrl}
+                          alt="Comment"
+                          className="mt-2 rounded-lg border"
+                        />
+                      )}
 
                       {/* Delete button */}
                       {comment.author === user.name && (
@@ -141,7 +194,7 @@ const CommentModal = ({ post, onClose }) => {
                           }}
                           className="absolute bottom-2 right-2 text-gray-400 hover:text-red-500 text-xs"
                         >
-                          <FiIcons.FiTrash/>
+                          <FiIcons.FiTrash />
                         </button>
                       )}
                     </div>
@@ -154,25 +207,65 @@ const CommentModal = ({ post, onClose }) => {
 
         {/* Comment Input */}
         <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
-          <form onSubmit={handleSubmit} className="flex items-center space-x-3 w-full">
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center space-x-3 w-full"
+          >
             <img
               src={user.avatar}
               alt={user.name}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-              rows={1}
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-              disabled={submitting}
+            <div className="flex-1">
+              <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+                rows={1}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                disabled={submitting}
+              />
+              {/* Image Preview */}
+              {commentImage && (
+                <div className="mt-2 relative w-20">
+                  <img
+                    src={commentImage}
+                    alt="Preview"
+                    className="w-full rounded-lg border"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow"
+                  >
+                    <SafeIcon icon={FiX} className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              id="comment-image-upload"
+              style={{ display: "none" }}
+              onChange={handleImageChange}
             />
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById("comment-image-upload").click()
+              }
+              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <SafeIcon icon={FiImage} className="w-5 h-5" />
+            </button>
+
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={!newComment.trim() || submitting}
+              disabled={(!newComment.trim() && !commentImage) || submitting}
               className="flex items-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
             >
               <SafeIcon icon={FiSend} className="w-4 h-4" />
