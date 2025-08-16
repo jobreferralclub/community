@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
-  title: { 
-    type: String, 
-    required: true 
+  title: {
+    type: String,
+    required: true
   },
-  content: { 
-    type: String, 
-    required: true 
+  content: {
+    type: String,
+    required: true
   },
   tags: {
     type: [String],
@@ -17,17 +17,17 @@ const PostSchema = new mongoose.Schema({
     type: [String], // Stores useful resource links
     default: []
   },
-  imageUrl: { 
-    type: String, 
+  imageUrl: {
+    type: String,
     default: '' // Stores uploaded image URL from backend
   },
-  author: { 
-    type: String, 
-    default: '' 
+  author: {
+    type: String,
+    default: ''
   },
-  avatar: { 
-    type: String, 
-    default: '' 
+  avatar: {
+    type: String,
+    default: ''
   },
   createdAt: {
     type: Date,
@@ -55,6 +55,10 @@ const PostSchema = new mongoose.Schema({
   community: {
     type: String,
     default: null
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   }
 });
 

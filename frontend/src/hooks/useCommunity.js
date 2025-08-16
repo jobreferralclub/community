@@ -37,7 +37,7 @@ export const useCommunity = () => {
         body: JSON.stringify({
           ...postData,
           author: {
-            id: userId,
+            createBy: userId,
             name: user.name,
             avatar: user.avatar
           }
@@ -58,13 +58,20 @@ export const useCommunity = () => {
   const updatePost = async (postId, updatedData) => {
     try {
       const res = await fetch(`${API_BASE}/posts/${postId}`, {
-        method: 'PUT',
+        method: 'PATCH', // ✅ match backend route
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
+        body: JSON.stringify({
+          ...updatedData,
+          updatedBy: userId, // optional, for ownership checks
+        }),
       });
+
       if (!res.ok) throw new Error('Failed to update post');
       const data = await res.json();
-      setPosts(prev => prev.map(p => p._id === postId ? data : p));
+
+      // Update post in local state
+      setPosts(prev => prev.map(p => (p._id === postId ? data : p)));
+
       toast.success('Post updated successfully!');
       return data;
     } catch (error) {
@@ -77,11 +84,17 @@ export const useCommunity = () => {
   const deletePost = async (postId) => {
     try {
       const res = await fetch(`${API_BASE}/posts/${postId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }) // ✅ send user id if you check permissions
       });
+
       if (!res.ok) throw new Error('Failed to delete post');
       await res.json();
+
+      // Remove post from local state
       setPosts(prev => prev.filter(p => p._id !== postId));
+
       toast.success('Post deleted successfully!');
     } catch (error) {
       console.error('Error deleting post:', error);

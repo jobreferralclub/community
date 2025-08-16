@@ -1,6 +1,7 @@
 import express from 'express';
 import Post from '../models/Post.js';
 import Comment from '../models/Comment.js';
+import { create } from 'domain';
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    let { tags, links, imageUrl, ...rest } = req.body;
+    let { tags, links, imageUrl, userId, ...rest } = req.body;
 
     // Normalize tags
     if (typeof tags === 'string') {
@@ -53,7 +54,8 @@ router.post('/', async (req, res) => {
       likes: 0,
       comments: 0,
       likedBy: [],
-      createdAt: new Date()
+      createdAt: new Date(),
+      createdBy: userId ? userId : null
     });
 
     const saved = await post.save();
@@ -61,6 +63,70 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('Error creating post:', error);
     res.status(500).json({ error: 'Failed to create post' });
+  }
+});
+
+/**
+ * @route PATCH /api/posts/:id
+ * @desc Update a post
+ */
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { tags, links, imageUrl, ...rest } = req.body;
+
+    // Normalize tags
+    if (typeof tags === 'string') {
+      tags = tags.split(',').map(t => t.trim()).filter(Boolean);
+    } else if (!Array.isArray(tags)) {
+      tags = [];
+    }
+
+    // Normalize links
+    if (typeof links === 'string') {
+      links = links.split(',').map(l => l.trim()).filter(Boolean);
+    } else if (!Array.isArray(links)) {
+      links = [];
+    }
+
+    // Ensure imageUrl is a string
+    if (typeof imageUrl !== 'string') {
+      imageUrl = '';
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { ...rest, tags, links, imageUrl, updatedAt: new Date() },
+      { new: true } // return the updated document
+    );
+
+    if (!updatedPost) return res.status(404).json({ error: 'Post not found' });
+
+    res.json(updatedPost);
+  } catch (error) {
+    console.error('Error updating post:', error);
+    res.status(500).json({ error: 'Failed to update post' });
+  }
+});
+
+/**
+ * @route DELETE /api/posts/:id
+ * @desc Delete a post
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedPost = await Post.findByIdAndDelete(id);
+    if (!deletedPost) return res.status(404).json({ error: 'Post not found' });
+
+    // Also delete comments related to this post
+    await Comment.deleteMany({ postId: id });
+
+    res.json({ message: 'Post deleted successfully', deleted: deletedPost });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    res.status(500).json({ error: 'Failed to delete post' });
   }
 });
 

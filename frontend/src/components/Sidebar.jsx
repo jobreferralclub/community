@@ -25,6 +25,7 @@ const Sidebar = ({ open, setOpen }) => {
   const { user } = useAuthStore();
   const [openSubMenu, setOpenSubMenu] = React.useState(null);
   const [openRegion, setOpenRegion] = React.useState(null);
+  const currentLocation = useAuthStore((state) => state.location);
 
   const handleToggleSubMenu = (menuName) => {
     setOpenSubMenu(openSubMenu === menuName ? null : menuName);
@@ -46,7 +47,7 @@ const Sidebar = ({ open, setOpen }) => {
       icon: FiUsers,
       isSubmenu: true,
       children: [
-        { 
+        {
           name: "Community Hub",
           children: [
             { name: "Introductions", path: "/community/introductions" },
@@ -57,6 +58,7 @@ const Sidebar = ({ open, setOpen }) => {
         },
         {
           name: "India Jobs",
+          region: "india",
           children: [
             { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
             { name: "Program and Project Management", path: "/community/in/program" },
@@ -72,6 +74,7 @@ const Sidebar = ({ open, setOpen }) => {
         },
         {
           name: "United States Jobs",
+          region: "us",
           children: [
             { name: "Operations and Supply Chain Management", path: "/community/us/operations" },
             { name: "Program and Project Management", path: "/community/us/program" },
@@ -112,6 +115,19 @@ const Sidebar = ({ open, setOpen }) => {
     role === "admin"
       ? menuItems
       : menuItems.filter((item) => !adminOnly.includes(item.name));
+
+  const filteredCommunity = filteredMenu.map((item) => {
+    if (item.name === "Community") {
+      return {
+        ...item,
+        children: item.children.filter(
+          (child) =>
+            !child.region || child.region === currentLocation // keep hub + matching region
+        ),
+      };
+    }
+    return item;
+  });
 
   const renderMenuItem = (item) => {
     if (item.isSubmenu) {
@@ -209,7 +225,7 @@ const Sidebar = ({ open, setOpen }) => {
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {filteredMenu.map((item) => (
+        {filteredCommunity.map((item) => (
           <div key={item.name}>
             {renderMenuItem(item)}
 

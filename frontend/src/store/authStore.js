@@ -5,11 +5,14 @@ import { persist } from 'zustand/middleware';
 export const useAuthStore = create(
   persist(
     (set, get) => ({
-      userId: null, // persisted
-      user: null,   // full user (not persisted)
-      role: null,   // user role (not persisted)
+      userId: null,   // persisted
+      user: null,     // full user (not persisted)
+      role: null,     // user role (not persisted)
+      location: null, // 🌍 job location
 
       setRole: (role) => set({ role }),
+
+      setLocation: (location) => set({ location }), // 🌍 add location setter
 
       login: (userData) => {
         set({
@@ -23,6 +26,7 @@ export const useAuthStore = create(
           userId: null,
           user: null,
           role: null,
+          location: null,
         });
       },
 
@@ -34,7 +38,10 @@ export const useAuthStore = create(
     {
       name: 'token', // localStorage key
       getStorage: () => localStorage,
-      partialize: (state) => ({ userId: state.userId }), // persist only token
+      partialize: (state) => ({
+        userId: state.userId,
+        location: state.location, // ✅ persist location too
+      }),
     }
   )
 );
