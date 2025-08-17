@@ -6,7 +6,6 @@ import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../store/authStore";
 
 const {
-  FiHome,
   FiUsers,
   FiBarChart3,
   FiMail,
@@ -22,26 +21,38 @@ const {
 const Sidebar = ({ open, setOpen }) => {
   const location = useLocation();
   const role = useAuthStore((state) => state.role);
-  const { user } = useAuthStore();
-  const [openSubMenu, setOpenSubMenu] = React.useState("Community");
-  const [openRegion, setOpenRegion] = React.useState("Community Hub");
   const currentLocation = useAuthStore((state) => state.location);
 
+  // Instead of string, store arrays of open menus/regions (so multiple can be open)
+  const [openSubMenus, setOpenSubMenus] = React.useState(["Community"]);
+  const [openRegions, setOpenRegions] = React.useState([
+    "Community Hub",
+    "India Jobs",
+    "United States Jobs",
+  ]);
+
   const handleToggleSubMenu = (menuName) => {
-    setOpenSubMenu(openSubMenu === menuName ? null : menuName);
+    setOpenSubMenus((prev) =>
+      prev.includes(menuName)
+        ? prev.filter((m) => m !== menuName)
+        : [...prev, menuName]
+    );
   };
 
   const handleToggleRegion = (regionName) => {
-    setOpenRegion(openRegion === regionName ? null : regionName);
+    setOpenRegions((prev) =>
+      prev.includes(regionName)
+        ? prev.filter((r) => r !== regionName)
+        : [...prev, regionName]
+    );
   };
 
   // Helper function to check if any community route is active
   const isCommunityActive = () => {
-    return location.pathname.includes('/community');
+    return location.pathname.includes("/community");
   };
 
   const menuItems = [
-    // { name: "Dashboard", icon: FiHome, path: "/" },
     {
       name: "Community",
       icon: FiUsers,
@@ -97,7 +108,6 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Monetization", icon: FiDollarSign, path: "/monetization" },
     { name: "Coaching", icon: FiCalendar, path: "/coaching" },
     { name: "Course Builder", icon: FiBook, path: "/courses" },
-    { name: "Settings", icon: FiSettings, path: "/settings" },
   ];
 
   const adminOnly = [
@@ -120,7 +130,7 @@ const Sidebar = ({ open, setOpen }) => {
       return {
         ...item,
         children: item.children.filter(
-          (child) => !child.region || child.region === currentLocation // keep hub + matching region
+          (child) => !child.region || child.region === currentLocation
         ),
       };
     }
@@ -160,7 +170,7 @@ const Sidebar = ({ open, setOpen }) => {
             <SafeIcon
               icon={FiChevronLeft}
               className={`w-4 h-4 transition-transform ${
-                openSubMenu === item.name ? "rotate-90" : ""
+                openSubMenus.includes(item.name) ? "rotate-90" : ""
               }`}
             />
           )}
@@ -212,11 +222,9 @@ const Sidebar = ({ open, setOpen }) => {
               className="flex items-center space-x-2"
             >
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">JR</span>
+                <img src="/logo.jpg" alt="" />
               </div>
-              <span className="font-bold text-gray-100">
-                JobReferral.Club
-              </span>
+              <span className="font-bold text-gray-100">JobReferral.Club</span>
             </motion.div>
           )}
           <button
@@ -232,13 +240,14 @@ const Sidebar = ({ open, setOpen }) => {
           </button>
         </div>
       </div>
+
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {filteredCommunity.map((item) => (
           <div key={item.name}>
             {renderMenuItem(item)}
             {/* Submenu rendering */}
-            {item.children && openSubMenu === item.name && open && (
+            {item.children && openSubMenus.includes(item.name) && open && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
@@ -254,11 +263,11 @@ const Sidebar = ({ open, setOpen }) => {
                       <SafeIcon
                         icon={FiChevronLeft}
                         className={`w-4 h-4 transition-transform ${
-                          openRegion === region.name ? "rotate-90" : ""
+                          openRegions.includes(region.name) ? "rotate-90" : ""
                         }`}
                       />
                     </button>
-                    {region.children && openRegion === region.name && (
+                    {region.children && openRegions.includes(region.name) && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -288,26 +297,30 @@ const Sidebar = ({ open, setOpen }) => {
           </div>
         ))}
       </nav>
-      {/* User Profile */}
+
+      {/* Settings at Bottom */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center space-x-3">
-          <img
-            src={user?.avatar || "/default-avatar.jpg"}
-            alt="Profile"
-            className="w-10 h-10 rounded-full object-cover"
-          />
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
+              isActive
+                ? activeClass
+                : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+            }`
+          }
+        >
+          <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0" />
           {open && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex-1 min-w-0"
+            <motion.span
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="ml-3 font-medium"
             >
-              <p className="text-sm font-medium text-gray-100 truncate">
-                {user.name || "Guest User"}
-              </p>
-            </motion.div>
+              Settings
+            </motion.span>
           )}
-        </div>
+        </NavLink>
       </div>
     </motion.div>
   );

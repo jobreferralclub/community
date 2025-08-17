@@ -250,7 +250,7 @@ const Login = () => {
         {/* Logo */}
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-[#79e708] rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-black font-bold text-2xl">JR</span>
+            <img src="/logo.jpg" alt="" />
           </div>
           <h1 className="text-3xl font-bold text-white">JobReferral.Club</h1>
           <p className="text-gray-400 mt-1">
