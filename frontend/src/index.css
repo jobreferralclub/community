@@ -18,3 +18,39 @@ body {
   width: 100%;
   height: 100%;
 }
+
+/* Force dark mode by default */
+html {
+  color-scheme: dark;
+}
+
+/* Dark mode CSS variables for toasts - always active */
+:root {
+  --toast-bg: #374151;
+  --toast-color: #f9fafb;
+}
+
+/* Custom scrollbar - dark theme only */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Smooth transitions for any theme-related changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}

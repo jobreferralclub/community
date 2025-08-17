@@ -66,7 +66,11 @@ const PostCard = ({ post }) => {
   const handleShare = async () => {
     try {
       const postUrl = `${window.location.origin}${window.location.pathname}?postid=${post._id}`;
-      const shareContent = { title: post.title, text: `${post.title}\n\n${post.content}`, url: postUrl };
+      const shareContent = {
+        title: post.title,
+        text: `${post.title}\n\n${post.content}`,
+        url: postUrl,
+      };
 
       if (navigator.share && navigator.canShare && navigator.canShare(shareContent)) {
         await navigator.share(shareContent);
@@ -85,10 +89,10 @@ const PostCard = ({ post }) => {
 
   const getPostTypeColor = (type) => {
     switch (type) {
-      case 'job-posting': return 'bg-blue-100 text-blue-800';
-      case 'success-story': return 'bg-green-100 text-green-800';
-      case 'discussion': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'job-posting': return 'bg-blue-800 text-blue-300';
+      case 'success-story': return 'bg-green-800 text-green-300';
+      case 'discussion': return 'bg-purple-800 text-purple-300';
+      default: return 'bg-gray-800 text-gray-300';
     }
   };
 
@@ -127,7 +131,7 @@ const PostCard = ({ post }) => {
       {/* Post Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all"
+        className="bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-700 hover:shadow-md transition-all text-gray-100"
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
@@ -138,8 +142,8 @@ const PostCard = ({ post }) => {
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h4 className="font-semibold text-gray-900">{post.author}</h4>
-              <p className="text-sm text-gray-500">
+              <h4 className="font-semibold text-white">{post.author}</h4>
+              <p className="text-sm text-gray-400">
                 {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -149,26 +153,26 @@ const PostCard = ({ post }) => {
               {post.type?.replace('-', ' ') || 'discussion'}
             </span>
 
-            {post.createdBy == user?._id && (
+            {post.createdBy === user?._id && (
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(prev => !prev)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   <SafeIcon icon={FiMoreHorizontal} className="w-4 h-4 text-gray-400" />
                 </button>
 
                 {showMenu && (
-                  <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-md z-10">
+                  <div className="absolute right-0 mt-2 w-36 bg-gray-800 border border-gray-700 rounded-lg shadow-md z-10">
                     <button
                       onClick={handleEdit}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
                     >
                       Edit Post
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-700"
                     >
                       Delete Post
                     </button>
@@ -181,8 +185,8 @@ const PostCard = ({ post }) => {
 
         {/* Content */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{post.title}</h3>
-          <p className="text-gray-700">{post.content}</p>
+          <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
+          <p className="text-gray-300">{post.content}</p>
         </div>
 
         {/* Image Preview */}
@@ -191,7 +195,7 @@ const PostCard = ({ post }) => {
             <img
               src={post.imageUrl}
               alt="Post attachment"
-              className="block w-full max-h-96 object-contain rounded-lg border border-gray-300"
+              className="block w-full max-h-96 object-contain rounded-lg border border-gray-700"
             />
           </div>
         )}
@@ -199,10 +203,10 @@ const PostCard = ({ post }) => {
         {/* Tags */}
         {post.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {post.tags.map((tag) => (
+            {post.tags.map(tag => (
               <span
                 key={tag}
-                className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-sm"
+                className="px-2 py-1 bg-gray-800 text-gray-400 rounded-md text-sm"
               >
                 #{tag}
               </span>
@@ -213,13 +217,13 @@ const PostCard = ({ post }) => {
         {/* Links */}
         {post.links?.length > 0 && (
           <div className="flex flex-col gap-1 mb-4">
-            {post.links.map((link) => (
+            {post.links.map(link => (
               <a
                 key={link}
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline break-all text-sm"
+                className="text-green-400 hover:underline break-all text-sm"
               >
                 {link}
               </a>
@@ -228,13 +232,15 @@ const PostCard = ({ post }) => {
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-700">
           <div className="flex items-center space-x-6">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLike}
-              className={`flex items-center space-x-2 transition-colors ${liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'}`}
+              className={`flex items-center space-x-2 transition-colors ${
+                liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+              }`}
             >
               <SafeIcon icon={FiHeart} className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
               <span className="text-sm font-medium">{likeCount}</span>
@@ -269,27 +275,27 @@ const PostCard = ({ post }) => {
       {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-md text-gray-100">
             <h3 className="text-lg font-semibold mb-4">Edit Post</h3>
             <input
               type="text"
               value={editData.title}
               onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-              className="w-full border rounded p-2 mb-3"
+              className="w-full border border-gray-700 rounded p-2 mb-3 bg-gray-800 text-gray-100"
               placeholder="Post title"
             />
             <textarea
               value={editData.content}
               onChange={(e) => setEditData({ ...editData, content: e.target.value })}
-              className="w-full border rounded p-2 mb-4"
+              className="w-full border border-gray-700 rounded p-2 mb-4 bg-gray-800 text-gray-100"
               rows="4"
               placeholder="Post content"
             />
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-200 rounded">
+              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-700 rounded text-gray-200">
                 Cancel
               </button>
-              <button onClick={confirmEdit} className="px-4 py-2 bg-blue-600 text-white rounded">
+              <button onClick={confirmEdit} className="px-4 py-2 bg-green-600 text-white rounded">
                 Save
               </button>
             </div>
@@ -300,11 +306,11 @@ const PostCard = ({ post }) => {
       {/* Delete Confirm Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-sm text-center">
+          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-sm text-center text-gray-100">
             <h3 className="text-lg font-semibold mb-4">Delete Post?</h3>
-            <p className="text-gray-600 mb-6">This action cannot be undone.</p>
+            <p className="text-gray-400 mb-6">This action cannot be undone.</p>
             <div className="flex justify-center gap-3">
-              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gray-200 rounded">
+              <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 bg-gray-700 rounded text-gray-200">
                 Cancel
               </button>
               <button onClick={confirmDelete} className="px-4 py-2 bg-red-600 text-white rounded">

@@ -41,7 +41,7 @@ const Sidebar = ({ open, setOpen }) => {
   };
 
   const menuItems = [
-    { name: "Dashboard", icon: FiHome, path: "/" },
+    // { name: "Dashboard", icon: FiHome, path: "/" },
     {
       name: "Community",
       icon: FiUsers,
@@ -54,7 +54,7 @@ const Sidebar = ({ open, setOpen }) => {
             { name: "Ask the Community", path: "/community/ask-the-community" },
             { name: "Announcements", path: "/community/announcements" },
             { name: "Club Guidelines", path: "/community/club-guidelines" },
-          ]
+          ],
         },
         {
           name: "India Jobs",
@@ -100,7 +100,6 @@ const Sidebar = ({ open, setOpen }) => {
     { name: "Settings", icon: FiSettings, path: "/settings" },
   ];
 
-
   const adminOnly = [
     "Dashboard",
     "Analytics",
@@ -121,23 +120,29 @@ const Sidebar = ({ open, setOpen }) => {
       return {
         ...item,
         children: item.children.filter(
-          (child) =>
-            !child.region || child.region === currentLocation // keep hub + matching region
+          (child) => !child.region || child.region === currentLocation // keep hub + matching region
         ),
       };
     }
     return item;
   });
 
+  // Classes for shadow/highlight
+  const activeClass =
+    "bg-gray-900 text-white border-r-2 border-[#aaff6c] shadow-[0_0_16px_2px_#aaff6c]";
+  const hoverClass =
+    "hover:bg-gray-900 hover:text-white hover:shadow-[0_0_12px_2px_#aaff6c] dark:hover:bg-gray-900 dark:hover:text-white dark:hover:shadow-[0_0_12px_2px_#aaff6c] transition-all";
+
   const renderMenuItem = (item) => {
     if (item.isSubmenu) {
       return (
         <button
           onClick={() => handleToggleSubMenu(item.name)}
-          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isCommunityActive()
-            ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
-            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`}
+          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
+            isCommunityActive()
+              ? activeClass
+              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+          }`}
         >
           <div className="flex items-center space-x-3">
             <SafeIcon icon={item.icon} className="w-5 h-5 flex-shrink-0" />
@@ -154,21 +159,22 @@ const Sidebar = ({ open, setOpen }) => {
           {open && (
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-4 h-4 transition-transform ${openSubMenu === item.name ? "rotate-90" : ""
-                }`}
+              className={`w-4 h-4 transition-transform ${
+                openSubMenu === item.name ? "rotate-90" : ""
+              }`}
             />
           )}
         </button>
       );
     }
-
     return (
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isActive
-            ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
-            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
+            isActive
+              ? activeClass
+              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
           }`
         }
       >
@@ -192,11 +198,12 @@ const Sidebar = ({ open, setOpen }) => {
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
-      className={`${open ? "w-82" : "w-20"
-        } bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
+      className={`${
+        open ? "w-82" : "w-20"
+      } bg-gray-900 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           {open && (
             <motion.div
@@ -207,28 +214,29 @@ const Sidebar = ({ open, setOpen }) => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">JR</span>
               </div>
-              <span className="font-bold text-gray-900">JobReferral.Club</span>
+              <span className="font-bold text-gray-100">
+                JobReferral.Club
+              </span>
             </motion.div>
           )}
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-5 h-5 text-gray-600 transition-transform ${!open ? "rotate-180" : ""
-                }`}
+              className={`w-5 h-5 text-gray-400 transition-transform ${
+                !open ? "rotate-180" : ""
+              }`}
             />
           </button>
         </div>
       </div>
-
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {filteredCommunity.map((item) => (
           <div key={item.name}>
             {renderMenuItem(item)}
-
             {/* Submenu rendering */}
             {item.children && openSubMenu === item.name && open && (
               <motion.div
@@ -240,16 +248,16 @@ const Sidebar = ({ open, setOpen }) => {
                   <div key={region.name}>
                     <button
                       onClick={() => handleToggleRegion(region.name)}
-                      className="flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-50"
+                      className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg text-gray-300 dark:text-gray-300 ${hoverClass}`}
                     >
                       {region.name}
                       <SafeIcon
                         icon={FiChevronLeft}
-                        className={`w-4 h-4 transition-transform ${openRegion === region.name ? "rotate-90" : ""
-                          }`}
+                        className={`w-4 h-4 transition-transform ${
+                          openRegion === region.name ? "rotate-90" : ""
+                        }`}
                       />
                     </button>
-
                     {region.children && openRegion === region.name && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
@@ -261,9 +269,10 @@ const Sidebar = ({ open, setOpen }) => {
                             key={sub.name}
                             to={sub.path}
                             className={({ isActive }) =>
-                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
-                                ? "bg-primary-50 text-primary-700 border-r-2 border-primary-600"
-                                : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                isActive
+                                  ? activeClass
+                                  : `text-gray-400 dark:text-gray-400 ${hoverClass}`
                               }`
                             }
                           >
@@ -279,9 +288,8 @@ const Sidebar = ({ open, setOpen }) => {
           </div>
         ))}
       </nav>
-
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-3">
           <img
             src={user?.avatar || "/default-avatar.jpg"}
@@ -294,7 +302,7 @@ const Sidebar = ({ open, setOpen }) => {
               animate={{ opacity: 1 }}
               className="flex-1 min-w-0"
             >
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-gray-100 truncate">
                 {user.name || "Guest User"}
               </p>
             </motion.div>
