@@ -66,7 +66,7 @@ router.get(
     passport.authenticate('google', { failureRedirect: '/login', session: false }),
     (req, res) => {
         const user = req.user;
-        const frontendUrl = `http://localhost:5173/login?token=${user._id}`; // replace with JWT ideally
+        const frontendUrl = `${process.env.FRONTEND_URL}/login?token=${user._id}`; // replace with JWT ideally
         res.redirect(frontendUrl);
     }
 );
