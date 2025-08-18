@@ -4,16 +4,9 @@ import { motion } from "framer-motion";
 import SafeIcon from "../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../store/authStore";
+import { menuItems, adminOnly } from "../data/menuList";
 
 const {
-  FiUsers,
-  FiBarChart3,
-  FiMail,
-  FiVideo,
-  FiAward,
-  FiDollarSign,
-  FiCalendar,
-  FiBook,
   FiSettings,
   FiChevronLeft,
 } = FiIcons;
@@ -52,73 +45,6 @@ const Sidebar = ({ open, setOpen }) => {
     return location.pathname.includes("/community");
   };
 
-  const menuItems = [
-    {
-      name: "Community",
-      icon: FiUsers,
-      isSubmenu: true,
-      children: [
-        {
-          name: "Community Hub",
-          children: [
-            { name: "Introductions", path: "/community/introductions" },
-            { name: "Ask the Community", path: "/community/ask-the-community" },
-            { name: "Announcements", path: "/community/announcements" },
-            { name: "Club Guidelines", path: "/community/club-guidelines" },
-          ],
-        },
-        {
-          name: "India Jobs",
-          region: "india",
-          children: [
-            { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
-            { name: "Program and Project Management", path: "/community/in/program" },
-            { name: "Product Management", path: "/community/in/product" },
-            { name: "Marketing Management", path: "/community/in/marketing" },
-            { name: "Sales and Account Management", path: "/community/in/account" },
-            { name: "Category and Vendor Management", path: "/community/in/category" },
-            { name: "Finance", path: "/community/in/finance" },
-            { name: "Human Resources", path: "/community/in/hr" },
-            { name: "Analytics", path: "/community/in/analyst" },
-            { name: "Strategy and Consulting", path: "/community/in/strategy" },
-          ],
-        },
-        {
-          name: "United States Jobs",
-          region: "us",
-          children: [
-            { name: "Operations and Supply Chain Management", path: "/community/us/operations" },
-            { name: "Program and Project Management", path: "/community/us/program" },
-            { name: "Product Management", path: "/community/us/product" },
-            { name: "Marketing Management", path: "/community/us/marketing" },
-            { name: "Sales and Account Management", path: "/community/us/account" },
-            { name: "Category and Vendor Management", path: "/community/us/category" },
-            { name: "Finance", path: "/community/us/finance" },
-            { name: "Human Resources", path: "/community/us/hr" },
-            { name: "Analytics", path: "/community/us/analyst" },
-            { name: "Strategy and Consulting", path: "/community/us/strategy" },
-          ],
-        },
-      ],
-    },
-    { name: "Analytics", icon: FiBarChart3, path: "/analytics" },
-    { name: "Email Broadcast", icon: FiMail, path: "/email" },
-    { name: "Events", icon: FiVideo, path: "/videos" },
-    { name: "Gamification", icon: FiAward, path: "/gamification" },
-    { name: "Monetization", icon: FiDollarSign, path: "/monetization" },
-    { name: "Coaching", icon: FiCalendar, path: "/coaching" },
-    { name: "Course Builder", icon: FiBook, path: "/courses" },
-  ];
-
-  const adminOnly = [
-    "Dashboard",
-    "Analytics",
-    "Email Broadcast",
-    "Gamification",
-    "Monetization",
-    "Coaching",
-    "Course Builder",
-  ];
 
   const filteredMenu =
     role === "admin"

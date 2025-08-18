@@ -5,40 +5,10 @@ import * as FiIcons from 'react-icons/fi';
 import { useCommunityStore } from '../store/communityStore';
 import { useAuthStore } from '../store/authStore';
 import { useLocation } from 'react-router-dom';
+import { subCommunities } from '../data/communityList';
 
 const { FiX, FiImage, FiLink, FiHash } = FiIcons;
 
-const subCommunities = [
-  // 🌍 Community Hub
-  { path: '/community/introductions', title: 'Introductions' },
-  { path: '/community/ask-the-community', title: 'Ask the Community' },
-  { path: '/community/announcements', title: 'Announcements' },
-  { path: '/community/club-guidelines', title: 'Club Guidelines' },
-
-  // 🇮🇳 India Jobs
-  { path: '/community/in/operations', title: 'Operations & Supply Chain - India' },
-  { path: '/community/in/program', title: 'Program & Project Management - India' },
-  { path: '/community/in/product', title: 'Product Management - India' },
-  { path: '/community/in/marketing', title: 'Marketing Management - India' },
-  { path: '/community/in/account', title: 'Sales & Account Management - India' },
-  { path: '/community/in/category', title: 'Category & Vendor Management - India' },
-  { path: '/community/in/finance', title: 'Finance - India' },
-  { path: '/community/in/hr', title: 'Human Resources - India' },
-  { path: '/community/in/analyst', title: 'Analytics - India' },
-  { path: '/community/in/strategy', title: 'Strategy & Consulting - India' },
-
-  // 🇺🇸 US Jobs
-  { path: '/community/us/operations', title: 'Operations & Supply Chain - US' },
-  { path: '/community/us/program', title: 'Program & Project Management - US' },
-  { path: '/community/us/product', title: 'Product Management - US' },
-  { path: '/community/us/marketing', title: 'Marketing Management - US' },
-  { path: '/community/us/account', title: 'Sales & Account Management - US' },
-  { path: '/community/us/category', title: 'Category & Vendor Management - US' },
-  { path: '/community/us/finance', title: 'Finance - US' },
-  { path: '/community/us/hr', title: 'Human Resources - US' },
-  { path: '/community/us/analyst', title: 'Analytics - US' },
-  { path: '/community/us/strategy', title: 'Strategy & Consulting - US' },
-];
 
 const CreatePost = ({ onClose }) => {
   const location = useLocation();
