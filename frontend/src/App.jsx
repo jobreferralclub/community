@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import { useAuthStore } from "./store/authStore";
 import AuthCallback from "./pages/community/AuthCallback";
 import Landing from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -142,6 +143,7 @@ function AppWrapper() {
       <Routes>
         {/* ✅ Landing page (always public) */}
         <Route path="/" element={<Landing />} />
+        <Route path="*" element={<NotFound/>} />
 
         {/* ✅ Public login route */}
         <Route

@@ -31,16 +31,21 @@ import companyRoutes from "./routes/companies.js";
 import otpRoutes from "./routes/otp.js";
 import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
-import rolesStatsRoutes from "./routes/rolesStats.js";   // ✅ New
+import rolesStatsRoutes from "./routes/rolesStats.js";
 
+// Community
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/auth", otpRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/analytics", analyticsRoutes);
-app.use("/api/roleStats", rolesStatsRoutes);   // ✅ Mount roles router
+
+// Login/Signup
+app.use("/api/auth", authRoutes);
+app.use("/api/auth", otpRoutes);
+
+// Landing page
+app.use("/api/roleStats", rolesStatsRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
