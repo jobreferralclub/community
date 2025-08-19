@@ -33,21 +33,49 @@ export const getUserById = async (req, res) => {
   }
 };
 
+
 // Update user
 export const updateUser = async (req, res) => {
   try {
-    const { name, email, password, accountRole } = req.body;
+    const {
+      name,
+      email,
+      password,
+      accountRole,
+      avatar,
+      job_title,
+      company,
+      location,
+      bio,
+      phone,
+    } = req.body;
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, password, accountRole },
+      {
+        name,
+        email,
+        password,
+        accountRole,
+        avatar,
+        job_title,
+        company,
+        location,
+        bio,
+        phone,
+      },
       { new: true, runValidators: true }
     );
-    if (!updatedUser) return res.status(404).json({ error: "User not found" });
+
+    if (!updatedUser)
+      return res.status(404).json({ error: "User not found" });
+
     res.json(updatedUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 // Delete user by ID
 export const deleteUser = async (req, res) => {

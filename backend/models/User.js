@@ -31,7 +31,12 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  job_title: String,
+  company: String,
+  location: String,
+  bio: String,
+  phone: String
 });
 
 export default mongoose.model('User', userSchema);
