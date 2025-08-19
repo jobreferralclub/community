@@ -24,7 +24,7 @@ const HeroSection = () => {
   const { user } = useAuthStore();
 
   const handleNavigate = () => {
-    window.open("/community", "_self"); // navigate to /community in same tab
+    user? window.open("/community", "_self"): window.open("/login", "_self");
   };
 
   return (

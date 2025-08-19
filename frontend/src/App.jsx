@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import { useAuthStore } from "./store/authStore";
 import AuthCallback from "./pages/community/AuthCallback";
 import Landing from "./pages/LandingPage";
+import ResumeBuilder from "./pages/resume/builder/ResumeBuilder";
 import NotFound from "./pages/NotFound";
 
 function AppWrapper() {
@@ -143,6 +144,7 @@ function AppWrapper() {
       <Routes>
         {/* ✅ Landing page (always public) */}
         <Route path="/" element={<Landing />} />
+        <Route path="/resume-builder" element={<ResumeBuilder/>} />
         <Route path="*" element={<NotFound/>} />
 
         {/* ✅ Public login route */}
@@ -217,7 +219,7 @@ function AppWrapper() {
           />
         ) : (
           // Redirect all unknown routes to login if not authenticated
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/community/*" element={<Navigate to="/login" replace />} />
         )}
       </Routes>
     </>

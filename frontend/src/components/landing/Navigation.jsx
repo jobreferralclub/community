@@ -8,12 +8,12 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
-  const { user } = useAuthStore();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const { user, logout } = useAuthStore();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -24,10 +24,6 @@ const Navigation = () => {
     { label: "Success Stories", href: "#stories" },
     { label: "Simulations", href: "#practice" },
   ];
-
-  const handleCommunity = () => {
-    window.location.href = "/community"; // navigates inside your app
-  };
 
   return (
     <motion.nav
@@ -90,7 +86,7 @@ const Navigation = () => {
                     className="absolute left-0 top-full mt-2 bg-black rounded-lg border border-gray-800 w-56 shadow-lg z-50 overflow-hidden"
                   >
                     {[
-                      { label: "Resume Builder", href: "./ai-resume-builder" },
+                      { label: "Resume Builder", href: "./resume-builder" },
                       { label: "Resume Ranker", href: "./resume-ranker" },
                       { label: "Resume Analyzer", href: "./resume-analyzer" },
                     ].map((service, idx) => (
@@ -111,14 +107,55 @@ const Navigation = () => {
           {/* CTA + Mobile Menu Button */}
           <div className="flex items-center gap-4">
             <div className="hidden lg:block">
-              <Button
-                onClick={handleCommunity}
-                className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20 whitespace-nowrap"
-              >
-                {user ? "Continue to Community" : "Sign In / Sign Up"}
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
+              {user ? (
+                <div
+                  className="relative flex items-center gap-2 cursor-pointer"
+                  onMouseEnter={() => setProfileOpen(true)}
+                  onMouseLeave={() => setProfileOpen(false)}
+                >
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-full border-2 border-primary-green"
+                  />
+                  <span className="text-gray-300 font-medium">{user.name}</span>
+
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 top-0 mt-12 bg-black rounded-lg border border-gray-800 w-48 shadow-lg z-50 overflow-hidden"
+                      >
+                        <a
+                          href="/community"
+                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
+                        >
+                          Continue to Community
+                        </a>
+                        <button
+                          onClick={() => logout()}
+                          className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
+                        >
+                          Log Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => (window.location.href = "/login")}
+                  className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20 whitespace-nowrap"
+                >
+                  Sign In / Sign Up
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </Button>
+              )}
             </div>
+
+            {/* Mobile menu icon */}
             <div className="lg:hidden">
               {menuOpen ? (
                 <X
@@ -155,16 +192,37 @@ const Navigation = () => {
                     {item.label}
                   </a>
                 ))}
-                <Button
-                  onClick={() => {
-                    handleCommunity();
-                    setMenuOpen(false);
-                  }}
-                  className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20"
-                >
-                  {user ? "Continue to Community" : "Sign In / Sign Up"}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </Button>
+                {user ? (
+                  <>
+                    <a
+                      href="/community"
+                      className="text-gray-300 hover:text-primary-green transition-colors duration-300 font-medium"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Continue to Community
+                    </a>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMenuOpen(false);
+                      }}
+                      className="text-red-400 hover:text-red-500 transition-colors duration-300 text-left"
+                    >
+                      Log Out
+                    </button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      window.location.href = "/login";
+                      setMenuOpen(false);
+                    }}
+                    className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20"
+                  >
+                    Sign In / Sign Up
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}

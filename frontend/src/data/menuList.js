@@ -61,13 +61,13 @@ export const menuItems = [
             },
         ],
     },
-    { name: "Analytics", icon: FiBarChart3, path: "/analytics" },
-    { name: "Email Broadcast", icon: FiMail, path: "/email" },
-    { name: "Events", icon: FiVideo, path: "/videos" },
-    { name: "Gamification", icon: FiAward, path: "/gamification" },
-    { name: "Monetization", icon: FiDollarSign, path: "/monetization" },
-    { name: "Coaching", icon: FiCalendar, path: "/coaching" },
-    { name: "Course Builder", icon: FiBook, path: "/courses" },
+    { name: "Analytics", icon: FiBarChart3, path: "/community/analytics" },
+    { name: "Email Broadcast", icon: FiMail, path: "/community/email" },
+    { name: "Events", icon: FiVideo, path: "/community/videos" },
+    { name: "Gamification", icon: FiAward, path: "/community/gamification" },
+    { name: "Monetization", icon: FiDollarSign, path: "/community/monetization" },
+    { name: "Coaching", icon: FiCalendar, path: "/community/coaching" },
+    { name: "Course Builder", icon: FiBook, path: "/community/courses" },
 ];
 
 export const adminOnly = [

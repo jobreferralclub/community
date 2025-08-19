@@ -220,7 +220,7 @@ const Sidebar = ({ open, setOpen }) => {
       {/* Settings at Bottom */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <NavLink
-          to="/settings"
+          to="/community/settings"
           className={({ isActive }) =>
             `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${isActive
               ? activeClass
