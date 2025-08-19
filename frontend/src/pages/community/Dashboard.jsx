@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import ReactECharts from 'echarts-for-react';
 
 const {

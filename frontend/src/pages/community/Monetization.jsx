@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 import ReactECharts from 'echarts-for-react';
 
 // Destructure icons
-const { 
-  FiDollarSign, 
-  FiCreditCard, 
-  FiUsers, 
-  FiTrendingUp, 
-  FiLink, 
-  FiSettings 
+const {
+  FiDollarSign,
+  FiCreditCard,
+  FiUsers,
+  FiTrendingUp,
+  FiLink,
+  FiSettings
 } = FiIcons;
 
 const Monetization = () => {
@@ -27,10 +27,10 @@ const Monetization = () => {
 
   // Pie chart for revenue
   const revenueChartOptions = {
-    title: { 
-      text: 'Revenue Breakdown', 
+    title: {
+      text: 'Revenue Breakdown',
       left: 'center',
-      textStyle: { color: '#e5e7eb' } 
+      textStyle: { color: '#e5e7eb' }
     },
     tooltip: { trigger: 'item' },
     series: [{
@@ -58,7 +58,7 @@ const Monetization = () => {
       name: 'Basic',
       price: '$9.99',
       interval: 'month',
-      features: ['Community Access','Basic Job Alerts','Standard Support'],
+      features: ['Community Access', 'Basic Job Alerts', 'Standard Support'],
       subscribers: 1245,
       color: 'blue'
     },
@@ -66,7 +66,7 @@ const Monetization = () => {
       name: 'Premium',
       price: '$19.99',
       interval: 'month',
-      features: ['Everything in Basic','Priority Referrals','Mentorship Access','1-on-1 Sessions'],
+      features: ['Everything in Basic', 'Priority Referrals', 'Mentorship Access', '1-on-1 Sessions'],
       subscribers: 856,
       color: 'purple'
     },
@@ -74,7 +74,7 @@ const Monetization = () => {
       name: 'Enterprise',
       price: '$49.99',
       interval: 'month',
-      features: ['Everything in Premium','Custom Branding','API Access','Dedicated Support'],
+      features: ['Everything in Premium', 'Custom Branding', 'API Access', 'Dedicated Support'],
       subscribers: 55,
       color: 'orange'
     }
@@ -342,11 +342,11 @@ const Monetization = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Publishable Key</label>
-              <input type="text" placeholder="pk_test_..." className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+              <input type="text" placeholder="pk_test_..." className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Secret Key</label>
-              <input type="password" placeholder="sk_test_..." className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+              <input type="password" placeholder="sk_test_..." className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
             </div>
           </div>
         </div>
@@ -357,11 +357,11 @@ const Monetization = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID</label>
-              <input type="text" placeholder="PayPal Client ID" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+              <input type="text" placeholder="PayPal Client ID" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client Secret</label>
-              <input type="password" placeholder="PayPal Client Secret" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+              <input type="password" placeholder="PayPal Client Secret" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
             </div>
           </div>
         </div>
@@ -378,13 +378,13 @@ const Monetization = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Default Tax Rate</label>
                 <div className="flex items-center space-x-2">
-                  <input type="number" step="0.01" defaultValue="8.25" className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+                  <input type="number" step="0.01" defaultValue="8.25" className="flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
                   <span className="text-sm text-gray-600 dark:text-gray-400">%</span>
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tax ID</label>
-                <input type="text" placeholder="Enter tax ID" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"/>
+                <input type="text" placeholder="Enter tax ID" className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-2 focus:ring-primary-500" />
               </div>
             </div>
           </div>
@@ -418,11 +418,10 @@ const Monetization = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab.id
+              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                   ? 'border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}
+                }`}
             >
               <SafeIcon icon={tab.icon} className="w-4 h-4" />
               <span>{tab.name}</span>

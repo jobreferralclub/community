@@ -1,12 +1,12 @@
 import { useLocation } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
-import { useCommunity } from '../hooks/useCommunity';
+import { useCommunity } from '../../hooks/useCommunity';
 import CommentModal from './CommentModal';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
@@ -238,9 +238,8 @@ const PostCard = ({ post }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLike}
-              className={`flex items-center space-x-2 transition-colors ${
-                liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-              }`}
+              className={`flex items-center space-x-2 transition-colors ${liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
+                }`}
             >
               <SafeIcon icon={FiHeart} className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
               <span className="text-sm font-medium">{likeCount}</span>

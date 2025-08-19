@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
 // Extract used Feather icons
@@ -75,7 +75,7 @@ const CourseBuilder = () => {
 
   // --- HELPER: Status color ---
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'published': return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-300';
       case 'draft': return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200';
       case 'scheduled': return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-300';
@@ -96,9 +96,9 @@ const CourseBuilder = () => {
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity:0, y:20 }}
-            animate={{ opacity:1, y:0 }}
-            transition={{ delay:index*0.1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
             className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border 
                        border-gray-200 dark:border-gray-700 text-center"
           >
@@ -117,15 +117,15 @@ const CourseBuilder = () => {
         {courses.map((course, index) => (
           <motion.div
             key={course.id}
-            initial={{opacity:0,y:20}}
-            animate={{opacity:1,y:0}}
-            transition={{delay:index*0.1}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
             className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm 
                        border border-gray-200 dark:border-gray-700 hover:shadow-md transition"
           >
             <div className="relative">
               <img src={course.thumbnail} alt={course.title}
-                   className="w-full h-48 object-cover"/>
+                className="w-full h-48 object-cover" />
               <div className="absolute top-4 right-4">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(course.status)}`}>
                   {course.status}
@@ -147,26 +147,26 @@ const CourseBuilder = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{course.description}</p>
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                 <span className="flex items-center space-x-1">
-                  <SafeIcon icon={FiUsers} className="w-4 h-4"/>
+                  <SafeIcon icon={FiUsers} className="w-4 h-4" />
                   <span>{course.students} students</span>
                 </span>
                 <span className="flex items-center space-x-1">
-                  <SafeIcon icon={FiBook} className="w-4 h-4"/>
+                  <SafeIcon icon={FiBook} className="w-4 h-4" />
                   <span>{course.lessons} lessons</span>
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-1">
                   <div className="flex">
-                    {[...Array(5)].map((_,i)=>(
+                    {[...Array(5)].map((_, i) => (
                       <SafeIcon key={i} icon={FiStar}
-                        className={`w-4 h-4 ${i<Math.floor(course.rating)?'text-yellow-400':'text-gray-300 dark:text-gray-600'}`}/>
+                        className={`w-4 h-4 ${i < Math.floor(course.rating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} />
                     ))}
                   </div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">({course.rating})</span>
                 </div>
                 <button className="text-primary-600 dark:text-primary-400 hover:text-primary-700 transition">
-                  <SafeIcon icon={FiEdit} className="w-5 h-5"/>
+                  <SafeIcon icon={FiEdit} className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -179,8 +179,8 @@ const CourseBuilder = () => {
   // ================= RENDER CREATE COURSE =================
   const renderCreateCourse = () => (
     <motion.div
-      initial={{opacity:0,y:20}}
-      animate={{opacity:1,y:0}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
                  border border-gray-200 dark:border-gray-700"
     >
@@ -212,17 +212,17 @@ const CourseBuilder = () => {
         {/* Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Price ($)</label>
-            <input type="number" className="w-full p-3 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"/></div>
+            <input type="number" className="w-full p-3 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" /></div>
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Difficulty</label>
             <select className="w-full p-3 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"><option>Beginner</option></select></div>
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duration</label>
-            <input type="text" placeholder="8 hours" className="w-full p-3 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"/></div>
+            <input type="text" placeholder="8 hours" className="w-full p-3 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" /></div>
         </div>
         {/* Thumb */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Thumbnail</label>
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-            <SafeIcon icon={FiPlus} className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2"/>
+            <SafeIcon icon={FiPlus} className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
             <p className="text-gray-600 dark:text-gray-400">Upload 1280x720 recommended</p>
             <button className="mt-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition">Choose File</button>
           </div>
@@ -231,9 +231,9 @@ const CourseBuilder = () => {
         <div className="space-y-4">
           <h4 className="font-medium text-gray-900 dark:text-white">Settings</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {['Enable drip content','Require approval','Issue certificates','Enable forums'].map((opt,i)=>(
+            {['Enable drip content', 'Require approval', 'Issue certificates', 'Enable forums'].map((opt, i) => (
               <label key={i} className="flex items-center space-x-3">
-                <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded"/>
+                <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded" />
                 <span className="text-sm text-gray-700 dark:text-gray-300">{opt}</span>
               </label>
             ))}
@@ -253,8 +253,8 @@ const CourseBuilder = () => {
     <div className="space-y-6">
       {/* Schedule */}
       <motion.div
-        initial={{opacity:0,y:20}}
-        animate={{opacity:1,y:0}}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Drip Schedule</h3>
@@ -262,47 +262,46 @@ const CourseBuilder = () => {
           <div><label className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Release</label>
             <select className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700"><option>Daily</option></select></div>
           <div><label className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Start</label>
-            <input type="date" className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700"/></div>
+            <input type="date" className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700" /></div>
           <div><label className="block text-sm text-gray-700 dark:text-gray-300 mb-2">TimeZone</label>
             <select className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700"><option>UTC</option></select></div>
         </div>
       </motion.div>
       {/* Timeline */}
-      <motion.div 
-        initial={{opacity:0,y:20}} 
-        animate={{opacity:1,y:0}}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
       >
         <div className="flex justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Timeline</h3>
           <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 flex items-center space-x-2">
-            <SafeIcon icon={FiPlus} className="w-4 h-4"/><span>Add</span>
+            <SafeIcon icon={FiPlus} className="w-4 h-4" /><span>Add</span>
           </button>
         </div>
         <div className="space-y-4">
-          {dripContent.map(c=>(
+          {dripContent.map(c => (
             <div key={c.id} className="flex items-center space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
               <div className="flex-shrink-0">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  c.status==='published'?'bg-green-100 dark:bg-green-800':
-                  c.status==='scheduled'?'bg-blue-100 dark:bg-blue-800':
-                  'bg-gray-100 dark:bg-gray-700'}`}>
-                  <SafeIcon icon={c.status==='published'?FiUnlock:FiLock}
-                    className={`w-4 h-4 ${c.status==='published'?'text-green-600 dark:text-green-300':c.status==='scheduled'?'text-blue-600 dark:text-blue-300':'text-gray-600 dark:text-gray-300'}`}/>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${c.status === 'published' ? 'bg-green-100 dark:bg-green-800' :
+                    c.status === 'scheduled' ? 'bg-blue-100 dark:bg-blue-800' :
+                      'bg-gray-100 dark:bg-gray-700'}`}>
+                  <SafeIcon icon={c.status === 'published' ? FiUnlock : FiLock}
+                    className={`w-4 h-4 ${c.status === 'published' ? 'text-green-600 dark:text-green-300' : c.status === 'scheduled' ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}`} />
                 </div>
               </div>
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900 dark:text-white">{c.title}</h4>
                 <div className="flex space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  <span className="flex items-center space-x-1"><SafeIcon icon={c.type==='video'?FiPlay:FiBook} className="w-3 h-3"/><span>{c.type}</span></span>
-                  <span className="flex items-center space-x-1"><SafeIcon icon={FiClock} className="w-3 h-3"/><span>{c.duration}</span></span>
+                  <span className="flex items-center space-x-1"><SafeIcon icon={c.type === 'video' ? FiPlay : FiBook} className="w-3 h-3" /><span>{c.type}</span></span>
+                  <span className="flex items-center space-x-1"><SafeIcon icon={FiClock} className="w-3 h-3" /><span>{c.duration}</span></span>
                   <span>{c.releaseDate}</span>
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(c.status)}`}>{c.status}</span>
                 <button className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-                  <SafeIcon icon={FiEdit} className="w-4 h-4"/>
+                  <SafeIcon icon={FiEdit} className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -323,23 +322,22 @@ const CourseBuilder = () => {
       {/* Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex space-x-8">
-          {tabs.map(tab=>(
-            <button key={tab.id} onClick={()=>setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition ${
-                activeTab===tab.id
+          {tabs.map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition ${activeTab === tab.id
                   ? 'border-primary-500 text-primary-600 dark:text-primary-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
-              }`}>
-              <SafeIcon icon={tab.icon} className="w-4 h-4"/><span>{tab.name}</span>
+                }`}>
+              <SafeIcon icon={tab.icon} className="w-4 h-4" /><span>{tab.name}</span>
             </button>
           ))}
         </nav>
       </div>
       {/* Content */}
       <div>
-        {activeTab==='courses' && renderCourses()}
-        {activeTab==='create' && renderCreateCourse()}
-        {activeTab==='drip' && renderDripContent()}
+        {activeTab === 'courses' && renderCourses()}
+        {activeTab === 'create' && renderCreateCourse()}
+        {activeTab === 'drip' && renderDripContent()}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
-import SafeIcon from "../common/SafeIcon";
+import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 
 const { FiTrendingUp, FiUsers, FiActivity, FiCalendar } = FiIcons;

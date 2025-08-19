@@ -1,7 +1,7 @@
 // VideoHub.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
 const {
@@ -364,11 +364,10 @@ const VideoHub = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
-                activeTab === tab.id
+              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                   ? 'border-primary-500 text-primary-400'
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
-              }`}
+                }`}
             >
               <SafeIcon icon={tab.icon} className="w-4 h-4" />
               <span>{tab.name}</span>

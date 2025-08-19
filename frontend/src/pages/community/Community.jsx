@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import SafeIcon from "../common/SafeIcon";
+import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
-import { useCommunityStore } from "../store/communityStore";
-import PostCard from "../components/PostCard";
-import CreatePost from "../components/CreatePost";
+import { useCommunityStore } from "../../store/communityStore";
+import PostCard from "../../components/community/PostCard";
+import CreatePost from "../../components/community/CreatePost";
 import { useLocation } from "react-router-dom";
-import { subCommunities } from "../data/communityList";
+import { subCommunities } from "../../data/communityList";
 
 const { FiPlus, FiFilter, FiSearch, FiTrendingUp } = FiIcons;
 
@@ -20,7 +20,7 @@ const Community = () => {
   useEffect(() => {
     loadPosts();
   }, [loadPosts]);
-  
+
   const currentCommunity =
     subCommunities.find((c) => location.pathname.startsWith(c.path)) || {
       title: "Community",
@@ -99,8 +99,8 @@ const Community = () => {
                   key={filterOption.id}
                   onClick={() => setFilter(filterOption.id)}
                   className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-                      ? "bg-[#79e708] !text-black"
-                      : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                    ? "bg-[#79e708] !text-black"
+                    : "bg-gray-700 text-gray-400 hover:bg-gray-600"
                     }`}
                 >
                   {filterOption.name} ({filterOption.count})

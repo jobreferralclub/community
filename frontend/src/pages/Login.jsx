@@ -158,19 +158,19 @@ const Login = () => {
 
     const payload = isSignup
       ? {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          accountRole: roleParam,
-          companyDomain:
-            roleParam === "recruiter" || roleParam === "tpo"
-              ? selectedCompanyDomain
-              : undefined,
-        }
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        accountRole: roleParam,
+        companyDomain:
+          roleParam === "recruiter" || roleParam === "tpo"
+            ? selectedCompanyDomain
+            : undefined,
+      }
       : {
-          email: formData.email,
-          password: formData.password,
-        };
+        email: formData.email,
+        password: formData.password,
+      };
 
     try {
       const response = await fetch(url, {
@@ -432,11 +432,10 @@ const Login = () => {
           <button
             type="submit"
             disabled={isSignup && !isOtpVerified}
-            className={`w-full py-3 rounded-lg font-medium ${
-              isSignup && !isOtpVerified
-                ? "bg-[#79e708] text-black opacity-50 cursor-not-allowed"
-                : "bg-[#79e708] text-black hover:bg-[#79e708]/90"
-            } transition-colors`}
+            className={`w-full py-3 rounded-lg font-medium ${isSignup && !isOtpVerified
+              ? "bg-[#79e708] text-black opacity-50 cursor-not-allowed"
+              : "bg-[#79e708] text-black hover:bg-[#79e708]/90"
+              } transition-colors`}
           >
             {isSignup ? "Create Account" : "Login"}
           </button>

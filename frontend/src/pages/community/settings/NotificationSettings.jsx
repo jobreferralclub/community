@@ -8,7 +8,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FiMail, FiSmartphone } from "react-icons/fi";
-import SafeIcon from "../../common/SafeIcon";
+import SafeIcon from "../../../common/SafeIcon";
 
 const NotificationSettings = () => {
   return (

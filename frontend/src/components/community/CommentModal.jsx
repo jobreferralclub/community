@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import SafeIcon from "../common/SafeIcon";
+import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
-import { useCommunity } from "../hooks/useCommunity";
-import { useAuthStore } from "../store/authStore";
+import { useCommunity } from "../../hooks/useCommunity";
+import { useAuthStore } from "../../store/authStore";
 import { formatDistanceToNow } from "date-fns";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";

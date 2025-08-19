@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import LocationModal from './LocationModal';
 
 const Layout = ({ children }) => {
@@ -42,9 +42,9 @@ const Layout = ({ children }) => {
         </div>
       </div>
 
-      <LocationModal 
-        isOpen={location === null} 
-        onSelect={(loc) => setLocation(loc)} 
+      <LocationModal
+        isOpen={location === null}
+        onSelect={(loc) => setLocation(loc)}
       />
     </>
   );

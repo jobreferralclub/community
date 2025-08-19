@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -48,9 +48,9 @@ const calendarDarkStyle = `
   }
 `;
 
-const { 
+const {
   FiCalendar, FiClock, FiUser, FiVideo, FiPhone,
-  FiMapPin, FiPlus, FiEdit, FiStar 
+  FiMapPin, FiPlus, FiEdit, FiStar
 } = FiIcons;
 
 const Coaching = () => {
@@ -65,7 +65,7 @@ const Coaching = () => {
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1e5?w=150&h=150&fit=crop&crop=face',
       rating: 4.9,
       sessions: 156,
-      specialties: ['React','System Design','Career Growth'],
+      specialties: ['React', 'System Design', 'Career Growth'],
       hourlyRate: 120,
       availability: 'Available today'
     },
@@ -76,7 +76,7 @@ const Coaching = () => {
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       rating: 4.8,
       sessions: 203,
-      specialties: ['Product Strategy','Leadership','Interview Prep'],
+      specialties: ['Product Strategy', 'Leadership', 'Interview Prep'],
       hourlyRate: 150,
       availability: 'Available tomorrow'
     },
@@ -87,7 +87,7 @@ const Coaching = () => {
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
       rating: 5.0,
       sessions: 89,
-      specialties: ['Team Management','Technical Leadership','Scaling'],
+      specialties: ['Team Management', 'Technical Leadership', 'Scaling'],
       hourlyRate: 180,
       availability: 'Available this week'
     }
@@ -124,12 +124,12 @@ const Coaching = () => {
   ];
 
   const timeSlots = [
-    '9:00 AM','10:00 AM','11:00 AM','2:00 PM',
-    '3:00 PM','4:00 PM','5:00 PM'
+    '9:00 AM', '10:00 AM', '11:00 AM', '2:00 PM',
+    '3:00 PM', '4:00 PM', '5:00 PM'
   ];
 
   const getStatusColor = (status) => {
-    switch(status) {
+    switch (status) {
       case 'confirmed': return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-300';
       case 'pending': return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200';
       case 'cancelled': return 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-300';
@@ -150,7 +150,7 @@ const Coaching = () => {
           </p>
         </div>
         <motion.button
-          whileHover={{ scale: 1.02 }} 
+          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowBookingModal(true)}
           className="mt-4 sm:mt-0 bg-primary-600 text-white px-4 py-2 rounded-lg font-medium 
@@ -166,21 +166,21 @@ const Coaching = () => {
         <div className="lg:col-span-2 space-y-6">
           {/* Upcoming Sessions */}
           <motion.div
-            initial={{ opacity:0, y:20 }}
-            animate={{ opacity:1, y:0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
                        border border-gray-200 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Sessions</h3>
             <div className="space-y-4">
-              {upcomingSessions.map((session)=>(
+              {upcomingSessions.map((session) => (
                 <div key={session.id} className="flex items-center justify-between p-4 
                                                 border border-gray-200 dark:border-gray-700 
                                                 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                   <div className="flex items-center space-x-4">
                     <div className="p-2 bg-primary-50 dark:bg-primary-900 rounded-lg">
-                      <SafeIcon 
-                        icon={session.type === 'Video Call' ? FiVideo : FiPhone} 
+                      <SafeIcon
+                        icon={session.type === 'Video Call' ? FiVideo : FiPhone}
                         className="w-5 h-5 text-primary-600 dark:text-primary-400"
                       />
                     </div>
@@ -213,25 +213,25 @@ const Coaching = () => {
           </motion.div>
           {/* Coaches */}
           <motion.div
-            initial={{ opacity:0, y:20 }}
-            animate={{ opacity:1, y:0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
                        border border-gray-200 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Coaches</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {coaches.map((coach)=>(
+              {coaches.map((coach) => (
                 <div key={coach.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg
                                                hover:border-primary-200 dark:hover:border-primary-600 transition-colors">
                   <div className="flex items-start space-x-3">
-                    <img src={coach.avatar} alt={coach.name} className="w-12 h-12 rounded-full object-cover"/>
+                    <img src={coach.avatar} alt={coach.name} className="w-12 h-12 rounded-full object-cover" />
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900 dark:text-white">{coach.name}</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{coach.title}</p>
                       {/* Stars */}
                       <div className="flex items-center space-x-2 mb-2">
                         <div className="flex items-center">
-                          {[...Array(5)].map((_, i)=>(
+                          {[...Array(5)].map((_, i) => (
                             <SafeIcon key={i} icon={FiStar} className={`w-3 h-3 ${i < Math.floor(coach.rating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} />
                           ))}
                         </div>
@@ -241,7 +241,7 @@ const Coaching = () => {
                       </div>
                       {/* Skills */}
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {coach.specialties.map((sp)=>(
+                        {coach.specialties.map((sp) => (
                           <span key={sp} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs">
                             {sp}
                           </span>
@@ -253,8 +253,8 @@ const Coaching = () => {
                           <p className="text-sm font-medium text-gray-900 dark:text-white">${coach.hourlyRate}/hour</p>
                           <p className="text-xs text-green-600 dark:text-green-400">{coach.availability}</p>
                         </div>
-                        <button 
-                          onClick={()=>setShowBookingModal(true)} 
+                        <button
+                          onClick={() => setShowBookingModal(true)}
                           className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700 transition">
                           Book
                         </button>
@@ -267,15 +267,15 @@ const Coaching = () => {
           </motion.div>
         </div>
         {/* Sidebar: Calendar */}
-        <motion.div 
-          initial={{ opacity:0, x:20 }} 
-          animate={{ opacity:1, x:0 }}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
           className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
         >
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Schedule</h3>
           <div className="calendar-container">
-            <Calendar 
-              onChange={setSelectedDate} 
+            <Calendar
+              onChange={setSelectedDate}
               value={selectedDate}
               className="w-full border-none"
             />
@@ -284,8 +284,8 @@ const Coaching = () => {
           <div className="mt-6">
             <h4 className="font-medium text-gray-900 dark:text-white mb-3">Available Times</h4>
             <div className="grid grid-cols-2 gap-2">
-              {timeSlots.map((time)=>(
-                <button 
+              {timeSlots.map((time) => (
+                <button
                   key={time}
                   className="p-2 text-sm border border-gray-200 dark:border-gray-700 rounded 
                              hover:border-primary-200 dark:hover:border-primary-600 
@@ -318,15 +318,15 @@ const Coaching = () => {
       {/* Booking Modal */}
       {showBookingModal && (
         <motion.div
-          initial={{ opacity:0 }}
-          animate={{ opacity:1 }}
-          exit={{ opacity:0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
         >
           <motion.div
-            initial={{ scale:0.95, opacity:0 }}
-            animate={{ scale:1, opacity:1 }}
-            exit={{ scale:0.95, opacity:0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
             className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md"
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Book a Session</h3>
@@ -336,7 +336,7 @@ const Coaching = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Coach</label>
                 <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
                   <option>Choose a coach...</option>
-                  {coaches.map((coach)=>(
+                  {coaches.map((coach) => (
                     <option key={coach.id} value={coach.id}>
                       {coach.name} - ${coach.hourlyRate}/hour
                     </option>
@@ -373,13 +373,13 @@ const Coaching = () => {
             </div>
             {/* Buttons */}
             <div className="flex items-center justify-end space-x-3 mt-6">
-              <button 
-                onClick={()=>setShowBookingModal(false)}
+              <button
+                onClick={() => setShowBookingModal(false)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition">
                 Cancel
               </button>
               <button
-                onClick={()=>setShowBookingModal(false)}
+                onClick={() => setShowBookingModal(false)}
                 className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition">
                 Book Session
               </button>

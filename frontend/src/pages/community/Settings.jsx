@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import SafeIcon from "../common/SafeIcon";
+import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
-import { useAuthStore } from "../store/authStore";
-import {tabs, adminOnly} from "../data/settingList";
+import { useAuthStore } from "../../store/authStore";
+import { tabs, adminOnly } from "../../data/settingList";
 import ProfileSettings from "./settings/ProfileSettings";
 import NotificationSettings from "./settings/NotificationSettings";
 import PrivacySettings from "./settings/PrivacySettings";
@@ -85,11 +85,10 @@ const Settings = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                      activeTab === tab.id
+                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === tab.id
                         ? "bg-primary-700 text-primary-300"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <SafeIcon icon={tab.icon} className="w-5 h-5" />
                     <span className="font-medium">{tab.name}</span>
@@ -103,13 +102,13 @@ const Settings = () => {
         {/* Content */}
         <div className="lg:col-span-3">
           {activeTab === "profile" && <ProfileSettings user={user} />}
-          {activeTab === "notifications" && <NotificationSettings/>}
-          {activeTab === "privacy" && <PrivacySettings/>}
-          {activeTab === "integrations" && <IntegrationSettings/>}
-          {activeTab === "api" && <ApiSettings/>}
-          {activeTab === "data" && <DataExportSettings/>}
-          {activeTab === "companies" && <CompanySettings/>}
-          {activeTab === "users" && <UserSettings/>}
+          {activeTab === "notifications" && <NotificationSettings />}
+          {activeTab === "privacy" && <PrivacySettings />}
+          {activeTab === "integrations" && <IntegrationSettings />}
+          {activeTab === "api" && <ApiSettings />}
+          {activeTab === "data" && <DataExportSettings />}
+          {activeTab === "companies" && <CompanySettings />}
+          {activeTab === "users" && <UserSettings />}
         </div>
       </div>
 

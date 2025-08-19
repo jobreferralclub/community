@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import SafeIcon from '../common/SafeIcon';
+import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
-import { useCommunityStore } from '../store/communityStore';
-import { useAuthStore } from '../store/authStore';
+import { useCommunityStore } from '../../store/communityStore';
+import { useAuthStore } from '../../store/authStore';
 import { useLocation } from 'react-router-dom';
-import { subCommunities } from '../data/communityList';
+import { subCommunities } from '../../data/communityList';
 
 const { FiX, FiImage, FiLink, FiHash } = FiIcons;
 
@@ -117,7 +117,7 @@ const CreatePost = ({ onClose }) => {
   return (
     <motion.div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
       <motion.div className="bg-gray-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">Create New Post</h2>

@@ -1,10 +1,10 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import SafeIcon from "../common/SafeIcon";
+import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
-import { useAuthStore } from "../store/authStore";
-import { menuItems, adminOnly } from "../data/menuList";
+import { useAuthStore } from "../../store/authStore";
+import { menuItems, adminOnly } from "../../data/menuList";
 
 const {
   FiSettings,
@@ -74,11 +74,10 @@ const Sidebar = ({ open, setOpen }) => {
       return (
         <button
           onClick={() => handleToggleSubMenu(item.name)}
-          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
-            isCommunityActive()
+          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isCommunityActive()
               ? activeClass
               : `text-gray-300 dark:text-gray-300 ${hoverClass}`
-          }`}
+            }`}
         >
           <div className="flex items-center space-x-3">
             <SafeIcon icon={item.icon} className="w-5 h-5 flex-shrink-0" />
@@ -95,9 +94,8 @@ const Sidebar = ({ open, setOpen }) => {
           {open && (
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-4 h-4 transition-transform ${
-                openSubMenus.includes(item.name) ? "rotate-90" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${openSubMenus.includes(item.name) ? "rotate-90" : ""
+                }`}
             />
           )}
         </button>
@@ -107,10 +105,9 @@ const Sidebar = ({ open, setOpen }) => {
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
-            isActive
-              ? activeClass
-              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isActive
+            ? activeClass
+            : `text-gray-300 dark:text-gray-300 ${hoverClass}`
           }`
         }
       >
@@ -134,9 +131,8 @@ const Sidebar = ({ open, setOpen }) => {
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
-      className={`${
-        open ? "w-82" : "w-20"
-      } bg-gray-900 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
+      className={`${open ? "w-82" : "w-20"
+        } bg-gray-900 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -159,9 +155,8 @@ const Sidebar = ({ open, setOpen }) => {
           >
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-5 h-5 text-gray-400 transition-transform ${
-                !open ? "rotate-180" : ""
-              }`}
+              className={`w-5 h-5 text-gray-400 transition-transform ${!open ? "rotate-180" : ""
+                }`}
             />
           </button>
         </div>
@@ -188,9 +183,8 @@ const Sidebar = ({ open, setOpen }) => {
                       {region.name}
                       <SafeIcon
                         icon={FiChevronLeft}
-                        className={`w-4 h-4 transition-transform ${
-                          openRegions.includes(region.name) ? "rotate-90" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${openRegions.includes(region.name) ? "rotate-90" : ""
+                          }`}
                       />
                     </button>
                     {region.children && openRegions.includes(region.name) && (
@@ -204,10 +198,9 @@ const Sidebar = ({ open, setOpen }) => {
                             key={sub.name}
                             to={sub.path}
                             className={({ isActive }) =>
-                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                isActive
-                                  ? activeClass
-                                  : `text-gray-400 dark:text-gray-400 ${hoverClass}`
+                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
+                                ? activeClass
+                                : `text-gray-400 dark:text-gray-400 ${hoverClass}`
                               }`
                             }
                           >
@@ -229,10 +222,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/settings"
           className={({ isActive }) =>
-            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
-              isActive
-                ? activeClass
-                : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${isActive
+              ? activeClass
+              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
             }`
           }
         >
