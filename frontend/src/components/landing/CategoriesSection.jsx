@@ -97,7 +97,7 @@ const CategoriesSection = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const res = await fetch(import.meta.env.VITE_API_URL + "/api/roles");
+        const res = await fetch(import.meta.env.VITE_API_PORT + "/api/roleStats");
         const data = await res.json();
 
         const updated = baseCategories.map((category) => {

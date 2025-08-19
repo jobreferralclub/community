@@ -2,11 +2,17 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path from "path";
 
 import { conn, gfsBucket, upload } from "./utils/gridfs.js";
 
 // === Load Environment Variables ===
 dotenv.config();
+
+// === Fix __dirname for ES modules ===
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // === Initialize Express App ===
 const app = express();
@@ -25,14 +31,17 @@ import companyRoutes from "./routes/companies.js";
 import otpRoutes from "./routes/otp.js";
 import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
+import rolesStatsRoutes from "./routes/rolesStats.js";   // ✅ New
 
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes); // Auth/login/signup
-app.use("/api/auth", otpRoutes);  // OTP verification
+app.use("/api/auth", authRoutes);
+app.use("/api/auth", otpRoutes);
 app.use("/api/companies", companyRoutes);
-app.use("/api", uploadRoutes); // Image upload routes
-app.use("/api/analytics",analyticsRoutes);
+app.use("/api", uploadRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/roleStats", rolesStatsRoutes);   // ✅ Mount roles router
+
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
