@@ -1,12 +1,9 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import multer from 'multer';
-import { GridFsStorage } from 'multer-gridfs-storage';
-import path from 'path';
-import crypto from 'crypto';
-import { GridFSBucket } from 'mongodb';
+// server.js
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+
+import { conn, gfsBucket, upload } from "./utils/gridfs.js";
 
 // === Load Environment Variables ===
 dotenv.config();
@@ -18,42 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === MongoDB Connection ===
-const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const conn = mongoose.connection;
-
-// === GridFS Bucket Setup ===
-let gfsBucket;
-conn.once('open', () => {
-  gfsBucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
-  console.log('✅ MongoDB connected & GridFSBucket initialized');
-});
-
-// === Multer + GridFS Storage Setup ===
-const storage = new GridFsStorage({
-  url: mongoURI,
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      crypto.randomBytes(16, (err, buf) => {
-        if (err) return reject(err);
-        const filename = buf.toString('hex') + path.extname(file.originalname);
-        resolve({
-          filename,
-          bucketName: 'uploads',
-        });
-      });
-    });
-  },
-});
-const upload = multer({ storage });
-
 // ===================================================================
-// 📂 Image Upload + Retrieval Routes
+// 🌐 API Routes
 // ===================================================================
 
 // Upload an image
@@ -99,17 +62,15 @@ import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
 import companyRoutes from './routes/companies.js';
 import otpRoutes from './routes/otp.js';
-import analyticsRoutes from './routes/analytics.js';
 
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);  // Auth/login/signup
 app.use('/api/auth', otpRoutes);   // OTP verification
 app.use('/api/companies', companyRoutes);
-app.use('/api/analytics', analyticsRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // ===================================================================
 // 🚀 Start Server
