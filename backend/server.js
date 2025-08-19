@@ -99,12 +99,14 @@ import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
 import companyRoutes from './routes/companies.js';
 import otpRoutes from './routes/otp.js';
+import analyticsRoutes from './routes/analytics.js';
 
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);  // Auth/login/signup
 app.use('/api/auth', otpRoutes);   // OTP verification
 app.use('/api/companies', companyRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));

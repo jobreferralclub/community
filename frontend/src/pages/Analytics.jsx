@@ -1,204 +1,278 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import ReactECharts from 'echarts-for-react';
-import SafeIcon from '../common/SafeIcon';
-import * as FiIcons from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import ReactECharts from "echarts-for-react";
+import SafeIcon from "../common/SafeIcon";
+import * as FiIcons from "react-icons/fi";
 
-// Extract icons for easy usage
-const { FiTrendingUp, FiUsers, FiActivity, FiDollarSign, FiCalendar } = FiIcons;
+const { FiTrendingUp, FiUsers, FiActivity, FiCalendar } = FiIcons;
+
+const formatNumber = (num) => {
+  if (num === null || num === undefined) return "...";
+  if (num > 9999) return (num / 1000).toFixed(1) + "k";
+  return num.toString();
+};
+
+// Helper to format nested _id object {year, month, day} to 'DD/MM'
+const formatDayMonthFromId = (dateObj) => {
+  if (!dateObj) return "No date";
+  const day = String(dateObj.day).padStart(2, "0");
+  const month = String(dateObj.month).padStart(2, "0");
+  return `${day}/${month}`;
+};
+
+// Updated formatSeries for nested date _id
+const formatSeries = (data) => {
+  if (!data) return { labels: [], values: [] };
+  return {
+    labels: data.map((d) => formatDayMonthFromId(d._id)),
+    values: data.map((d) => d.count),
+  };
+};
 
 const Analytics = () => {
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState("30d");
+  const [userGrowthData, setUserGrowthData] = useState(null);
+  const [postsActivityData, setPostsActivityData] = useState(null);
+  const [commentsActivityData, setCommentsActivityData] = useState(null);
+  const [userRolesData, setUserRolesData] = useState(null);
+  const [topActiveUsersData, setTopActiveUsersData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Metrics summary
+  useEffect(() => {
+    async function fetchAnalytics() {
+      setLoading(true);
+      setError(null);
+      try {
+        const [userGrowthRes, postsActivityRes, commentsActivityRes, userRolesRes] =
+          await Promise.all([
+            fetch(`http://localhost:5000/api/analytics/user-growth?timeRange=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/posts-activity?timeRange=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/comments-activity?timeRange=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/user-roles?timeRange=${timeRange}`),
+          ]);
+
+        if (
+          !userGrowthRes.ok ||
+          !postsActivityRes.ok ||
+          !commentsActivityRes.ok ||
+          !userRolesRes.ok
+        ) {
+          throw new Error("One or more API requests failed");
+        }
+        const [userGrowthJson, postsActivityJson, commentsActivityJson, userRolesJson] =
+          await Promise.all([
+            userGrowthRes.json(),
+            postsActivityRes.json(),
+            commentsActivityRes.json(),
+            userRolesRes.json(),
+          ]);
+
+        setUserGrowthData(userGrowthJson);
+        setPostsActivityData(postsActivityJson);
+        setCommentsActivityData(commentsActivityJson);
+        setUserRolesData(userRolesJson);
+
+        const postsByUser = {};
+        postsActivityJson?.forEach(({ userId, name, avatar, count }) => {
+          postsByUser[userId] = { userId, name, avatar, posts: count, comments: 0, total: count };
+        });
+        commentsActivityJson?.forEach(({ userId, name, avatar, count }) => {
+          if (postsByUser[userId]) {
+            postsByUser[userId].comments = count;
+            postsByUser[userId].total += count;
+          } else {
+            postsByUser[userId] = { userId, name, avatar, posts: 0, comments: count, total: count };
+          }
+        });
+        const combinedUsers = Object.values(postsByUser).sort((a, b) => b.total - a.total);
+        setTopActiveUsersData(combinedUsers);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnalytics();
+  }, [timeRange]);
+
+  const { labels: userGrowthLabels, values: userGrowthValues } = formatSeries(userGrowthData);
+  const { labels: postsLabels, values: postsValues } = formatSeries(postsActivityData);
+  const { labels: commentsLabels, values: commentsValues } = formatSeries(commentsActivityData);
+
   const metrics = [
-    { name: 'Total Users', value: '12,847', change: '+12.5%', icon: FiUsers, color: 'blue' },
-    { name: 'Active Sessions', value: '3,421', change: '+8.2%', icon: FiActivity, color: 'green' },
-    { name: 'Revenue', value: '$45,230', change: '+23.1%', icon: FiDollarSign, color: 'purple' },
-    { name: 'Conversion Rate', value: '4.2%', change: '+0.8%', icon: FiTrendingUp, color: 'orange' },
+    {
+      name: "Total Users",
+      value: userRolesData ? userRolesData.reduce((acc, r) => acc + r.count, 0) : null,
+      icon: FiUsers,
+      color: "blue",
+    },
+    {
+      name: "Posts Created",
+      value: postsActivityData ? postsActivityData.reduce((a, d) => a + d.count, 0) : null,
+      icon: FiTrendingUp,
+      color: "orange",
+    },
+    {
+      name: "Comments Added",
+      value: commentsActivityData ? commentsActivityData.reduce((a, d) => a + d.count, 0) : null,
+      icon: FiActivity,
+      color: "green",
+    },
   ];
 
-  // User growth chart data
   const userGrowthOptions = {
-    title: { text: 'User Growth', left: 'center', textStyle: { color: '#d1d5db' } },
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['New Users', 'Returning Users'], top: '10%', textStyle: { color: '#9ca3af' } },
+    title: { text: "Daily New Users", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
     xAxis: {
-      type: 'category',
-      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-      axisLine: { lineStyle: { color: '#6b7280' } },
-      axisLabel: { color: '#d1d5db' }
+      type: "category",
+      data: userGrowthLabels,
+      axisLabel: { color: "#d1d5db" },
+      axisLine: { lineStyle: { color: "#6b7280" } },
     },
-    yAxis: { type: 'value', axisLine: { lineStyle: { color: '#6b7280' } }, splitLine: { lineStyle: { color: '#374151' } }, axisLabel: { color: '#d1d5db' } },
+    yAxis: {
+      type: "value",
+      axisLabel: { color: "#d1d5db" },
+      axisLine: { lineStyle: { color: "#6b7280" } },
+    },
+    tooltip: { trigger: "axis" },
+    series: [{ type: "line", smooth: true, data: userGrowthValues, color: "#3b82f6" }],
+  };
+
+  const activityOptions = {
+    title: { text: "Daily Posts vs Comments", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
+    tooltip: { trigger: "axis" },
+    legend: { top: "10%", data: ["Posts", "Comments"], textStyle: { color: "#9ca3af" } },
+    xAxis: {
+      type: "category",
+      data: postsLabels.length ? postsLabels : commentsLabels,
+      axisLabel: { color: "#9ca3af" },
+      axisLine: { lineStyle: { color: "#6b7280" } },
+    },
+    yAxis: {
+      type: "value",
+      axisLabel: { color: "#9ca3af" },
+      axisLine: { lineStyle: { color: "#6b7280" } },
+      splitLine: { lineStyle: { color: "#374151" } },
+    },
+    series: [
+      { name: "Posts", type: "bar", data: postsValues, itemStyle: { color: "#f97316" }, barWidth: "40%" },
+      { name: "Comments", type: "bar", data: commentsValues, itemStyle: { color: "#3b82f6" }, barWidth: "40%" },
+    ],
+  };
+
+  const rolesOptions = {
+    title: { text: "Users by Role", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
+    tooltip: {
+      trigger: "item",
+      formatter: (params) => `${params.data.name}: ${params.value}`,
+    },
     series: [
       {
-        name: 'New Users',
-        type: 'line',
-        data: [120, 132, 101, 134, 90, 230, 210],
-        smooth: true,
-        color: '#3b82f6'
+        type: "pie",
+        radius: ["40%", "70%"],
+        label: {
+          color: "#e5e7eb",
+          formatter: "{b} ({d}%)",
+        },
+        data: userRolesData
+          ? userRolesData.map((r) => ({ name: r._id, value: r.count }))
+          : [],
       },
-      {
-        name: 'Returning Users',
-        type: 'line',
-        data: [220, 182, 191, 234, 290, 330, 310],
-        smooth: true,
-        color: '#10b981'
-      }
-    ]
+    ],
   };
-
-  // Engagement chart (doughnut)
-  const engagementOptions = {
-    title: { text: 'User Engagement', left: 'center', textStyle: { color: '#d1d5db' } },
-    tooltip: { trigger: 'item' },
-    series: [{
-      type: 'pie',
-      radius: ['40%', '70%'],
-      data: [
-        { value: 1048, name: 'Job Seekers' },
-        { value: 735, name: 'Referrers' },
-        { value: 580, name: 'Mentors' },
-        { value: 484, name: 'Premium Users' }
-      ],
-      label: { color: '#e5e7eb' },
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.7)'
-        }
-      }
-    }]
-  };
-
-  // Revenue chart
-  const revenueOptions = {
-    title: { text: 'Revenue Breakdown', left: 'center', textStyle: { color: '#d1d5db' } },
-    tooltip: { trigger: 'axis' },
-    xAxis: {
-      type: 'category',
-      data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      axisLine: { lineStyle: { color: '#6b7280' } },
-      axisLabel: { color: '#d1d5db' }
-    },
-    yAxis: { type: 'value', axisLine: { lineStyle: { color: '#6b7280' } }, splitLine: { lineStyle: { color: '#374151' } }, axisLabel: { color: '#d1d5db' } },
-    series: [{
-      data: [8200, 9320, 9010, 9340, 12900, 13300],
-      type: 'bar',
-      color: '#8b5cf6'
-    }]
-  };
-
-  // Referral leaderboard
-  const topReferrers = [
-    { name: 'Sarah Chen', referrals: 45, avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1e5?w=40&h=40&fit=crop&crop=face' },
-    { name: 'Mike Rodriguez', referrals: 38, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face' },
-    { name: 'Emily Davis', referrals: 32, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face' },
-    { name: 'David Kim', referrals: 28, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face' },
-  ];
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen px-4 py-6">
+    <div className="space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen px-6 py-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track your community&apos;s performance and growth</p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex items-center space-x-2">
-          <SafeIcon icon={FiCalendar} className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-0">Analytics Dashboard</h1>
+        <div className="flex items-center space-x-2">
+          <SafeIcon icon={FiCalendar} className="w-5 h-5 text-gray-400" aria-hidden="true" />
+          <label htmlFor="timeRange" className="sr-only">Select time range</label>
           <select
+            id="timeRange"
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Select time range"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="1y">Last year</option>
           </select>
         </div>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metrics.map((metric, index) => (
+      {loading && <p className="text-center text-gray-600 dark:text-gray-400">Loading data...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
+
+      {/* Metrics */}
+      <section aria-label="Summary metrics" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {metrics.map((m) => (
           <motion.div
-            key={metric.name}
+            key={m.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition"
+            transition={{ delay: 0.1 }}
+            className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow flex justify-between items-center"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{metric.name}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{metric.value}</p>
-                <p className="text-sm text-green-600 dark:text-green-400 mt-1">{metric.change}</p>
-              </div>
-              <div className={`p-3 rounded-lg bg-${metric.color}-50 dark:bg-${metric.color}-900`}>
-                <SafeIcon icon={metric.icon} className={`w-6 h-6 text-${metric.color}-600 dark:text-${metric.color}-400`} />
-              </div>
+            <div>
+              <p className="text-sm text-gray-500">{m.name}</p>
+              <p className="text-3xl font-semibold">{formatNumber(m.value)}</p>
             </div>
+            <SafeIcon icon={m.icon} className={`w-10 h-10 text-${m.color}-500`} aria-hidden="true" />
           </motion.div>
         ))}
-      </div>
+      </section>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <ReactECharts option={userGrowthOptions} style={{ height: '350px' }} />
-        </motion.div>
+      {/* Charts */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <article aria-label="User Growth Chart" className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+          <ReactECharts option={userGrowthOptions} style={{ height: 360 }} />
+        </article>
+        <article aria-label="User Engagement Chart" className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+          <ReactECharts option={rolesOptions} style={{ height: 360 }} />
+        </article>
+      </section>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      {/* Activity + Top Active Users */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <article
+          aria-label="Daily Posts and Comments Activity"
+          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
         >
-          <ReactECharts option={engagementOptions} style={{ height: '350px' }} />
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          <ReactECharts option={activityOptions} style={{ height: 360 }} />
+        </article>
+        <aside
+          aria-label="Top Active Users List"
+          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow overflow-y-auto max-h-[520px]"
         >
-          <ReactECharts option={revenueOptions} style={{ height: '300px' }} />
-        </motion.div>
-
-        {/* Top Referrers */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
-        >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Referrers</h3>
-          <div className="space-y-4">
-            {topReferrers.map((referrer, index) => (
-              <div key={referrer.name} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-4">#{index + 1}</span>
-                  <img
-                    src={referrer.avatar}
-                    alt={referrer.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-200">{referrer.name}</span>
-                </div>
-                <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{referrer.referrals}</span>
+          <h2 className="text-xl font-semibold mb-6">Top Active Users</h2>
+          {topActiveUsersData.length === 0 && (
+            <p className="text-gray-600 dark:text-gray-400 text-center">No data available</p>
+          )}
+          {topActiveUsersData.map((u, idx) => (
+            <div
+              key={u.userId || idx}
+              className="flex justify-between items-center mb-4 last:mb-0"
+              tabIndex={0}
+              aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-sm w-5">{idx + 1}</span>
+                <img
+                  src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
+                  alt={`${u.name} avatar`}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <span className="font-medium text-gray-900 dark:text-white">{u.name}</span>
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+              <div className="text-xs text-gray-600 dark:text-gray-400">
+                📝 {u.posts} | 💬 {u.comments} | Total: {u.total}
+              </div>
+            </div>
+          ))}
+        </aside>
+      </section>
     </div>
   );
 };
