@@ -21,7 +21,7 @@ router.patch("/:id", updatePost);
 router.delete("/:id", deletePost);
 router.patch("/:id/like", toggleLike);
 
-// Comments
+// Comments getComments
 router.get("/:postId/comments", getComments);
 router.post("/:postId/comments", addComment);
 router.delete("/comments/:commentId", deleteComment);

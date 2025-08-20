@@ -12,7 +12,6 @@ const formatNumber = (num) => {
   return num.toString();
 };
 
-// Helper to format nested _id object {year, month, day} to 'DD/MM'
 const formatDayMonthFromId = (dateObj) => {
   if (!dateObj) return "No date";
   const day = String(dateObj.day).padStart(2, "0");
@@ -20,7 +19,6 @@ const formatDayMonthFromId = (dateObj) => {
   return `${day}/${month}`;
 };
 
-// Updated formatSeries for nested date _id
 const formatSeries = (data) => {
   if (!data) return { labels: [], values: [] };
   return {
@@ -44,28 +42,32 @@ const Analytics = () => {
       setLoading(true);
       setError(null);
       try {
-        const [userGrowthRes, postsActivityRes, commentsActivityRes, userRolesRes] =
+        const [userGrowthRes, postsActivityRes, commentsActivityRes, userRolesRes, topActiveUsersRes] =
           await Promise.all([
-            fetch(`http://localhost:5000/api/analytics/user-growth?timeRange=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/posts-activity?timeRange=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/comments-activity?timeRange=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/user-roles?timeRange=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/user-growth?range=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/posts-activity?range=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/comments-activity?range=${timeRange}`),
+            fetch(`http://localhost:5000/api/analytics/user-roles`),
+            fetch(`http://localhost:5000/api/analytics/top-active-users?range=${timeRange}`),
           ]);
 
         if (
           !userGrowthRes.ok ||
           !postsActivityRes.ok ||
           !commentsActivityRes.ok ||
-          !userRolesRes.ok
+          !userRolesRes.ok ||
+          !topActiveUsersRes.ok
         ) {
           throw new Error("One or more API requests failed");
         }
-        const [userGrowthJson, postsActivityJson, commentsActivityJson, userRolesJson] =
+
+        const [userGrowthJson, postsActivityJson, commentsActivityJson, userRolesJson, topActiveUsersJson] =
           await Promise.all([
             userGrowthRes.json(),
             postsActivityRes.json(),
             commentsActivityRes.json(),
             userRolesRes.json(),
+            topActiveUsersRes.json(),
           ]);
 
         setUserGrowthData(userGrowthJson);
@@ -73,20 +75,14 @@ const Analytics = () => {
         setCommentsActivityData(commentsActivityJson);
         setUserRolesData(userRolesJson);
 
-        const postsByUser = {};
-        postsActivityJson?.forEach(({ userId, name, avatar, count }) => {
-          postsByUser[userId] = { userId, name, avatar, posts: count, comments: 0, total: count };
-        });
-        commentsActivityJson?.forEach(({ userId, name, avatar, count }) => {
-          if (postsByUser[userId]) {
-            postsByUser[userId].comments = count;
-            postsByUser[userId].total += count;
-          } else {
-            postsByUser[userId] = { userId, name, avatar, posts: 0, comments: count, total: count };
-          }
-        });
-        const combinedUsers = Object.values(postsByUser).sort((a, b) => b.total - a.total);
-        setTopActiveUsersData(combinedUsers);
+        // Top active users data from backend is already combined and sorted by sum(posts+comments)
+        // We just set it directly here
+        setTopActiveUsersData(
+          topActiveUsersJson.map((u) => ({
+            ...u,
+            total: (u.posts || 0) + (u.comments || 0),
+          }))
+        );
       } catch (err) {
         setError(err.message);
       } finally {
@@ -174,9 +170,7 @@ const Analytics = () => {
           color: "#e5e7eb",
           formatter: "{b} ({d}%)",
         },
-        data: userRolesData
-          ? userRolesData.map((r) => ({ name: r._id, value: r.count }))
-          : [],
+        data: userRolesData ? userRolesData.map((r) => ({ name: r._id, value: r.count })) : [],
       },
     ],
   };
@@ -243,35 +237,52 @@ const Analytics = () => {
           <ReactECharts option={activityOptions} style={{ height: 360 }} />
         </article>
         <aside
-          aria-label="Top Active Users List"
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow overflow-y-auto max-h-[520px]"
-        >
-          <h2 className="text-xl font-semibold mb-6">Top Active Users</h2>
-          {topActiveUsersData.length === 0 && (
-            <p className="text-gray-600 dark:text-gray-400 text-center">No data available</p>
-          )}
-          {topActiveUsersData.map((u, idx) => (
-            <div
-              key={u.userId || idx}
-              className="flex justify-between items-center mb-4 last:mb-0"
-              tabIndex={0}
-              aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
-            >
-              <div className="flex items-center space-x-3">
-                <span className="text-sm w-5">{idx + 1}</span>
-                <img
-                  src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
-                  alt={`${u.name} avatar`}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <span className="font-medium text-gray-900 dark:text-white">{u.name}</span>
-              </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">
-                📝 {u.posts} | 💬 {u.comments} | Total: {u.total}
-              </div>
-            </div>
-          ))}
-        </aside>
+  aria-label="Top Active Users List"
+  className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow overflow-y-auto max-h-[520px]"
+>
+  <h2 className="text-xl font-semibold mb-6">Top Active Users</h2>
+  {topActiveUsersData.length === 0 && (
+    <p className="text-gray-600 dark:text-gray-400 text-center">No data available</p>
+  )}
+
+  <ul className="flex flex-col gap-4">
+    {topActiveUsersData.map((u, idx) => (
+      <li
+        key={u.userId || idx}
+        className="flex items-center justify-between py-3 px-3 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-sm"
+        tabIndex={0}
+        aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
+      >
+        {/* Left: Rank, avatar, name */}
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-6 flex-shrink-0 text-center">
+            {idx + 1}
+          </span>
+          <img
+            src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
+            alt={`${u.name} avatar`}
+            className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+          />
+          <span className="truncate font-medium text-gray-900 dark:text-white">{u.name}</span>
+        </div>
+        {/* Right: Activity numbers */}
+        <div className="flex items-center gap-4 text-xs text-gray-700 dark:text-gray-400 flex-shrink-0">
+          <span className="flex items-center gap-1">
+            <span role="img" aria-label="posts">📝</span>
+            <span className="font-bold">{u.posts}</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <span role="img" aria-label="comments">💬</span>
+            <span className="font-bold">{u.comments}</span>
+          </span>
+          <span>
+            Total: <span className="font-bold">{u.total}</span>
+          </span>
+        </div>
+      </li>
+    ))}
+  </ul>
+</aside>
       </section>
     </div>
   );

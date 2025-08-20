@@ -34,14 +34,14 @@ router.get('/user-growth', async (req, res) => {
       {
         $group: {
           _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
           },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
     res.json(growth);
   } catch (err) {
@@ -50,7 +50,7 @@ router.get('/user-growth', async (req, res) => {
   }
 });
 
-// 2. Posts Activity by day (for Activity Hotspots)
+// 2. Posts Activity by day
 router.get('/posts-activity', async (req, res) => {
   try {
     const startDate = getStartDate(req.query.range);
@@ -59,14 +59,14 @@ router.get('/posts-activity', async (req, res) => {
       {
         $group: {
           _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
           },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
     res.json(activity);
   } catch (err) {
@@ -84,14 +84,14 @@ router.get('/comments-activity', async (req, res) => {
       {
         $group: {
           _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' },
           },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } }
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } },
     ]);
     res.json(activity);
   } catch (err) {
@@ -100,16 +100,16 @@ router.get('/comments-activity', async (req, res) => {
   }
 });
 
-// 4. User Roles count for engagement pie chart
+// 4. User Roles count
 router.get('/user-roles', async (req, res) => {
   try {
     const roles = await User.aggregate([
       {
         $group: {
-          _id: "$accountRole",
-          count: { $sum: 1 }
-        }
-      }
+          _id: '$accountRole',
+          count: { $sum: 1 },
+        },
+      },
     ]);
     res.json(roles);
   } catch (err) {
@@ -118,77 +118,76 @@ router.get('/user-roles', async (req, res) => {
   }
 });
 
-// 5. Top Active Users (by posts count + comments count)
+// 5. Top Active Users (by sum of posts + comments)
 router.get('/top-active-users', async (req, res) => {
   try {
     const startDate = getStartDate(req.query.range);
 
-    // Aggregate posts count per user
-   const postsCounts = await Post.aggregate([
-  { $match: { createdAt: { $gte: startDate }, createdBy: { $ne: null } } }, // Exclude null createdBy
-  {
-    $group: {
-      _id: "$createdBy",
-      posts: { $sum: 1 }
-    }
-  }
-]);
+    const postsCounts = await Post.aggregate([
+      { $match: { createdAt: { $gte: startDate }, createdBy: { $ne: null } } },
+      {
+        $group: {
+          _id: '$createdBy',
+          posts: { $sum: 1 },
+        },
+      },
+    ]);
 
-const commentsCounts = await Comment.aggregate([
-  { $match: { createdAt: { $gte: startDate }, userId: { $ne: null } } }, // Exclude null userId
-  {
-    $group: {
-      _id: "$userId",
-      comments: { $sum: 1 }
-    }
-  }
-]);
+    const commentsCounts = await Comment.aggregate([
+      { $match: { createdAt: { $gte: startDate }, userId: { $ne: null } } },
+      {
+        $group: {
+          _id: '$userId',
+          comments: { $sum: 1 },
+        },
+      },
+    ]);
 
-const combinedMap = new Map();
+    const combinedMap = new Map();
 
-postsCounts.forEach(p => {
-  if (p._id) {
-    combinedMap.set(p._id.toString(), { userId: p._id, posts: p.posts, comments: 0 });
-  }
-});
-commentsCounts.forEach(c => {
-  if (c._id) {
-    const key = c._id.toString();
-    if (combinedMap.has(key)) {
-      combinedMap.get(key).comments = c.comments;
-    } else {
-      combinedMap.set(key, { userId: c._id, posts: 0, comments: c.comments });
-    }
-  }
-});
+    postsCounts.forEach((p) => {
+      if (p._id) {
+        combinedMap.set(p._id.toString(), { userId: p._id, posts: p.posts, comments: 0 });
+      }
+    });
 
+    commentsCounts.forEach((c) => {
+      if (c._id) {
+        const key = c._id.toString();
+        if (combinedMap.has(key)) {
+          combinedMap.get(key).comments = c.comments;
+        } else {
+          combinedMap.set(key, { userId: c._id, posts: 0, comments: c.comments });
+        }
+      }
+    });
 
-    // Fetch user info for each userId and prepare final array
     const userIds = Array.from(combinedMap.keys());
     const users = await User.find({ _id: { $in: userIds } }, 'name avatar').lean();
 
-    const result = users.map(user => {
-      const stats = combinedMap.get(user._id.toString()) || { posts: 0, comments: 0, reactions: 0 };
+    const result = users.map((user) => {
+      const stats = combinedMap.get(user._id.toString()) || { posts: 0, comments: 0 };
       return {
         userId: user._id,
         name: user.name,
         avatar: user.avatar,
         posts: stats.posts,
         comments: stats.comments,
-        reactions: stats.reactions, // Assuming reactions tracked separately, else 0
+        totalActivity: stats.posts + stats.comments,
       };
     });
 
-    // Sort top active users by combined activity (posts + comments)
-    result.sort((a, b) => (b.posts + b.comments + b.reactions) - (a.posts + a.comments + a.reactions));
+    result.sort((a, b) => b.totalActivity - a.totalActivity);
 
-    res.json(result.slice(0, 10)); // Top 10 active users
+    res.json(result.slice(0, 10));
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch top active users' });
   }
 });
-router.get("/",(req,res) => {
-  res.send("analytics")
-})
+
+router.get('/', (req, res) => {
+  res.send('analytics');
+});
+
 export default router;
