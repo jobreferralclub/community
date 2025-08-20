@@ -188,5 +188,7 @@ commentsCounts.forEach(c => {
     res.status(500).json({ error: 'Failed to fetch top active users' });
   }
 });
-
+router.get("/",(req,res) => {
+  res.send("analytics")
+})
 export default router;
