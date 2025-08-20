@@ -128,6 +128,7 @@ export const useCommunity = () => {
           imageUrl,              // ✅ include image URL
           author: user.name,     // string
           avatar: user.avatar,   // string
+          userId: user._id,
         }),
       });
 

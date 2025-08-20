@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 
 const commentSchema = new mongoose.Schema({
   postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },  // Add this line
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },  //reference by user
   content: String,
   author: String,
   avatar: String,

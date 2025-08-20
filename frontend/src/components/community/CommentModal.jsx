@@ -96,7 +96,7 @@ const CommentModal = ({ post, onClose }) => {
       const comment = await addComment(post._id, {
         content: newComment,
         imageUrl: commentImage,
-        userId: userData._id,
+        userId: user._id,
       });
       setComments((prev) => [...prev, comment]);
       setNewComment("");

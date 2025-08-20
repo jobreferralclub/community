@@ -7,13 +7,18 @@ import Comment from "../models/Comment.js";
 // Get all posts (newest first)
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    // Populate `createdBy` field with user name and avatar, like a SQL LEFT JOIN
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate('createdBy', 'name avatar');  // only select name and avatar from user
+
     res.json(posts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Failed to get posts" });
   }
 };
+
 
 // Create a new post
 export const createPost = async (req, res) => {
@@ -166,13 +171,14 @@ export const getComments = async (req, res) => {
 // Add a comment
 export const addComment = async (req, res) => {
   try {
-    const { content, author, avatar, imageUrl } = req.body;
+    const { content, author,userId, avatar, imageUrl } = req.body;
     const { postId } = req.params;
 
     const comment = new Comment({
       postId,
       content,
       author,
+      userId,
       avatar,
       imageUrl,
       createdAt: new Date(),

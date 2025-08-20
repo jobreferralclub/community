@@ -137,7 +137,7 @@ const PostCard = ({ post }) => {
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
           <div className="flex items-center space-x-3">
             <img
-              src={post.avatar || 'https://via.placeholder.com/48'}
+              src={(post.createdBy?.avatar == null)? "/default-avatar.jpg": post.createdBy?.avatar}
               alt={post.author}
               className="w-12 h-12 rounded-full object-cover"
             />
