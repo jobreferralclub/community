@@ -1,3 +1,5 @@
+// models/Post.js
+
 import mongoose from 'mongoose';
 
 const PostSchema = new mongoose.Schema({
@@ -20,14 +22,6 @@ const PostSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
     default: '' // Stores uploaded image URL from backend
-  },
-  author: {
-    type: String,
-    default: ''
-  },
-  avatar: {
-    type: String,
-    default: ''
   },
   createdAt: {
     type: Date,
@@ -59,6 +53,7 @@ const PostSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true
   }
 });
 

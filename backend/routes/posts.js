@@ -9,6 +9,7 @@ import {
   getComments,
   addComment,
   deleteComment,
+  getCommentCountByUser,
 } from "../controllers/posts.controller.js";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.patch("/:id/like", toggleLike);
 router.get("/:postId/comments", getComments);
 router.post("/:postId/comments", addComment);
 router.delete("/comments/:commentId", deleteComment);
+router.get('/comments-count/:userId', getCommentCountByUser);
 
 export default router;

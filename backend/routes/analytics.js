@@ -124,41 +124,44 @@ router.get('/top-active-users', async (req, res) => {
     const startDate = getStartDate(req.query.range);
 
     // Aggregate posts count per user
-    const postsCounts = await Post.aggregate([
-      { $match: { createdAt: { $gte: startDate } } },
-      {
-        $group: {
-          _id: "$createdBy",
-          posts: { $sum: 1 }
-        }
-      }
-    ]);
+   const postsCounts = await Post.aggregate([
+  { $match: { createdAt: { $gte: startDate }, createdBy: { $ne: null } } }, // Exclude null createdBy
+  {
+    $group: {
+      _id: "$createdBy",
+      posts: { $sum: 1 }
+    }
+  }
+]);
 
-    // Aggregate comments count per user
-    const commentsCounts = await Comment.aggregate([
-      { $match: { createdAt: { $gte: startDate } } },
-      {
-        $group: {
-          _id: "$author",
-          comments: { $sum: 1 }
-        }
-      }
-    ]);
+const commentsCounts = await Comment.aggregate([
+  { $match: { createdAt: { $gte: startDate }, userId: { $ne: null } } }, // Exclude null userId
+  {
+    $group: {
+      _id: "$userId",
+      comments: { $sum: 1 }
+    }
+  }
+]);
 
-    // Merge postsCounts and commentsCounts by userId
-    const combinedMap = new Map();
+const combinedMap = new Map();
 
-    postsCounts.forEach(p => {
-      combinedMap.set(p._id.toString(), { userId: p._id, posts: p.posts, comments: 0, reactions: 0 });
-    });
-    commentsCounts.forEach(c => {
-      const key = c._id.toString();
-      if (combinedMap.has(key)) {
-        combinedMap.get(key).comments = c.comments;
-      } else {
-        combinedMap.set(key, { userId: c._id, posts: 0, comments: c.comments, reactions: 0 });
-      }
-    });
+postsCounts.forEach(p => {
+  if (p._id) {
+    combinedMap.set(p._id.toString(), { userId: p._id, posts: p.posts, comments: 0 });
+  }
+});
+commentsCounts.forEach(c => {
+  if (c._id) {
+    const key = c._id.toString();
+    if (combinedMap.has(key)) {
+      combinedMap.get(key).comments = c.comments;
+    } else {
+      combinedMap.set(key, { userId: c._id, posts: 0, comments: c.comments });
+    }
+  }
+});
+
 
     // Fetch user info for each userId and prepare final array
     const userIds = Array.from(combinedMap.keys());

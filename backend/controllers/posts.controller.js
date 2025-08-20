@@ -211,3 +211,18 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ error: "Failed to delete comment" });
   }
 };
+// Get comment count for a specific user
+export const getCommentCountByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const count = await Comment.countDocuments({ userId });
+    res.json({ userId, commentCount: count });
+  } catch (error) {
+    console.error("Error counting comments by user:", error);
+    res.status(500).json({ error: "Failed to count comments by user" });
+  }
+};

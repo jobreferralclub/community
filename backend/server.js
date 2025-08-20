@@ -33,6 +33,7 @@ import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
 import rolesStatsRoutes from "./routes/rolesStats.js";
 
+
 // Community
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
