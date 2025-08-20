@@ -42,7 +42,7 @@ const Sidebar = ({ open, setOpen }) => {
 
   // Helper function to check if any community route is active
   const isCommunityActive = () => {
-    return location.pathname.includes("/community");
+    return location.pathname.includes("/community/in") || location.pathname.includes("/community/us");
   };
 
 
@@ -146,7 +146,10 @@ const Sidebar = ({ open, setOpen }) => {
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <img src="/logo.jpg" alt="" />
               </div>
+              <a href="/">
               <span className="font-bold text-gray-100">JobReferral.Club</span>
+              </a>
+              
             </motion.div>
           )}
           <button

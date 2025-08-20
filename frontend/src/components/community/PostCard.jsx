@@ -138,11 +138,11 @@ const PostCard = ({ post }) => {
           <div className="flex items-center space-x-3">
             <img
               src={(post.createdBy?.avatar == null)? "/default-avatar.jpg": post.createdBy?.avatar}
-              alt={post.author}
+              alt="image"
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h4 className="font-semibold text-white">{post.author}</h4>
+              <h4 className="font-semibold text-white">{(post.createdBy?.name == null)? post.author :post.createdBy?.name}</h4>
               <p className="text-sm text-gray-400">
                 {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
               </p>

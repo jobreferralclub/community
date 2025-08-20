@@ -127,13 +127,13 @@ const CommentModal = ({ post, onClose }) => {
         <div className="flex items-center justify-between border-b border-gray-700 p-6 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <img
-              src={post.avatar || "https://via.placeholder.com/40"}
+              src={(post.createdBy?.avatar == null) ? "/default-avatar.jpg" : post.createdBy?.avatar}
               alt={post.author}
               className="w-10 h-10 rounded-full object-cover"
             />
             <div>
               <span className="block font-semibold text-white">
-                {post.author}
+                {(post.createdBy?.name == null) ? post.author : post.createdBy?.name}
               </span>
               <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(post.createdAt), {

@@ -26,6 +26,9 @@ import AuthCallback from "./pages/community/AuthCallback";
 import Landing from "./pages/LandingPage";
 import ResumeBuilder from "./pages/resume/builder/ResumeBuilder";
 import NotFound from "./pages/NotFound";
+import ResumeBuilderQuestionnaire from "./pages/resume/builder/ResumeBuilderQuestionnaire";
+import ResumeBuilderPreview from "./pages/resume/builder/ResumeBuilderPreview";
+import ProfilePage from "./pages/ProfilePage";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -144,7 +147,11 @@ function AppWrapper() {
       <Routes>
         {/* ✅ Landing page (always public) */}
         <Route path="/" element={<Landing />} />
-        <Route path="/resume-builder" element={<ResumeBuilder/>} />
+        <Route path="/resume-builder">
+          <Route index element={<ResumeBuilder />} />
+          <Route path="questionnaire" element={<ResumeBuilderQuestionnaire/>}/>
+          <Route path="preview" element={<ResumeBuilderPreview/>}/>
+        </Route>
         <Route path="*" element={<NotFound/>} />
 
         {/* ✅ Public login route */}
@@ -153,6 +160,11 @@ function AppWrapper() {
           element={isAuthenticated ? <Navigate to="/community/introductions" replace /> : <Login />}
         />
 
+        {isAuthenticated ? (
+          <Route path="/profile" element={<ProfilePage/>} />
+        ):(
+          <Route path="/profile" element={<Navigate to="/login" replace />} />
+        )}
         {/* ✅ Protected routes under /community */}
         {isAuthenticated ? (
           <Route

@@ -3,8 +3,17 @@ import User from "../models/User.js";
 // Create a new user
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password, accountRole } = req.body;
-    const newUser = new User({ name, email, password, accountRole });
+    const { name, email, password, accountRole, education } = req.body;
+
+    // Create new user with education array if provided
+    const newUser = new User({
+      name,
+      email,
+      password,
+      accountRole,
+      education: education || [] // fallback empty array
+    });
+
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {
@@ -48,6 +57,7 @@ export const updateUser = async (req, res) => {
       location,
       bio,
       phone,
+      education // ✅ new field
     } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -63,18 +73,21 @@ export const updateUser = async (req, res) => {
         location,
         bio,
         phone,
+        ...(education && { education }) // only update if provided
       },
       { new: true, runValidators: true }
     );
 
-    if (!updatedUser)
+    if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
+    }
 
     res.json(updatedUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 // Delete user by ID

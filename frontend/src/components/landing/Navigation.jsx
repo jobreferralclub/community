@@ -134,6 +134,12 @@ const Navigation = () => {
                         >
                           Continue to Community
                         </a>
+                        <a
+                          href="/profile"
+                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
+                        >
+                          User Profile
+                        </a>
                         <button
                           onClick={() => logout()}
                           className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
@@ -200,6 +206,13 @@ const Navigation = () => {
                       onClick={() => setMenuOpen(false)}
                     >
                       Continue to Community
+                    </a>
+                    <a
+                      href="/profile"
+                      className="text-gray-300 hover:text-primary-green transition-colors duration-300 font-medium"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      User Profile
                     </a>
                     <button
                       onClick={() => {
