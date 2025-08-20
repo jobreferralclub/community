@@ -5,6 +5,16 @@ const DataExportSettings = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // New states for posts
+  const [postsData, setPostsData] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState(null);
+
+  // New states for analytics data
+  const [analyticsData, setAnalyticsData] = useState([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [analyticsError, setAnalyticsError] = useState(null);
+
   useEffect(() => {
     fetch("http://localhost:5000/api/users")
       .then((response) => response.json())
@@ -16,6 +26,36 @@ const DataExportSettings = () => {
         console.error("Error fetching user data:", error);
       })
       .finally(() => setLoading(false));
+  }, []);
+
+  // New effect to fetch community posts separately
+  useEffect(() => {
+    fetch("http://localhost:5000/api/posts/")
+      .then((response) => response.json())
+      .then((data) => {
+        setPostsData(Array.isArray(data) ? data : []);
+        console.log("Posts data:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching posts data:", error);
+        setPostsError(error);
+      })
+      .finally(() => setPostsLoading(false));
+  }, []);
+
+  // New effect to fetch analytics data from user-growth endpoint
+  useEffect(() => {
+    fetch("http://localhost:5000/api/analytics/user-growth")
+      .then((response) => response.json())
+      .then((data) => {
+        setAnalyticsData(Array.isArray(data) ? data : [data]);
+        console.log("Analytics data:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching analytics data:", error);
+        setAnalyticsError(error);
+      })
+      .finally(() => setAnalyticsLoading(false));
   }, []);
 
   // Utility to convert JSON array to CSV string, with safety checks
@@ -45,6 +85,33 @@ const DataExportSettings = () => {
     return csvRows.join("\n");
   };
 
+  // Transform user-growth analytics data for CSV export
+  const transformAnalyticsDataForCsv = (data) => {
+    return data.map((item) => {
+      const dateObj = item._id || {};
+      const year = dateObj.year || "";
+      const month = dateObj.month ? String(dateObj.month).padStart(2, "0") : "";
+      const day = dateObj.day ? String(dateObj.day).padStart(2, "0") : "";
+      return {
+        Date: `${year}-${month}-${day}`,
+        "Number of members joined": item.count,
+      };
+    });
+  };
+
+  // Transform community posts data to include createdBy name only for CSV export
+  const transformPostsDataForCsv = (data) => {
+    return data.map((post) => ({
+      title: post.title || "",
+      content: post.content || "",
+      community: post.community || "",
+      createdByName: post.createdBy?.name || "",
+      createdAt: post.createdAt || "",
+      likes: post.likes || 0,
+      comments: post.comments || 0,
+    }));
+  };
+
   // Download CSV file helper function
   const downloadCsv = (data, filename) => {
     const csv = jsonToCsv(data);
@@ -59,7 +126,7 @@ const DataExportSettings = () => {
     document.body.removeChild(link);
   };
 
-  // Export options - all CSV only
+  // Export options - all CSV only, renamed "Analytics Data" to "User Analytics"
   const exportOptions = [
     {
       name: "Profile Data",
@@ -80,39 +147,48 @@ const DataExportSettings = () => {
       dataKey: "referralHistory",
     },
     {
-      name: "Analytics Data",
+      name: "User Analytics",
       description: "Your engagement and activity metrics",
       format: "CSV",
       dataKey: "analyticsData",
     },
   ];
 
-  // Safe data extraction from userData, ensure always array format
+  // Safe data extraction from userData, postsData, and analyticsData; ensure always array format
   const getDataByKey = (key) => {
+    if (key === "communityPosts") {
+      return postsData;
+    }
+    if (key === "analyticsData") {
+      return analyticsData;
+    }
     if (!userData) return [];
 
     switch (key) {
       case "profileData":
         // API already returns an array of user profiles
         return Array.isArray(userData) ? userData : [userData];
-      case "communityPosts":
-        return Array.isArray(userData.posts) ? userData.posts : [];
       case "referralHistory":
         return Array.isArray(userData.referrals) ? userData.referrals : [];
-      case "analyticsData":
-        return userData.analytics ? [userData.analytics] : [];
       default:
         return [];
     }
   };
 
-  // Export handler, always CSV
+  // Export handler, transforms data for analytics and community posts before export
   const handleExport = (option) => {
-    const data = getDataByKey(option.dataKey);
+    let data = getDataByKey(option.dataKey);
+
+    if (option.dataKey === "analyticsData") {
+      data = transformAnalyticsDataForCsv(data);
+    } else if (option.dataKey === "communityPosts") {
+      data = transformPostsDataForCsv(data);
+    }
+
     downloadCsv(data, `${option.name.replace(/\s+/g, "_")}.csv`);
   };
 
-  if (loading) {
+  if (loading || postsLoading || analyticsLoading) {
     return <div className="text-white p-6">Loading user data...</div>;
   }
 
@@ -139,7 +215,11 @@ const DataExportSettings = () => {
                 <button
                   onClick={() => handleExport(dataType)}
                   className="text-primary-500 hover:text-primary-600 transition-colors"
-                  disabled={!userData}
+                  disabled={
+                    (dataType.dataKey === "communityPosts" && (postsLoading || postsData.length === 0)) ||
+                    (dataType.dataKey === "analyticsData" && (analyticsLoading || analyticsData.length === 0)) ||
+                    !userData
+                  }
                 >
                   Export
                 </button>
