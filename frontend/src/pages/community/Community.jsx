@@ -23,7 +23,7 @@ const Community = () => {
 
   const currentCommunity =
     subCommunities.find((c) => location.pathname.startsWith(c.path)) || {
-      title: "Community",
+      title: "Operations & Supply Chain - India",
       subtitle: "Connect, share, and grow together",
     };
 

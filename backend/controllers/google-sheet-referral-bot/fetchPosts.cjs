@@ -33,6 +33,8 @@ async function createPost(title, content) {
       title: title,
       content: content,
       userId: '68983120b0b01c3a69f54851',  // Replace with valid userId or pass dynamically
+      community: "Operations & Supply Chain - India",
+      type: "job-posting"
       // Add other required post fields here, for example userId if needed
     });
     console.log(`Post created: ${response.data._id}`);
