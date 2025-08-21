@@ -29,6 +29,10 @@ import NotFound from "./pages/NotFound";
 import ResumeBuilderQuestionnaire from "./pages/resume/builder/ResumeBuilderQuestionnaire";
 import ResumeBuilderPreview from "./pages/resume/builder/ResumeBuilderPreview";
 import ProfilePage from "./pages/ProfilePage";
+import ResumeFromLinkedin from "./pages/resume/builder/ResumeFromLinkedin";
+import ResumeEnhancer from "./pages/resume/builder/ResumeEnhancer";
+import ResumeRanker from "./pages/resume/ranker/ResumeRanker";
+import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -151,7 +155,11 @@ function AppWrapper() {
           <Route index element={<ResumeBuilder />} />
           <Route path="questionnaire" element={<ResumeBuilderQuestionnaire/>}/>
           <Route path="preview" element={<ResumeBuilderPreview/>}/>
+          <Route path="resume-from-linkedin" element={<ResumeFromLinkedin/>}/>
+          <Route path="enhancer" element={<ResumeEnhancer/>}/>
         </Route>
+        <Route path="/resume-ranker" element={<ResumeRanker/>}/>
+        <Route path="/resume-analyzer" element={<ResumeAnalyzer/>}/>
         <Route path="*" element={<NotFound/>} />
 
         {/* ✅ Public login route */}

@@ -29,10 +29,10 @@ const ProfilePage = () => {
 
     // ===== State for Sections =====
     const [education, setEducation] = useState(user?.education || []);
-    const [workExperience, setWorkExperience] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [skills, setSkills] = useState([]);
-    const [certificates, setCertificates] = useState([]);
+    const [workExperience, setWorkExperience] = useState(user?.work || []);
+    const [projects, setProjects] = useState(user?.projects || []);
+    const [skills, setSkills] = useState(user?.skills || []);
+    const [certificates, setCertificates] = useState(user?.certificates || []);
 
     // ===== Modal State =====
     const [showModal, setShowModal] = useState(false);
@@ -63,7 +63,6 @@ const ProfilePage = () => {
                 updatedData = editingItem
                     ? education.map((e) => (e.id === editingItem.id ? formData : e))
                     : [...education, { ...formData, id: Date.now() }];
-
                 setEducation(updatedData);
 
                 try {
@@ -72,7 +71,7 @@ const ProfilePage = () => {
                         `http://localhost:5000/api/users/${user._id}`,
                         { education: updatedData }
                     );
-                    setUser(res.data); // ✅ Update global user state
+                    setUser(res.data);
                 } catch (err) {
                     console.error("Error updating education:", err);
                 } finally {
@@ -85,6 +84,19 @@ const ProfilePage = () => {
                     ? workExperience.map((w) => (w.id === editingItem.id ? formData : w))
                     : [...workExperience, { ...formData, id: Date.now() }];
                 setWorkExperience(updatedData);
+
+                try {
+                    setLoading(true);
+                    const res = await axios.put(
+                        `http://localhost:5000/api/users/${user._id}`,
+                        { work: updatedData }
+                    );
+                    setUser(res.data);
+                } catch (err) {
+                    console.error("Error updating work experience:", err);
+                } finally {
+                    setLoading(false);
+                }
                 break;
 
             case "project":
@@ -92,6 +104,19 @@ const ProfilePage = () => {
                     ? projects.map((p) => (p.id === editingItem.id ? formData : p))
                     : [...projects, { ...formData, id: Date.now() }];
                 setProjects(updatedData);
+
+                try {
+                    setLoading(true);
+                    const res = await axios.put(
+                        `http://localhost:5000/api/users/${user._id}`,
+                        { projects: updatedData }
+                    );
+                    setUser(res.data);
+                } catch (err) {
+                    console.error("Error updating projects:", err);
+                } finally {
+                    setLoading(false);
+                }
                 break;
 
             case "skill":
@@ -99,6 +124,19 @@ const ProfilePage = () => {
                     ? skills.map((s) => (s.id === editingItem.id ? formData : s))
                     : [...skills, { ...formData, id: Date.now() }];
                 setSkills(updatedData);
+
+                try {
+                    setLoading(true);
+                    const res = await axios.put(
+                        `http://localhost:5000/api/users/${user._id}`,
+                        { skills: updatedData }
+                    );
+                    setUser(res.data);
+                } catch (err) {
+                    console.error("Error updating skills:", err);
+                } finally {
+                    setLoading(false);
+                }
                 break;
 
             case "certificate":
@@ -106,6 +144,19 @@ const ProfilePage = () => {
                     ? certificates.map((c) => (c.id === editingItem.id ? formData : c))
                     : [...certificates, { ...formData, id: Date.now() }];
                 setCertificates(updatedData);
+
+                try {
+                    setLoading(true);
+                    const res = await axios.put(
+                        `http://localhost:5000/api/users/${user._id}`,
+                        { certificates: updatedData } // ✅ update certificates via API
+                    );
+                    setUser(res.data); // sync global user state
+                } catch (err) {
+                    console.error("Error updating certificates:", err);
+                } finally {
+                    setLoading(false);
+                }
                 break;
 
             default:
@@ -351,32 +402,71 @@ const ProfilePage = () => {
                     </div>
                 );
 
-
             case "project":
                 return (
                     <div className="space-y-3">
+                        {/* Project Title */}
                         <input
                             type="text"
-                            placeholder="Title"
+                            placeholder="Project Title"
                             value={formData.title || ""}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
-                        <input
-                            type="text"
-                            placeholder="Duration"
-                            value={formData.duration || ""}
-                            onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                            className="w-full p-2 rounded bg-gray-800 text-white"
-                        />
+
+                        {/* Start & End Month */}
+                        <div className="flex gap-3">
+                            <input
+                                type="month"
+                                value={formData.startMonth || ""}
+                                onChange={(e) => setFormData({ ...formData, startMonth: e.target.value })}
+                                className="w-1/2 p-2 rounded bg-gray-800 text-white"
+                            />
+                            <input
+                                type="month"
+                                value={formData.endMonth || ""}
+                                onChange={(e) => setFormData({ ...formData, endMonth: e.target.value })}
+                                disabled={formData.currentlyOngoing}
+                                className="w-1/2 p-2 rounded bg-gray-800 text-white"
+                            />
+                        </div>
+
+                        {/* Currently Ongoing */}
+                        <label className="flex items-center gap-2 text-gray-300">
+                            <input
+                                type="checkbox"
+                                checked={formData.currentlyOngoing || false}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        currentlyOngoing: e.target.checked,
+                                        endMonth: e.target.checked ? "" : formData.endMonth,
+                                    })
+                                }
+                            />
+                            Currently ongoing
+                        </label>
+
+                        {/* Description (optional) */}
                         <textarea
-                            placeholder="Description"
+                            placeholder="Description (optional)"
                             value={formData.description || ""}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full p-2 rounded bg-gray-800 text-white"
+                            rows={3}
+                        />
+
+                        {/* Project Link (optional) */}
+                        <input
+                            type="url"
+                            placeholder="Project Link (optional)"
+                            value={formData.projectLink || ""}
+                            onChange={(e) => setFormData({ ...formData, projectLink: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
                     </div>
                 );
+
             case "skill":
                 return (
                     <div className="space-y-3">
@@ -387,18 +477,13 @@ const ProfilePage = () => {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
-                        <input
-                            type="number"
-                            placeholder="Level (%)"
-                            value={formData.level || ""}
-                            onChange={(e) => setFormData({ ...formData, level: e.target.value })}
-                            className="w-full p-2 rounded bg-gray-800 text-white"
-                        />
                     </div>
                 );
+
             case "certificate":
                 return (
                     <div className="space-y-3">
+                        {/* Certificate Name */}
                         <input
                             type="text"
                             placeholder="Certificate Name"
@@ -406,6 +491,8 @@ const ProfilePage = () => {
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
+
+                        {/* Issuer */}
                         <input
                             type="text"
                             placeholder="Issuer"
@@ -413,15 +500,27 @@ const ProfilePage = () => {
                             onChange={(e) => setFormData({ ...formData, issuer: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
+
+                        {/* Month & Year */}
                         <input
-                            type="text"
-                            placeholder="Date"
+                            type="month"
+                            placeholder="Month & Year"
                             value={formData.date || ""}
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                             className="w-full p-2 rounded bg-gray-800 text-white"
                         />
+
+                        {/* Credential URL (optional) */}
+                        <input
+                            type="url"
+                            placeholder="Credential URL (optional)"
+                            value={formData.credentialUrl || ""}
+                            onChange={(e) => setFormData({ ...formData, credentialUrl: e.target.value })}
+                            className="w-full p-2 rounded bg-gray-800 text-white"
+                        />
                     </div>
                 );
+
             default:
                 return null;
         }

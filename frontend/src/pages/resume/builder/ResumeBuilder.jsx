@@ -13,8 +13,8 @@ const ResumeBuilder = () => {
   }, []);
 
   const handleOptionClick = (option) => {
-    if (option === "enhance") navigate("/ai-resume-builder/enhancer");
-    else if (option === "linkedin") navigate("/ai-resume-builder/resume-from-linkedin");
+    if (option === "enhance") navigate("/resume-builder/enhancer");
+    else if (option === "linkedin") navigate("/resume-builder/resume-from-linkedin");
     else navigate("/resume-builder/questionnaire");
   };
 
