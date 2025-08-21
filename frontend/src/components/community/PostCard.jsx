@@ -23,6 +23,7 @@ const PostCard = ({ post }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editData, setEditData] = useState({ title: post.title, content: post.content });
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   const { toggleLike, updatePost, deletePost } = useCommunity();
   const { user } = useAuthStore();
@@ -137,12 +138,12 @@ const PostCard = ({ post }) => {
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
           <div className="flex items-center space-x-3">
             <img
-              src={(post.createdBy?.avatar == null)? "/default-avatar.jpg": post.createdBy?.avatar}
+              src={(post.createdBy?.avatar == null) ? "/default-avatar.jpg" : post.createdBy?.avatar}
               alt="image"
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h4 className="font-semibold text-white">{(post.createdBy?.name == null)? post.author :post.createdBy?.name}</h4>
+              <h4 className="font-semibold text-white">{(post.createdBy?.name == null) ? post.author : post.createdBy?.name}</h4>
               <p className="text-sm text-gray-400">
                 {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
               </p>
@@ -186,7 +187,7 @@ const PostCard = ({ post }) => {
         {/* Content */}
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
-         <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
 
         {/* Image Preview */}
@@ -238,8 +239,7 @@ const PostCard = ({ post }) => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleLike}
-              className={`flex items-center space-x-2 transition-colors ${liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'
-                }`}
+              className={`flex items-center space-x-2 transition-colors ${liked ? 'text-red-600' : 'text-gray-500 hover:text-red-600'}`}
             >
               <SafeIcon icon={FiHeart} className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
               <span className="text-sm font-medium">{likeCount}</span>
@@ -264,9 +264,74 @@ const PostCard = ({ post }) => {
               <SafeIcon icon={FiShare2} className="w-5 h-5" />
               <span className="text-sm font-medium">Share</span>
             </motion.button>
+
+            {/* NEW: Check Resume Compatibility Button */}
+            {post.type === "job-posting" && post.job_description && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowResumeModal(true)}
+                className="flex items-center space-x-2 hover:text-[#79e708] px-3 py-1 rounded transition-colors text-sm"
+              >
+                Check Resume Compatibility
+              </motion.button>
+            )}
+
           </div>
         </div>
+
       </motion.div>
+
+      {showResumeModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100">
+            <h3 className="text-lg font-semibold mb-4">Resume Compatibility</h3>
+            <p className="text-gray-300 mb-4">
+              Checking your resume against this job description:
+            </p>
+            <div className="bg-gray-800 p-4 rounded mb-4 max-h-40 overflow-y-auto text-sm">
+              {post.job_description}
+            </div>
+
+            {/* Warning box for missing info */}
+            {(!user.skills?.length || !user.education?.length || !user.certificates?.length || !user.work?.length) && (() => {
+              const missingFields = [];
+              if (!user.skills?.length) missingFields.push("Skills");
+              if (!user.education?.length) missingFields.push("Education");
+              if (!user.certificates?.length) missingFields.push("Certificates");
+              if (!user.work?.length) missingFields.push("Work Experience");
+
+              return (
+                <div className="bg-[#facc15]/10 p-4 rounded mb-4 text-yellow-500">
+                  ⚠️ Your profile is missing some details: {missingFields.join(", ")}. Do you want to proceed analyzing resume?
+                </div>
+              );
+            })()}
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  window.open('/profile', '_blank');
+                }}
+                className="px-4 py-2 bg-gray-900 text-yellow-400 rounded hover:bg-gray-800 transition-colors"
+              >
+                Edit Resume
+              </button>
+              <button
+                onClick={() => setShowResumeModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded text-gray-200"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => alert('Resume analysis coming soon!')}
+                className="px-4 py-2 bg-[#79e708] text-black rounded"
+              >
+                Analyze Resume
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Comments Modal */}
       {showComments && <CommentModal post={post} onClose={() => setShowComments(false)} />}

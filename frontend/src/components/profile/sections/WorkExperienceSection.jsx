@@ -61,9 +61,8 @@ const WorkExperienceSection = ({ workExperience, onAdd, onEdit, onDelete }) => (
             {/* Organization */}
             <p className="text-gray-300 mb-1 flex items-center gap-1">
               <Building size={14} />
-              {`${work.workType.slice(0, 1).toUpperCase() + work.workType.slice(1)} at ${
-                work.organization
-              }`}
+              {`${work.workType.slice(0, 1).toUpperCase() + work.workType.slice(1)} at ${work.organization
+                }`}
             </p>
 
             {/* Location (show Remote if WFH) */}
@@ -75,7 +74,25 @@ const WorkExperienceSection = ({ workExperience, onAdd, onEdit, onDelete }) => (
             {/* Duration with experience time */}
             <p className="text-sm text-gray-400 mb-3 flex items-center gap-1">
               <Calendar size={14} />
-              {work.startDate} - {work.currentlyWorking ? "Present" : work.endDate}{" "}
+
+              {work.startDate
+                ? new Date(work.startDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+                : ""}
+
+              {" - "}
+
+              {work.currentlyWorking
+                ? "Present"
+                : work.endDate
+                  ? new Date(work.endDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric",
+                  })
+                  : ""}
+
               <span className="ml-2 text-gray-500">
                 ({calculateDuration(work.startDate, work.endDate, work.currentlyWorking)})
               </span>

@@ -57,7 +57,11 @@ export const updateUser = async (req, res) => {
       location,
       bio,
       phone,
-      education // ✅ new field
+      education, // ✅ field
+      work,      // ✅ field
+      projects,
+      skills,
+      certificates,
     } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -73,7 +77,11 @@ export const updateUser = async (req, res) => {
         location,
         bio,
         phone,
-        ...(education && { education }) // only update if provided
+        ...(education && { education }), // only update if provided
+        ...(work && { work }),           // only update if provided
+        ...(projects && { projects }),    // ✅ projects update
+        ...(skills && { skills }),    // ✅ projects update
+        ...(certificates && { certificates }),    // ✅ projects update
       },
       { new: true, runValidators: true }
     );
