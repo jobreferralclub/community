@@ -32,7 +32,7 @@ async function createPost(title, content, job_description) {
     const response = await axios.post('http://localhost:5000/api/posts/', {
       title: title,
       content: content,
-      userId: '68983120b0b01c3a69f54851',  // Replace with valid userId or pass dynamically
+      userId: '68983120b0b01c3a69f54851', // Replace with valid userId or pass dynamically
       community: "Operations & Supply Chain - India",
       job_description: job_description,
       type: "job-posting"
@@ -52,29 +52,30 @@ async function generatePostsAll() {
   }
 
   for (const row of data) {
-    // Assuming your sheet header key for Job ID is 'Job ID', trim spaces just in case
+    // Extract Job ID, trim spaces, and use only the value (no label)
     const jobId = row['Job ID'] || row['Job ID ']; // fallback if extra spaces in header
     const job_description = row['About the Job'];
     if (jobId && jobId.trim()) {
       const trimmedJobId = jobId.trim();
-      const message = `<div>
-  <h2>Job Referral Opportunity</h2>
-  <p><strong>Job ID:</strong> ${trimmedJobId}</p>
-  <p><strong>Company Name:</strong> ${row['Company Name']}</p>
-  <p><strong>Job Role:</strong> ${row['Job Title']}</p>
-  <p><strong>Location:</strong> ${row['Location']}</p>
-  <p>
-    ${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title']}</strong> at <strong>${row['Company Name']}</strong>.
-  </p>
-  <p>
-    Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to 
-    <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${trimmedJobId}</strong> in the subject line. We will refer on your behalf.
-  </p>
-  <p><em>T&amp;C applied.</em></p>
-</div>
+      const title = 'Job Referral Opportunity';
+      
+      const message = `
+<p><strong>Job ID:</strong> ${trimmedJobId}</p>
+<p><strong>Company Name:</strong> ${row['Company Name']}</p>
+<p><strong>Job Role:</strong> ${row['Job Title']}</p>
+<p><strong>Location:</strong> ${row['Location']}</p>
+<p>
+  ${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title']}</strong> at <strong>${row['Company Name']}</strong>.
+</p>
+<p>
+  Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to 
+  <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${trimmedJobId}</strong> in the subject line. We will refer on your behalf.
+</p>
+<p><em>T&amp;C applied.</em></p>
 `;
+
       console.log(`Creating post for Job ID: ${trimmedJobId}`);
-      await createPost(trimmedJobId, message, job_description);
+      await createPost(title, message, job_description);
     }
   }
 }

@@ -192,6 +192,7 @@ function AppWrapper() {
                       <Route path="in/hr" element={<Community />} />
                       <Route path="in/analyst" element={<Community />} />
                       <Route path="in/strategy" element={<Community />} />
+                      <Route path="in/freshers" element={<Community />} />
 
                       {/* US sub-communities */}
                       <Route path="us/operations" element={<Community />} />

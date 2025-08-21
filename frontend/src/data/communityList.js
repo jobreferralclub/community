@@ -50,6 +50,12 @@ export const subCommunities = [
     title: 'Strategy and Consulting - India',
     subtitle: 'Business strategies, consulting insights, and industry best practices.'
   },
+   {
+    path: '/community/in/freshers',
+    title: 'Freshers - India',
+    subtitle: 'Building skills, sharing jobs, creating futures.'
+  },
+
   // United States
   {
     path: '/community/us/operations',

@@ -41,6 +41,7 @@ export const menuItems = [
                     { name: "Human Resources", path: "/community/in/hr" },
                     { name: "Analytics", path: "/community/in/analyst" },
                     { name: "Strategy and Consulting", path: "/community/in/strategy" },
+                    { name: "Freshers", path: "/community/in/freshers"}
                 ],
             },
             {
