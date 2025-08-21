@@ -1,7 +1,7 @@
 import Navigation from "../../../components/landing/Navigation";
 import React, { useState } from "react";
 
-const API_URL = import.meta.env.VITE_FLASK_API_URL + "/rank";
+const API_URL = import.meta.env.VITE_API_PORT + "/api/resume/rank";
 
 const ResumeRanker = () => {
   const [jdText, setJdText] = useState("");

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import useTemplateStore from "../../../store/useTemplateStore";
 import { templates } from "../../../components/resume/builder/Templates";
-import TemplateSelectionPopup from "./TemplateSelectionPopup";
 
 const LivePreview: React.FC = () => {
   const currentTemplate = useTemplateStore((state) => state.currentTemplate);

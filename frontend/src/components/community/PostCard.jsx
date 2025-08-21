@@ -25,6 +25,9 @@ const PostCard = ({ post }) => {
   const [editData, setEditData] = useState({ title: post.title, content: post.content });
   const [showResumeModal, setShowResumeModal] = useState(false);
 
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+
   const { toggleLike, updatePost, deletePost } = useCommunity();
   const { user } = useAuthStore();
   const menuRef = useRef(null);
@@ -50,6 +53,41 @@ const PostCard = ({ post }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // 🔥 Resume Analysis Handler
+  const handleAnalyzeResume = async () => {
+    setLoadingAnalysis(true);
+    setAnalysisResult(null);
+
+    try {
+      // pick only necessary fields
+      const resumeData = {
+        education: user.education || [],
+        skills: user.skills || [],
+        certificates: user.certificates || [],
+        work: user.work || []
+      };
+
+      const response = await fetch("http://localhost:5000/api/resume/jd-analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume: resumeData,
+          jobDescription: post.job_description
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to analyze resume");
+
+      const data = await response.json();
+      setAnalysisResult(data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Resume analysis failed. Try again later.");
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
 
   const handleLike = async () => {
     try {
@@ -282,8 +320,8 @@ const PostCard = ({ post }) => {
       </motion.div>
 
       {showResumeModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100 my-10">
             <h3 className="text-lg font-semibold mb-4">Resume Compatibility</h3>
             <p className="text-gray-300 mb-4">
               Checking your resume against this job description:
@@ -292,7 +330,7 @@ const PostCard = ({ post }) => {
               {post.job_description}
             </div>
 
-            {/* Warning box for missing info */}
+            {/* Warning if details missing */}
             {(!user.skills?.length || !user.education?.length || !user.certificates?.length || !user.work?.length) && (() => {
               const missingFields = [];
               if (!user.skills?.length) missingFields.push("Skills");
@@ -302,16 +340,69 @@ const PostCard = ({ post }) => {
 
               return (
                 <div className="bg-[#facc15]/10 p-4 rounded mb-4 text-yellow-500">
-                  ⚠️ Your profile is missing some details: {missingFields.join(", ")}. Do you want to proceed analyzing resume?
+                  ⚠️ Your profile is missing some details: {missingFields.join(", ")}.
+                  <br />
+                  Do you want to proceed analyzing resume?
                 </div>
               );
             })()}
 
+            {/* Loader */}
+            {loadingAnalysis && (
+              <div className="text-center text-gray-400 mb-4">
+                ⏳ Please wait, analyzing your resume...
+              </div>
+            )}
+
+            {/* Analysis Result */}
+            {/* Analysis Result */}
+            {analysisResult && (
+              <div className="bg-gray-800 p-4 rounded mb-4 text-sm text-gray-200">
+                {/* Match Score */}
+                <div className="mb-4">
+                  <p className="text-lg font-semibold">
+                    Resume to JD Match Score:{" "}
+                    <span
+                      className={`font-bold ${analysisResult.matchScore >= 70
+                          ? "text-green-400"
+                          : analysisResult.matchScore >= 40
+                            ? "text-yellow-400"
+                            : "text-red-400"
+                        }`}
+                    >
+                      {analysisResult.matchScore}%
+                    </span>
+                  </p>
+                  <div className="w-full bg-gray-700 h-3 rounded mt-2">
+                    <div
+                      className={`h-3 rounded ${analysisResult.matchScore >= 70
+                          ? "bg-green-400"
+                          : analysisResult.matchScore >= 40
+                            ? "bg-yellow-400"
+                            : "bg-red-400"
+                        }`}
+                      style={{ width: `${analysisResult.matchScore}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Suggestions */}
+                {analysisResult.suggestions?.length > 0 && (
+                  <div>
+                    <p className="font-medium mb-2">Suggestions for Improvement:</p>
+                    <ul className="list-disc list-inside space-y-1 text-gray-300">
+                      {analysisResult.suggestions.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => {
-                  window.open('/profile', '_blank');
-                }}
+                onClick={() => window.open('/profile', '_blank')}
                 className="px-4 py-2 bg-gray-900 text-yellow-400 rounded hover:bg-gray-800 transition-colors"
               >
                 Edit Resume
@@ -323,12 +414,14 @@ const PostCard = ({ post }) => {
                 Close
               </button>
               <button
-                onClick={() => alert('Resume analysis coming soon!')}
-                className="px-4 py-2 bg-[#79e708] text-black rounded"
+                onClick={handleAnalyzeResume}
+                disabled={loadingAnalysis}
+                className="px-4 py-2 bg-[#79e708] text-black rounded disabled:opacity-50"
               >
-                Analyze Resume
+                {loadingAnalysis ? "Analyzing..." : "Analyze Resume"}
               </button>
             </div>
+
           </div>
         </div>
       )}

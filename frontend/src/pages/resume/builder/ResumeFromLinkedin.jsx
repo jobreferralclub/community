@@ -9,6 +9,8 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 import useResumeStore from "../../../store/useResumeStore";
 import LivePreview from "../../../components/resume/builder/LivePreview";
 import LinkedInExportGuide from "../../../components/resume/builder/LinkedinExportGuide";
+import TemplateSelectionPopup from "../../../components/resume/builder/TemplateSelectionPopup";
+import useTemplateStore from "@/store/useTemplateStore";
 
 const ResumeFromLinkedin = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -19,7 +21,12 @@ const ResumeFromLinkedin = () => {
   const lottieContainerRef = useRef(null);
   const navigate = useNavigate();
 
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
+  // ✅ Template popup state
+  const [showTemplatePopup, setShowTemplatePopup] = useState(false);
+  const [popupShownOnce, setPopupShownOnce] = useState(false);
+  const currentTemplate = useTemplateStore((state) => state.currentTemplate);
 
   const resumeTips = [
     "Tailor your resume for each job application.",
@@ -34,17 +41,11 @@ const ResumeFromLinkedin = () => {
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [showTips, setShowTips] = useState(false);
 
-  const {
-    updatePersonalInfo,
-    addExperience,
-    addEducation,
-    addSkill,
-    addProject,
-  } = useResumeStore();
+  const { updatePersonalInfo, addExperience, addEducation, addSkill, addProject } = useResumeStore();
 
+  // ✅ Resume tips cycling
   useEffect(() => {
     let tipInterval;
-
     if (step === "formatting") {
       setShowTips(true);
       tipInterval = setInterval(() => {
@@ -54,10 +55,10 @@ const ResumeFromLinkedin = () => {
       setShowTips(false);
       clearInterval(tipInterval);
     }
-
     return () => clearInterval(tipInterval);
   }, [step]);
 
+  // ✅ Lottie animation
   useEffect(() => {
     if (!showSuccessMessage || !lottieContainerRef.current) return;
     const animation = lottie.loadAnimation({
@@ -69,6 +70,14 @@ const ResumeFromLinkedin = () => {
     });
     return () => animation.destroy();
   }, [showSuccessMessage]);
+
+  // ✅ Show template popup when done
+  useEffect(() => {
+    if (step === "done" && !popupShownOnce && !currentTemplate) {
+      setShowTemplatePopup(true);
+      setPopupShownOnce(true);
+    }
+  }, [step, popupShownOnce, currentTemplate]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -84,14 +93,14 @@ const ResumeFromLinkedin = () => {
     setLoading(true);
 
     try {
-      const extractRes = await axios.post(`${apiUrl}/extract-text`, formData, {
-        headers: { "Content-Type": "multipart/enhance-resume" },
+      const extractRes = await axios.post(`${apiUrl}/api/resume/extract-text`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       const extractedText = extractRes.data.text;
       setStep("formatting");
 
-      const formatRes = await axios.post(`${apiUrl}/format-pdf`, {
+      const formatRes = await axios.post(`${apiUrl}/api/resume/format-pdf`, {
         resumeText: extractedText,
       });
 
@@ -124,6 +133,9 @@ const ResumeFromLinkedin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#1a1a1a] to-[#0d0d0d] text-white py-12 px-4">
+      {/* ✅ Template Popup */}
+      {showTemplatePopup && <TemplateSelectionPopup />}
+
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 transition-all duration-500">
         {/* Left Panel */}
         <div
@@ -143,6 +155,7 @@ const ResumeFromLinkedin = () => {
 
             <LinkedInExportGuide />
 
+            {/* Upload Box */}
             <div className="my-8">
               <label
                 htmlFor="resumeUpload"
@@ -172,6 +185,7 @@ const ResumeFromLinkedin = () => {
               )}
             </div>
 
+            {/* Action Button */}
             <div className="flex justify-center mb-6">
               <Button
                 onClick={handleFormatResume}
@@ -190,6 +204,7 @@ const ResumeFromLinkedin = () => {
               </Button>
             </div>
 
+            {/* Tips */}
             {showTips && (
               <div className="mt-6 text-center text-sm text-gray-400 min-h-[24px]">
                 <SwitchTransition>
@@ -204,6 +219,7 @@ const ResumeFromLinkedin = () => {
               </div>
             )}
 
+            {/* After Done */}
             {step === "done" && (
               <div className="flex justify-center mt-6">
                 <Button
@@ -217,7 +233,7 @@ const ResumeFromLinkedin = () => {
           </div>
         </div>
 
-        {/* Right Panel: Live Preview */}
+        {/* Right Panel */}
         {step === "done" && (
           <div className="w-full lg:w-1/2 transition-all duration-500">
             <LivePreview />

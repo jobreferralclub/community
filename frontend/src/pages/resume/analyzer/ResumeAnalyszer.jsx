@@ -38,7 +38,7 @@ const ResumeAnalyzer = () => {
     formData.append('resume', selectedFile);
 
     try {
-      const response = await fetch(import.meta.env.VITE_API_URL + '/analyze', {
+      const response = await fetch(import.meta.env.VITE_API_PORT + '/api/resume/analyze', {
         method: 'POST',
         body: formData,
       });

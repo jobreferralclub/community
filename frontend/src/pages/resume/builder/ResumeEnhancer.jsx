@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import useResumeStore from "../../../store/useResumeStore";
 import LivePreview from "../../../components/resume/builder/LivePreview";
+import TemplateSelectionPopup from "../../../components/resume/builder/TemplateSelectionPopup";
+import useTemplateStore from "@/store/useTemplateStore";
 
 const ResumeEnhancer = () => {
     const [resumeText, setResumeText] = useState("");
@@ -19,7 +21,15 @@ const ResumeEnhancer = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const navigate = useNavigate();
 
-    const apiUrl = import.meta.env.VITE_API_URL;
+    const apiUrl = import.meta.env.VITE_API_PORT;
+
+    const [currentTipIndex, setCurrentTipIndex] = useState(0);
+    const [showTips, setShowTips] = useState(false);
+
+    // 👇 Template popup states
+    const [showTemplatePopup, setShowTemplatePopup] = useState(false);
+    const [popupShownOnce, setPopupShownOnce] = useState(false);
+    const currentTemplate = useTemplateStore((state) => state.currentTemplate);
 
     const resumeTips = [
         "Tailor your resume for each job application.",
@@ -31,24 +41,17 @@ const ResumeEnhancer = () => {
         "Include relevant side projects or contributions.",
     ];
 
-    const [currentTipIndex, setCurrentTipIndex] = useState(0);
-    const [showTips, setShowTips] = useState(false);
-
     const {
         updatePersonalInfo,
         addExperience,
-        updateExperience,
         addEducation,
-        updateEducation,
         addSkill,
-        updateSkill,
         addProject,
-        updateProject,
     } = useResumeStore();
 
+    // ✅ Show tips animation
     useEffect(() => {
         let tipInterval;
-
         if (step === "enhancing") {
             setShowTips(true);
             tipInterval = setInterval(() => {
@@ -58,10 +61,10 @@ const ResumeEnhancer = () => {
             setShowTips(false);
             clearInterval(tipInterval);
         }
-
         return () => clearInterval(tipInterval);
     }, [step]);
 
+    // ✅ Lottie success animation
     useEffect(() => {
         if (!showSuccessMessage || !lottieContainerRef.current) return;
         const animation = lottie.loadAnimation({
@@ -74,6 +77,14 @@ const ResumeEnhancer = () => {
         return () => animation.destroy();
     }, [showSuccessMessage]);
 
+    // ✅ Auto-show Template popup when Live Preview is ready
+    useEffect(() => {
+        if (step === "done" && !popupShownOnce && !currentTemplate) {
+            setShowTemplatePopup(true);
+            setPopupShownOnce(true);
+        }
+    }, [step, popupShownOnce, currentTemplate]);
+
     const handleDownloadPDF = async () => {
         try {
             const html = document.querySelector("#resume-preview")?.outerHTML;
@@ -81,15 +92,12 @@ const ResumeEnhancer = () => {
                 alert("Resume preview not found.");
                 return;
             }
-
             const response = await fetch(`${apiUrl}/generate-pdf`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ html }),
             });
-
             if (!response.ok) throw new Error("Failed to generate PDF");
-
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -108,19 +116,16 @@ const ResumeEnhancer = () => {
     const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
-
-        setSelectedFile(file); // store file for UI display
-
+        setSelectedFile(file);
         const formData = new FormData();
         formData.append("resume", file);
         setStep("uploading");
-
         try {
-            const res = await axios.post(`${apiUrl}/extract-text`, formData, {
+            const res = await axios.post(`${apiUrl}/api/resume/extract-text`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             setResumeText(res.data.text);
-        } catch (err) {
+        } catch {
             alert("Error extracting text. Is the backend running?");
             setStep("idle");
         }
@@ -130,23 +135,18 @@ const ResumeEnhancer = () => {
         if (!resumeText.trim()) return;
         setLoading(true);
         setStep("enhancing");
-
         try {
-            const res = await axios.post(`${apiUrl}/enhance-resume`, {
+            const res = await axios.post(`${apiUrl}/api/resume/enhance-resume`, {
                 resumeText,
             });
 
-            const data = res.data;
-            const { personalInfo, experience, education, skills, projects } = data;
-
-            Object.entries(personalInfo).forEach(([key, value]) => {
-                updatePersonalInfo(key, value);
-            });
-
-            experience?.forEach((item) => addExperience(item));
-            education?.forEach((item) => addEducation(item));
-            skills?.forEach((item) => addSkill(item));
-            projects?.forEach((item) => addProject(item));
+            console.log("Enhanced Resume Data:", res.data);
+            const { personalInfo, experience, education, skills, projects } = res.data;
+            Object.entries(personalInfo).forEach(([k, v]) => updatePersonalInfo(k, v));
+            experience?.forEach(addExperience);
+            education?.forEach(addEducation);
+            skills?.forEach(addSkill);
+            projects?.forEach(addProject);
 
             setStep("done");
             setShowSuccessMessage(true);
@@ -155,8 +155,8 @@ const ResumeEnhancer = () => {
                 setShowSuccessMessage(false);
                 setIsFadingOut(false);
             }, 3500);
-        } catch (error) {
-            alert("Error enhancing resume. Check if backend and API key are set.");
+        } catch {
+            alert("Error enhancing resume. Check backend/API key.");
             setStep("idle");
         } finally {
             setLoading(false);
@@ -165,6 +165,9 @@ const ResumeEnhancer = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#1a1a1a] to-[#0d0d0d] text-white py-12 px-4">
+            {/* ✅ Show Template popup */}
+            {showTemplatePopup && <TemplateSelectionPopup />}
+
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 transition-all duration-500">
                 {/* Left: Upload/Enhance Form */}
                 <div

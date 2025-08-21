@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navigation from "@/components/Navigation";
+import Navigation from "../../../components/landing/Navigation";
 import './AnalyzerResult.css';
 
 interface AnalysisResult {

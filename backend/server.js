@@ -5,8 +5,6 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
 
-import { conn, gfsBucket, upload } from "./utils/gridfs.js";
-
 // === Load Environment Variables ===
 dotenv.config();
 
@@ -32,6 +30,8 @@ import otpRoutes from "./routes/otp.js";
 import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
 import rolesStatsRoutes from "./routes/rolesStats.js";
+import resumeRoutes from "./routes/resume.js";
+import { giveJoke } from "./controllers/give-joke.controller.js";
 
 
 // Community
@@ -45,11 +45,17 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/auth", otpRoutes);
 
+// Resume and JD analysis
+app.use("/api/resume", resumeRoutes);
+
 // Landing page
 app.use("/api/roleStats", rolesStatsRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+
+// Check if llm works or not
+app.get('/api/give-joke', giveJoke);
 
 // ===================================================================
 // 🚀 Start Server

@@ -8,7 +8,6 @@ export const useCommunityStore = create((set) => ({
   loadPosts: async () => {
     try {
       const data = await fetchPosts();
-      console.log("Loaded posts data:", data);
       set({ posts: data.reverse() }); // Latest posts first
     } catch (err) {
       console.error('Failed to load posts:', err);

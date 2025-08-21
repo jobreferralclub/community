@@ -33,6 +33,7 @@ import ResumeFromLinkedin from "./pages/resume/builder/ResumeFromLinkedin";
 import ResumeEnhancer from "./pages/resume/builder/ResumeEnhancer";
 import ResumeRanker from "./pages/resume/ranker/ResumeRanker";
 import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
+import AnalyzerResult from "./pages/resume/analyzer/AnalyzerResult";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -160,6 +161,7 @@ function AppWrapper() {
         </Route>
         <Route path="/resume-ranker" element={<ResumeRanker/>}/>
         <Route path="/resume-analyzer" element={<ResumeAnalyzer/>}/>
+        <Route path="/analyzer-result" element={<AnalyzerResult/>}/>
         <Route path="*" element={<NotFound/>} />
 
         {/* ✅ Public login route */}
