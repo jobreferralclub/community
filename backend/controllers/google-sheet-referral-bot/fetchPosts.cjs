@@ -27,13 +27,14 @@ async function fetchData() {
 }
 
 // Function to create a single post by calling your backend API
-async function createPost(title, content) {
+async function createPost(title, content, job_description) {
   try {
     const response = await axios.post('http://localhost:5000/api/posts/', {
       title: title,
       content: content,
       userId: '68983120b0b01c3a69f54851',  // Replace with valid userId or pass dynamically
       community: "Operations & Supply Chain - India",
+      job_description: job_description,
       type: "job-posting"
       // Add other required post fields here, for example userId if needed
     });
@@ -53,19 +54,27 @@ async function generatePostsAll() {
   for (const row of data) {
     // Assuming your sheet header key for Job ID is 'Job ID', trim spaces just in case
     const jobId = row['Job ID'] || row['Job ID ']; // fallback if extra spaces in header
+    const job_description = row['About the Job'];
     if (jobId && jobId.trim()) {
       const trimmedJobId = jobId.trim();
-      const message = `Job Referral Opportunity
-Job ID: ${trimmedJobId}
-Company Name: ${row['Company Name']}
-Job Role: ${row['Job Title']}
-Location: ${row['Location']}
-${row["Hiring Manager's Name"]} is hiring for ${row['Job Title']} at ${row['Company Name']}.
-Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to support@jobreferral.club mentioning Job ID: ${trimmedJobId} at subject line. We will refer on your behalf.
-T&C applied.
+      const message = `<div>
+  <h2>Job Referral Opportunity</h2>
+  <p><strong>Job ID:</strong> ${trimmedJobId}</p>
+  <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+  <p><strong>Job Role:</strong> ${row['Job Title']}</p>
+  <p><strong>Location:</strong> ${row['Location']}</p>
+  <p>
+    ${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title']}</strong> at <strong>${row['Company Name']}</strong>.
+  </p>
+  <p>
+    Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to 
+    <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${trimmedJobId}</strong> in the subject line. We will refer on your behalf.
+  </p>
+  <p><em>T&amp;C applied.</em></p>
+</div>
 `;
       console.log(`Creating post for Job ID: ${trimmedJobId}`);
-      await createPost(trimmedJobId, message);
+      await createPost(trimmedJobId, message, job_description);
     }
   }
 }

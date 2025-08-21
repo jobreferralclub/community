@@ -6,9 +6,10 @@ import { useCommunityStore } from '../../store/communityStore';
 import { useAuthStore } from '../../store/authStore';
 import { useLocation } from 'react-router-dom';
 import { subCommunities } from '../../data/communityList';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const { FiX, FiImage, FiLink, FiHash } = FiIcons;
-
 
 const CreatePost = ({ onClose }) => {
   const location = useLocation();
@@ -51,7 +52,7 @@ const CreatePost = ({ onClose }) => {
   const addLink = () => {
     const url = linkInput.trim();
     try {
-      new URL(url); // validate
+      new URL(url); // validate URL format
       if (url && !formData.links.includes(url)) {
         setFormData(prev => ({
           ...prev,
@@ -165,16 +166,15 @@ const CreatePost = ({ onClose }) => {
             />
           </div>
 
-          {/* Content */}
+          {/* Content - Rich Text Editor */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Content</label>
-            <textarea
+            <ReactQuill
+              theme="snow"
               value={formData.content}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              rows={6}
-              className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Share your thoughts, job details, or story..."
-              required
+              onChange={(content) => setFormData({ ...formData, content })}
+              className="mb-4 bg-gray-800 text-gray-100"
+              style={{ borderRadius: '0.5rem' }}
             />
           </div>
 

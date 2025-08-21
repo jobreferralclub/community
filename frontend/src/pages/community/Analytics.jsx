@@ -42,14 +42,27 @@ const Analytics = () => {
       setLoading(true);
       setError(null);
       try {
-        const [userGrowthRes, postsActivityRes, commentsActivityRes, userRolesRes, topActiveUsersRes] =
-          await Promise.all([
-            fetch(`http://localhost:5000/api/analytics/user-growth?range=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/posts-activity?range=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/comments-activity?range=${timeRange}`),
-            fetch(`http://localhost:5000/api/analytics/user-roles`),
-            fetch(`http://localhost:5000/api/analytics/top-active-users?range=${timeRange}`),
-          ]);
+        const [
+          userGrowthRes,
+          postsActivityRes,
+          commentsActivityRes,
+          userRolesRes,
+          topActiveUsersRes,
+        ] = await Promise.all([
+          fetch(
+            `http://localhost:5000/api/analytics/user-growth?range=${timeRange}`
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/posts-activity?range=${timeRange}`
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/comments-activity?range=${timeRange}`
+          ),
+          fetch(`http://localhost:5000/api/analytics/user-roles`),
+          fetch(
+            `http://localhost:5000/api/analytics/top-active-users?range=${timeRange}`
+          ),
+        ]);
 
         if (
           !userGrowthRes.ok ||
@@ -61,22 +74,25 @@ const Analytics = () => {
           throw new Error("One or more API requests failed");
         }
 
-        const [userGrowthJson, postsActivityJson, commentsActivityJson, userRolesJson, topActiveUsersJson] =
-          await Promise.all([
-            userGrowthRes.json(),
-            postsActivityRes.json(),
-            commentsActivityRes.json(),
-            userRolesRes.json(),
-            topActiveUsersRes.json(),
-          ]);
+        const [
+          userGrowthJson,
+          postsActivityJson,
+          commentsActivityJson,
+          userRolesJson,
+          topActiveUsersJson,
+        ] = await Promise.all([
+          userGrowthRes.json(),
+          postsActivityRes.json(),
+          commentsActivityRes.json(),
+          userRolesRes.json(),
+          topActiveUsersRes.json(),
+        ]);
 
         setUserGrowthData(userGrowthJson);
         setPostsActivityData(postsActivityJson);
         setCommentsActivityData(commentsActivityJson);
         setUserRolesData(userRolesJson);
 
-        // Top active users data from backend is already combined and sorted by sum(posts+comments)
-        // We just set it directly here
         setTopActiveUsersData(
           topActiveUsersJson.map((u) => ({
             ...u,
@@ -92,33 +108,47 @@ const Analytics = () => {
     fetchAnalytics();
   }, [timeRange]);
 
-  const { labels: userGrowthLabels, values: userGrowthValues } = formatSeries(userGrowthData);
-  const { labels: postsLabels, values: postsValues } = formatSeries(postsActivityData);
-  const { labels: commentsLabels, values: commentsValues } = formatSeries(commentsActivityData);
+  const { labels: userGrowthLabels, values: userGrowthValues } =
+    formatSeries(userGrowthData);
+  const { labels: postsLabels, values: postsValues } =
+    formatSeries(postsActivityData);
+  const { labels: commentsLabels, values: commentsValues } =
+    formatSeries(commentsActivityData);
 
   const metrics = [
     {
       name: "Total Users",
-      value: userRolesData ? userRolesData.reduce((acc, r) => acc + r.count, 0) : null,
+      value: userRolesData
+        ? userRolesData.reduce((acc, r) => acc + r.count, 0)
+        : null,
       icon: FiUsers,
       color: "blue",
     },
     {
       name: "Posts Created",
-      value: postsActivityData ? postsActivityData.reduce((a, d) => a + d.count, 0) : null,
+      value: postsActivityData
+        ? postsActivityData.reduce((a, d) => a + d.count, 0)
+        : null,
       icon: FiTrendingUp,
       color: "orange",
     },
     {
       name: "Comments Added",
-      value: commentsActivityData ? commentsActivityData.reduce((a, d) => a + d.count, 0) : null,
+      value: commentsActivityData
+        ? commentsActivityData.reduce((a, d) => a + d.count, 0)
+        : null,
       icon: FiActivity,
       color: "green",
     },
   ];
 
   const userGrowthOptions = {
-    title: { text: "Daily New Users", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
+    title: {
+      text: "Daily New Users",
+      left: "center",
+      textStyle: { color: "#d1d5db" },
+      top: 10,
+    },
     xAxis: {
       type: "category",
       data: userGrowthLabels,
@@ -131,13 +161,29 @@ const Analytics = () => {
       axisLine: { lineStyle: { color: "#6b7280" } },
     },
     tooltip: { trigger: "axis" },
-    series: [{ type: "line", smooth: true, data: userGrowthValues, color: "#3b82f6" }],
+    series: [
+      {
+        type: "line",
+        smooth: true,
+        data: userGrowthValues,
+        color: "#3b82f6",
+      },
+    ],
   };
 
   const activityOptions = {
-    title: { text: "Daily Posts vs Comments", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
+    title: {
+      text: "Daily Posts vs Comments",
+      left: "center",
+      textStyle: { color: "#d1d5db" },
+      top: 10,
+    },
     tooltip: { trigger: "axis" },
-    legend: { top: "10%", data: ["Posts", "Comments"], textStyle: { color: "#9ca3af" } },
+    legend: {
+      top: "10%",
+      data: ["Posts", "Comments"],
+      textStyle: { color: "#9ca3af" },
+    },
     xAxis: {
       type: "category",
       data: postsLabels.length ? postsLabels : commentsLabels,
@@ -151,13 +197,30 @@ const Analytics = () => {
       splitLine: { lineStyle: { color: "#374151" } },
     },
     series: [
-      { name: "Posts", type: "bar", data: postsValues, itemStyle: { color: "#f97316" }, barWidth: "40%" },
-      { name: "Comments", type: "bar", data: commentsValues, itemStyle: { color: "#3b82f6" }, barWidth: "40%" },
+      {
+        name: "Posts",
+        type: "bar",
+        data: postsValues,
+        itemStyle: { color: "#f97316" },
+        barWidth: "40%",
+      },
+      {
+        name: "Comments",
+        type: "bar",
+        data: commentsValues,
+        itemStyle: { color: "#3b82f6" },
+        barWidth: "40%",
+      },
     ],
   };
 
   const rolesOptions = {
-    title: { text: "Users by Role", left: "center", textStyle: { color: "#d1d5db" }, top: 10 },
+    title: {
+      text: "Users by Role",
+      left: "center",
+      textStyle: { color: "#d1d5db" },
+      top: 10,
+    },
     tooltip: {
       trigger: "item",
       formatter: (params) => `${params.data.name}: ${params.value}`,
@@ -170,7 +233,12 @@ const Analytics = () => {
           color: "#e5e7eb",
           formatter: "{b} ({d}%)",
         },
-        data: userRolesData ? userRolesData.map((r) => ({ name: r._id, value: r.count })) : [],
+        data: userRolesData
+          ? userRolesData.map((r) => ({
+              name: r._id,
+              value: r.count,
+            }))
+          : [],
       },
     ],
   };
@@ -179,10 +247,18 @@ const Analytics = () => {
     <div className="space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen px-6 py-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-0">Analytics Dashboard</h1>
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-0">
+          Analytics Dashboard
+        </h1>
         <div className="flex items-center space-x-2">
-          <SafeIcon icon={FiCalendar} className="w-5 h-5 text-gray-400" aria-hidden="true" />
-          <label htmlFor="timeRange" className="sr-only">Select time range</label>
+          <SafeIcon
+            icon={FiCalendar}
+            className="w-5 h-5 text-gray-400"
+            aria-hidden="true"
+          />
+          <label htmlFor="timeRange" className="sr-only">
+            Select time range
+          </label>
           <select
             id="timeRange"
             value={timeRange}
@@ -196,11 +272,18 @@ const Analytics = () => {
         </div>
       </div>
 
-      {loading && <p className="text-center text-gray-600 dark:text-gray-400">Loading data...</p>}
+      {loading && (
+        <p className="text-center text-gray-600 dark:text-gray-400">
+          Loading data...
+        </p>
+      )}
       {error && <p className="text-center text-red-500">{error}</p>}
 
       {/* Metrics */}
-      <section aria-label="Summary metrics" className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section
+        aria-label="Summary metrics"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
         {metrics.map((m) => (
           <motion.div
             key={m.name}
@@ -213,17 +296,27 @@ const Analytics = () => {
               <p className="text-sm text-gray-500">{m.name}</p>
               <p className="text-3xl font-semibold">{formatNumber(m.value)}</p>
             </div>
-            <SafeIcon icon={m.icon} className={`w-10 h-10 text-${m.color}-500`} aria-hidden="true" />
+            <SafeIcon
+              icon={m.icon}
+              className={`w-10 h-10 text-${m.color}-500`}
+              aria-hidden="true"
+            />
           </motion.div>
         ))}
       </section>
 
       {/* Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <article aria-label="User Growth Chart" className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+        <article
+          aria-label="User Growth Chart"
+          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
+        >
           <ReactECharts option={userGrowthOptions} style={{ height: 360 }} />
         </article>
-        <article aria-label="User Engagement Chart" className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow">
+        <article
+          aria-label="User Engagement Chart"
+          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
+        >
           <ReactECharts option={rolesOptions} style={{ height: 360 }} />
         </article>
       </section>
@@ -236,53 +329,66 @@ const Analytics = () => {
         >
           <ReactECharts option={activityOptions} style={{ height: 360 }} />
         </article>
+
+        {/* Top Active Users - Padded, Clean Structure */}
         <aside
   aria-label="Top Active Users List"
-  className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow overflow-y-auto max-h-[520px]"
+  className="p-0 max-h-[350px] w-full"
 >
-  <h2 className="text-xl font-semibold mb-6">Top Active Users</h2>
-  {topActiveUsersData.length === 0 && (
-    <p className="text-gray-600 dark:text-gray-400 text-center">No data available</p>
-  )}
-
-  <ul className="flex flex-col gap-4">
-    {topActiveUsersData.map((u, idx) => (
+  <h2 className="text-xl font-bold mb-3 text-gray-100">Top Active Users</h2>
+  {/* Column Headings */}
+  <div className="flex items-center justify-between px-3 py-1 bg-gray-800 mb-2 text-xs rounded">
+    <span className="font-semibold text-gray-300 w-6 text-center">#</span>
+    <span className="font-semibold text-gray-300 flex-1 mx-2">User</span>
+    <span className="font-semibold text-gray-300 min-w-[40px] flex items-center justify-center">
+      Posts
+    </span>
+    <span className="font-semibold text-gray-300 min-w-[60px] flex items-center justify-center">
+      Comment
+    </span>
+    <span className="font-semibold text-gray-300 min-w-[46px] flex items-center justify-center">
+      Total
+    </span>
+  </div>
+  <ul className="flex flex-col gap-2">
+    {topActiveUsersData.slice(0, 5).map((u, idx) => (
       <li
         key={u.userId || idx}
-        className="flex items-center justify-between py-3 px-3 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-sm"
+        className="flex items-center justify-between py-2 px-3 bg-transparent text-sm"
         tabIndex={0}
         aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
       >
-        {/* Left: Rank, avatar, name */}
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400 w-6 flex-shrink-0 text-center">
-            {idx + 1}
-          </span>
+        {/* Rank */}
+        <span className="text-base font-bold text-blue-400 w-6 text-center flex-shrink-0">{idx + 1}</span>
+        {/* Avatar + Name */}
+        <div className="flex items-center flex-1 gap-2 min-w-0 mx-2 truncate">
           <img
             src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
             alt={`${u.name} avatar`}
-            className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+            className="w-7 h-7 rounded-full object-cover flex-shrink-0"
           />
-          <span className="truncate font-medium text-gray-900 dark:text-white">{u.name}</span>
+          <span className="truncate font-medium text-gray-100">{u.name}</span>
         </div>
-        {/* Right: Activity numbers */}
-        <div className="flex items-center gap-4 text-xs text-gray-700 dark:text-gray-400 flex-shrink-0">
-          <span className="flex items-center gap-1">
-            <span role="img" aria-label="posts">📝</span>
-            <span className="font-bold">{u.posts}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span role="img" aria-label="comments">💬</span>
-            <span className="font-bold">{u.comments}</span>
-          </span>
-          <span>
-            Total: <span className="font-bold">{u.total}</span>
-          </span>
-        </div>
+        {/* Posts */}
+        <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
+          <span role="img" aria-label="posts" className="text-base">🗒</span>
+          <span className="font-bold">{u.posts}</span>
+        </span>
+        {/* Comments */}
+        <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
+          <span role="img" aria-label="comments" className="text-base">💬</span>
+          <span className="font-bold">{u.comments}</span>
+        </span>
+        {/* Total */}
+        <span className="flex items-center gap-1 min-w-[46px] justify-center text-green-400 font-bold">
+          <span role="img" aria-label="total" className="text-base">🚀</span>
+          <span>{u.total}</span>
+        </span>
       </li>
     ))}
   </ul>
 </aside>
+
       </section>
     </div>
   );

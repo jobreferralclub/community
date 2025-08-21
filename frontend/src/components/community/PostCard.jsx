@@ -186,7 +186,7 @@ const PostCard = ({ post }) => {
         {/* Content */}
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
-          <p className="text-gray-300">{post.content}</p>
+         <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
 
         {/* Image Preview */}
