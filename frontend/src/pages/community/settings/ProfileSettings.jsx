@@ -14,6 +14,8 @@ const ProfileSettings = ({ user }) => {
     avatar: user.avatar || "",
   });
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   // Handle input change for all fields except file uploads
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +34,7 @@ const ProfileSettings = ({ user }) => {
     formDataObj.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${apiUrl}/api/upload`, {
         method: "POST",
         body: formDataObj,
       });
@@ -55,7 +57,7 @@ const ProfileSettings = ({ user }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+      const response = await fetch(`${apiUrl}/api/users/${user._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -7,6 +7,8 @@ const ProfileHeader = ({ profile }) => {
   const [editData, setEditData] = useState(profile);
   const [uploading, setUploading] = useState(false);
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   const { user } = useAuthStore(); // ✅ assuming you have a setUser action in your store
 
   // Handle avatar upload
@@ -19,7 +21,7 @@ const ProfileHeader = ({ profile }) => {
 
     try {
       setUploading(true);
-      const res = await fetch("http://localhost:5000/api/upload", {
+      const res = await fetch(`${apiUrl}/api/upload`, {
         method: "POST",
         body: formDataObj,
       });
@@ -38,7 +40,7 @@ const ProfileHeader = ({ profile }) => {
   // Save changes to DB
   const handleSave = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+      const res = await fetch(`${apiUrl}/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editData),

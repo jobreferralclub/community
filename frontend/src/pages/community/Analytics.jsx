@@ -37,6 +37,8 @@ const Analytics = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   useEffect(() => {
     async function fetchAnalytics() {
       setLoading(true);
@@ -50,17 +52,17 @@ const Analytics = () => {
           topActiveUsersRes,
         ] = await Promise.all([
           fetch(
-            `http://localhost:5000/api/analytics/user-growth?range=${timeRange}`
+            `${apiUrl}/api/analytics/user-growth?range=${timeRange}`
           ),
           fetch(
-            `http://localhost:5000/api/analytics/posts-activity?range=${timeRange}`
+            `${apiUrl}/api/analytics/posts-activity?range=${timeRange}`
           ),
           fetch(
-            `http://localhost:5000/api/analytics/comments-activity?range=${timeRange}`
+            `${apiUrl}/api/analytics/comments-activity?range=${timeRange}`
           ),
-          fetch(`http://localhost:5000/api/analytics/user-roles`),
+          fetch(`${apiUrl}/api/analytics/user-roles`),
           fetch(
-            `http://localhost:5000/api/analytics/top-active-users?range=${timeRange}`
+            `${apiUrl}/api/analytics/top-active-users?range=${timeRange}`
           ),
         ]);
 

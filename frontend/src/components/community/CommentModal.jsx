@@ -19,6 +19,8 @@ const CommentModal = ({ post, onClose }) => {
   const [submitting, setSubmitting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   const emojiPickerRef = useRef(null);
   const emojiButtonRef = useRef(null);
 
@@ -67,7 +69,7 @@ const CommentModal = ({ post, onClose }) => {
     formDataObj.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:5000/api/upload", {
+      const response = await fetch(`${apiUrl}/api/upload`, {
         method: "POST",
         body: formDataObj,
       });

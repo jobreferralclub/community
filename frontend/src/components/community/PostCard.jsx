@@ -15,6 +15,8 @@ const PostCard = ({ post }) => {
   const queryParams = new URLSearchParams(location.search);
   const postIdFromUrl = queryParams.get('postid');
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   const [liked, setLiked] = useState(post.likedByUser || false);
   const [showComments, setShowComments] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
@@ -68,7 +70,7 @@ const PostCard = ({ post }) => {
         work: user.work || []
       };
 
-      const response = await fetch("http://localhost:5000/api/resume/jd-analyze", {
+      const response = await fetch(`${apiUrl}/api/resume/jd-analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

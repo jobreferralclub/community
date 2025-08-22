@@ -12,6 +12,8 @@ import axios from "axios";
 const ProfilePage = () => {
     const { user, setUser } = useAuthStore();
 
+    const apiUrl = import.meta.env.VITE_API_PORT;
+
     // ===== Profile Data from user =====
     const profile = {
         name: user?.name || "",
@@ -68,7 +70,7 @@ const ProfilePage = () => {
                 try {
                     setLoading(true);
                     const res = await axios.put(
-                        `http://localhost:5000/api/users/${user._id}`,
+                        `${apiUrl}/api/users/${user._id}`,
                         { education: updatedData }
                     );
                     setUser(res.data);
@@ -88,7 +90,7 @@ const ProfilePage = () => {
                 try {
                     setLoading(true);
                     const res = await axios.put(
-                        `http://localhost:5000/api/users/${user._id}`,
+                        `${apiUrl}/api/users/${user._id}`,
                         { work: updatedData }
                     );
                     setUser(res.data);
@@ -108,7 +110,7 @@ const ProfilePage = () => {
                 try {
                     setLoading(true);
                     const res = await axios.put(
-                        `http://localhost:5000/api/users/${user._id}`,
+                        `${apiUrl}/api/users/${user._id}`,
                         { projects: updatedData }
                     );
                     setUser(res.data);
@@ -128,7 +130,7 @@ const ProfilePage = () => {
                 try {
                     setLoading(true);
                     const res = await axios.put(
-                        `http://localhost:5000/api/users/${user._id}`,
+                        `${apiUrl}/api/users/${user._id}`,
                         { skills: updatedData }
                     );
                     setUser(res.data);
@@ -148,7 +150,7 @@ const ProfilePage = () => {
                 try {
                     setLoading(true);
                     const res = await axios.put(
-                        `http://localhost:5000/api/users/${user._id}`,
+                        `${apiUrl}/api/users/${user._id}`,
                         { certificates: updatedData } // ✅ update certificates via API
                     );
                     setUser(res.data); // sync global user state
@@ -542,7 +544,7 @@ const ProfilePage = () => {
                                 setEducation(updated);
                                 try {
                                     await axios.put(
-                                        `http://localhost:5000/api/users/${user._id}`,
+                                        `${apiUrl}/api/users/${user._id}`,
                                         { education: updated }
                                     );
                                     setUser({ ...user, education: updated });

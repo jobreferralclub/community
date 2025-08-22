@@ -5,6 +5,8 @@ const DataExportSettings = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   // New states for posts
   const [postsData, setPostsData] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
@@ -16,7 +18,7 @@ const DataExportSettings = () => {
   const [analyticsError, setAnalyticsError] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users")
+    fetch(`${apiUrl}/api/users`)
       .then((response) => response.json())
       .then((data) => {
         setUserData(data);
@@ -30,7 +32,7 @@ const DataExportSettings = () => {
 
   // New effect to fetch community posts separately
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts/")
+    fetch(`${apiUrl}/api/posts/`)
       .then((response) => response.json())
       .then((data) => {
         setPostsData(Array.isArray(data) ? data : []);
@@ -45,7 +47,7 @@ const DataExportSettings = () => {
 
   // New effect to fetch analytics data from user-growth endpoint
   useEffect(() => {
-    fetch("http://localhost:5000/api/analytics/user-growth")
+    fetch(`${apiUrl}/api/analytics/user-growth`)
       .then((response) => response.json())
       .then((data) => {
         setAnalyticsData(Array.isArray(data) ? data : [data]);

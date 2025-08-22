@@ -30,6 +30,8 @@ const CreatePost = ({ onClose }) => {
   const { addPost } = useCommunityStore();
   const { user } = useAuthStore();
 
+  const apiUrl = import.meta.env.VITE_API_PORT;
+
   // ===== Tag Handling =====
   const addTag = () => {
     const newTag = tagInput.trim();
@@ -80,7 +82,7 @@ const CreatePost = ({ onClose }) => {
     formDataObj.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:5000/api/upload', {
+      const response = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
         body: formDataObj,
       });
