@@ -16,6 +16,18 @@ const Sidebar = ({ open, setOpen }) => {
   const role = useAuthStore((state) => state.role);
   const currentLocation = useAuthStore((state) => state.location);
 
+  const isSubMenuActive = (item) => {
+    if (!item.children) return false;
+
+    // Flatten all child paths (nested 2 levels deep)
+    const allPaths = item.children.flatMap((region) =>
+      region.children ? region.children.map((sub) => sub.path) : []
+    );
+
+    return allPaths.some((p) => location.pathname.startsWith(p));
+  };
+
+
   // Instead of string, store arrays of open menus/regions (so multiple can be open)
   const [openSubMenus, setOpenSubMenus] = React.useState(["Community"]);
   const [openRegions, setOpenRegions] = React.useState([
@@ -74,7 +86,7 @@ const Sidebar = ({ open, setOpen }) => {
       return (
         <button
           onClick={() => handleToggleSubMenu(item.name)}
-          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isCommunityActive()
+          className={`w-full flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isSubMenuActive(item)
               ? activeClass
               : `text-gray-300 dark:text-gray-300 ${hoverClass}`
             }`}
@@ -147,9 +159,9 @@ const Sidebar = ({ open, setOpen }) => {
                 <img src="/logo.jpg" alt="" />
               </div>
               <a href="/">
-              <span className="font-bold text-gray-100">JobReferral.Club</span>
+                <span className="font-bold text-gray-100">JobReferral.Club</span>
               </a>
-              
+
             </motion.div>
           )}
           <button
