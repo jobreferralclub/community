@@ -10,7 +10,8 @@ export const getAllPosts = async (req, res) => {
     // Populate `createdBy` field with user name and avatar, like a SQL LEFT JOIN
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate('createdBy', 'name avatar');  // only select name and avatar from user
+      .select('-job_description')   // exclude job_description
+      .populate('createdBy', 'name avatar');
 
     res.json(posts);
   } catch (error) {
@@ -171,7 +172,7 @@ export const getComments = async (req, res) => {
 // Add a comment
 export const addComment = async (req, res) => {
   try {
-    const { content, author,userId, avatar, imageUrl } = req.body;
+    const { content, author, userId, avatar, imageUrl } = req.body;
     const { postId } = req.params;
 
     const comment = new Comment({

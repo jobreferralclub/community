@@ -1,5 +1,6 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { Auth0Provider } from '@auth0/auth0-react';
 import App from './App.jsx';
 import './index.css';
 
@@ -7,7 +8,15 @@ import './index.css';
 document.documentElement.classList.add('dark');
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <Auth0Provider
+    domain="jobreferralclub.us.auth0.com"
+    clientId="a9M853RFnaY99WW9zAEawG1mgorJK8zH"
+    authorizationParams={{
+      redirect_uri: window.location.origin
+    }}
+  >
+    {/* <StrictMode> */}
     <App />
-  </StrictMode>
+    {/* </StrictMode> */}
+  </Auth0Provider>
 );

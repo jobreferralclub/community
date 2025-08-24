@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -11,6 +12,7 @@ const Navigation = () => {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const { user, logout } = useAuthStore();
+  const { user: auth0user, logout: auth0logout, loginWithPopup} = useAuth0();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -141,7 +143,10 @@ const Navigation = () => {
                           User Profile
                         </a>
                         <button
-                          onClick={() => logout()}
+                          onClick={() => {
+                            logout();
+                            auth0logout({ returnTo: window.location.origin });
+                          }}
                           className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
                         >
                           Log Out
@@ -152,7 +157,7 @@ const Navigation = () => {
                 </div>
               ) : (
                 <Button
-                  onClick={() => (window.location.href = "/login")}
+                  onClick={loginWithPopup}
                   className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20 whitespace-nowrap"
                 >
                   Sign In / Sign Up

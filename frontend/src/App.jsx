@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { motion } from "framer-motion";
+import { motion, sync } from "framer-motion";
 import Layout from "./components/community/Layout";
 import Dashboard from "./pages/community/Dashboard";
 import Community from "./pages/community/Community";
@@ -34,12 +34,46 @@ import ResumeEnhancer from "./pages/resume/builder/ResumeEnhancer";
 import ResumeRanker from "./pages/resume/ranker/ResumeRanker";
 import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
 import AnalyzerResult from "./pages/resume/analyzer/AnalyzerResult";
+import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const { user: auth0user, isAuthenticated: auth0authenticated, loginWithPopup, logout: auth0logout } = useAuth0();
 
+  useEffect(() => {
+    const syncAuth0User = async () => {
+      try {
+        const res = await axios.post(`${import.meta.env.VITE_API_PORT}/api/users/auth0`, {
+          user: auth0user
+        });
+        if (res.status === 200 || res.status === 201) {
+          const backendUser = res.data.user;
+          console.log("Backend user data:", backendUser);
+          login({
+            ...backendUser,
+            avatar: backendUser.avatar || "/default-avatar.png",
+            points: backendUser.points || 2450,
+            badges: backendUser.badges || ["Top Referrer", "Community Helper", "Mentor"],
+            tier: backendUser.tier || "premium",
+          });
+          window.open("/community/introductions", "_self");
+        } else {
+          console.error("Failed to sync Auth0 user, status:", res.status);
+        }
+      } catch (error) {
+        console.error("Error syncing Auth0 user:", error);
+      }
+    }
+    if (auth0user && !user) {
+      console.log("Auth0 user detected, syncing with backend:", auth0user);
+      syncAuth0User();
+    }
+  }, [auth0user]);
+
+  console.log(user);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -98,7 +132,7 @@ function AppWrapper() {
               ...userData,
               avatar:
                 userData.avatar ||
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                "/default-avatar.jpg",
               points: userData.points || 2450,
               badges: userData.badges || [
                 "Top Referrer",
@@ -154,15 +188,15 @@ function AppWrapper() {
         <Route path="/" element={<Landing />} />
         <Route path="/resume-builder">
           <Route index element={<ResumeBuilder />} />
-          <Route path="questionnaire" element={<ResumeBuilderQuestionnaire/>}/>
-          <Route path="preview" element={<ResumeBuilderPreview/>}/>
-          <Route path="resume-from-linkedin" element={<ResumeFromLinkedin/>}/>
-          <Route path="enhancer" element={<ResumeEnhancer/>}/>
+          <Route path="questionnaire" element={<ResumeBuilderQuestionnaire />} />
+          <Route path="preview" element={<ResumeBuilderPreview />} />
+          <Route path="resume-from-linkedin" element={<ResumeFromLinkedin />} />
+          <Route path="enhancer" element={<ResumeEnhancer />} />
         </Route>
-        <Route path="/resume-ranker" element={<ResumeRanker/>}/>
-        <Route path="/resume-analyzer" element={<ResumeAnalyzer/>}/>
-        <Route path="/analyzer-result" element={<AnalyzerResult/>}/>
-        <Route path="*" element={<NotFound/>} />
+        <Route path="/resume-ranker" element={<ResumeRanker />} />
+        <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
+        <Route path="/analyzer-result" element={<AnalyzerResult />} />
+        <Route path="*" element={<NotFound />} />
 
         {/* ✅ Public login route */}
         <Route
@@ -171,8 +205,8 @@ function AppWrapper() {
         />
 
         {isAuthenticated ? (
-          <Route path="/profile" element={<ProfilePage/>} />
-        ):(
+          <Route path="/profile" element={<ProfilePage />} />
+        ) : (
           <Route path="/profile" element={<Navigate to="/login" replace />} />
         )}
         {/* ✅ Protected routes under /community */}

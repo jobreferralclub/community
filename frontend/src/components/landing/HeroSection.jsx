@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, TrendingUp, Zap } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const container = {
   hidden: { opacity: 0, y: 30 },
@@ -23,9 +24,12 @@ const item = {
 const HeroSection = () => {
   const { user } = useAuthStore();
 
+  const { loginWithPopup,} = useAuth0();
+
   const handleNavigate = () => {
-    user? window.open("/community", "_self"): window.open("/login", "_self");
+    user ? window.open("/community", "_self") : loginWithPopup();
   };
+
 
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden pt-16 md:pt-20">

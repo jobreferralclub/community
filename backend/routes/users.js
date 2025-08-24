@@ -11,6 +11,7 @@ import {
   loginUser,
   googleLogin,
 } from "../controllers/users.controller.js";
+import { auth0Login } from "../controllers/auth0.controller.js";
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.get("/:id", getUserById);
 router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);
 router.delete("/", deleteAllUsers);
+router.post("/auth0", auth0Login);
 
 // Role management
 router.get("/:id/role", getUserRole);
