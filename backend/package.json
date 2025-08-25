@@ -16,6 +16,7 @@
     "fs-extra": "^11.3.1",
     "googleapis": "^156.0.0",
     "gridfs-stream": "^1.1.1",
+    "ioredis": "^5.7.0",
     "jsonrepair": "^3.13.0",
     "jsonwebtoken": "^9.0.2",
     "mammoth": "^1.10.0",

@@ -1,14 +1,20 @@
 // src/controllers/postController.js
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
+import Community from "../models/Community.js";
 
 // ========== POSTS ==========
 
 // Get all posts (newest first)
 export const getAllPosts = async (req, res) => {
   try {
-    // Populate `createdBy` field with user name and avatar, like a SQL LEFT JOIN
-    const posts = await Post.find()
+    const { community } = req.body;
+
+    // Build query condition
+    const query = community ? { community } : {};
+
+    // Fetch posts with optional filter
+    const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .select('-job_description')   // exclude job_description
       .populate('createdBy', 'name avatar');
@@ -20,11 +26,10 @@ export const getAllPosts = async (req, res) => {
   }
 };
 
-
 // Create a new post
 export const createPost = async (req, res) => {
   try {
-    let { tags, links, imageUrl, userId, ...rest } = req.body;
+    let { tags, links, imageUrl, userId, communityId, ...rest } = req.body;
 
     // Normalize tags
     if (typeof tags === "string") {
@@ -45,6 +50,7 @@ export const createPost = async (req, res) => {
       imageUrl = "";
     }
 
+    // ✅ Create post
     const post = new Post({
       ...rest,
       tags,
@@ -57,8 +63,21 @@ export const createPost = async (req, res) => {
       createdBy: userId || null,
     });
 
-    const saved = await post.save();
-    res.status(201).json(saved);
+    const savedPost = await post.save();
+
+    // ✅ Attach post to community & increment postCount
+    if (communityId) {
+      await Community.findByIdAndUpdate(
+        communityId,
+        {
+          $push: { posts: { postId: savedPost._id, createdAt: savedPost.createdAt } },
+          $inc: { postCount: 1 },
+        },
+        { new: true }
+      );
+    }
+
+    res.status(201).json(savedPost);
   } catch (error) {
     console.error("Error creating post:", error);
     res.status(500).json({ error: "Failed to create post" });

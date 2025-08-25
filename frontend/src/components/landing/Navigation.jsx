@@ -145,7 +145,7 @@ const Navigation = () => {
                         <button
                           onClick={() => {
                             logout();
-                            auth0logout({ returnTo: window.location.origin });
+                            auth0logout({ returnTo: '/' });
                           }}
                           className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
                         >

@@ -110,6 +110,7 @@ const CreatePost = ({ onClose }) => {
     e.preventDefault();
     await addPost({
       ...formData,
+      communityId: currentCommunity?.id,   // ✅ add community ID
       author: user?.name,
       avatar: user?.avatar,
       userId: user?._id

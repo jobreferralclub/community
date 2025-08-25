@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
-import { useCommunityStore } from "../../store/communityStore";
 import PostCard from "../../components/community/PostCard";
 import CreatePost from "../../components/community/CreatePost";
 import { useLocation } from "react-router-dom";
@@ -13,19 +12,56 @@ const { FiPlus, FiFilter, FiSearch, FiTrendingUp } = FiIcons;
 const Community = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const { posts, loadPosts } = useCommunityStore();
   const location = useLocation();
 
-  useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
-
+  // Identify current community based on route
   const currentCommunity =
     subCommunities.find((c) => location.pathname.startsWith(c.path)) || {
-      title: "community",
+      id: null,
+      title: "Community",
       subtitle: "Connect, share, and grow together",
     };
+
+  useEffect(() => {
+    setPage(1);
+  }, [currentCommunity?.id]);
+  
+  // Fetch posts for this community with pagination
+  useEffect(() => {
+    if (!currentCommunity?.id) return;
+
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_PORT}/api/communities/${currentCommunity.id}/posts?page=${page}`, // 👈 page as query
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await res.json();
+        setPosts(data.posts || []);
+        setTotalPages(data.totalPages || 1);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [currentCommunity?.id, page]);
+
 
   const filters = [
     { id: "all", name: "All Posts", count: posts.length },
@@ -46,15 +82,9 @@ const Community = () => {
     },
   ];
 
-  const filteredPosts = posts
-    .filter((post) => {
-      const matchesCommunity = currentCommunity.path
-        ? post.community === currentCommunity.title
-        : true;
-      const matchesType = filter === "all" || post.type === filter;
-      return matchesCommunity && matchesType;
-    })
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const filteredPosts = posts.filter(
+    (post) => filter === "all" || post.type === filter
+  );
 
   return (
     <div className="bg-gray-900 text-gray-100 min-h-screen p-6 space-y-6">
@@ -75,10 +105,9 @@ const Community = () => {
         </motion.button>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search + Filters */}
       <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-700">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          {/* Search */}
           <div className="relative flex-1 max-w-md">
             <SafeIcon
               icon={FiSearch}
@@ -90,7 +119,7 @@ const Community = () => {
               className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
             />
           </div>
-          {/* Filters */}
+
           <div className="flex items-center space-x-2">
             <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" />
             <div className="flex space-x-2">
@@ -126,33 +155,30 @@ const Community = () => {
           <h3 className="text-lg font-semibold text-white">Trending Topics</h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {[
-            "React",
-            "Remote Work",
-            "Google",
-            "Meta",
-            "Interview Tips",
-            "Salary Negotiation",
-          ].map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 bg-[#79e708] !text-black rounded-full text-sm font-medium cursor-pointer hover:brightness-105"
-            >
-              #{tag}
-            </span>
-          ))}
+          {["React", "Remote Work", "Google", "Meta", "Interview Tips", "Salary Negotiation"].map(
+            (tag) => (
+              <span
+                key={tag}
+                className="px-3 py-1 bg-[#79e708] !text-black rounded-full text-sm font-medium cursor-pointer hover:brightness-105"
+              >
+                #{tag}
+              </span>
+            )
+          )}
         </div>
       </motion.div>
 
       {/* Posts */}
       <div className="space-y-6">
-        {filteredPosts.length > 0 ? (
+        {loading ? (
+          <div className="text-center text-gray-500 py-10">Loading posts...</div>
+        ) : filteredPosts.length > 0 ? (
           filteredPosts.map((post, index) => (
             <motion.div
               key={post._id || post.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
             >
               <PostCard post={post} />
             </motion.div>
@@ -164,10 +190,38 @@ const Community = () => {
         )}
       </div>
 
-      {/* Create Post Modal */}
-      {showCreatePost && (
-        <CreatePost onClose={() => setShowCreatePost(false)} />
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-6">
+          {/* Prev button */}
+          {page > 1 && (
+            <button
+              onClick={() => setPage((prev) => prev - 1)}
+              className="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+            >
+              Prev
+            </button>
+          )}
+
+          {/* Current page */}
+          <span className="px-3 py-1 rounded-lg bg-[#79e708] text-[#000] font-medium">
+            {page}
+          </span>
+
+          {/* Next button */}
+          {page < totalPages && (
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              className="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+            >
+              Next
+            </button>
+          )}
+        </div>
       )}
+
+
+      {showCreatePost && <CreatePost onClose={() => setShowCreatePost(false)} />}
     </div>
   );
 };

@@ -155,7 +155,12 @@ const CommentModal = ({ post, onClose }) => {
         {/* Post Preview */}
         <div className="border-b border-gray-700 p-6 flex-shrink-0 bg-gray-800">
           <h3 className="text-lg font-bold text-white">{post.title}</h3>
-          <p className="mt-2 text-gray-300">{post.content}</p>
+
+          {/* Render HTML safely */}
+          <div
+            className="mt-2 text-gray-300"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
         </div>
 
         {/* Comments List */}

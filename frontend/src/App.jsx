@@ -59,7 +59,7 @@ function AppWrapper() {
             badges: backendUser.badges || ["Top Referrer", "Community Helper", "Mentor"],
             tier: backendUser.tier || "premium",
           });
-          window.open("/community/introductions", "_self");
+          window.open("/community", "_self");
         } else {
           console.error("Failed to sync Auth0 user, status:", res.status);
         }

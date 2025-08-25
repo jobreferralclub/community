@@ -31,6 +31,7 @@ import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
 import rolesStatsRoutes from "./routes/rolesStats.js";
 import resumeRoutes from "./routes/resume.js";
+import communityRoutes from  "./routes/community.js";
 import { giveJoke } from "./controllers/give-joke.controller.js";
 
 
@@ -40,6 +41,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/communities", communityRoutes);
 
 // Login/Signup
 app.use("/api/auth", authRoutes);
