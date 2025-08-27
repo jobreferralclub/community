@@ -4,153 +4,153 @@ import React, { useState } from "react";
 const API_URL = import.meta.env.VITE_API_PORT + "/api/resume/rank";
 
 const ResumeRanker = () => {
-  const [jdText, setJdText] = useState("");
-  const [techSkills, setTechSkills] = useState("");
-  const [softSkills, setSoftSkills] = useState("");
-  const [weightSkills, setWeightSkills] = useState(0.0);
-  const [weightExperience, setWeightExperience] = useState(0.0);
-  const [weightEducation, setWeightEducation] = useState(0.0);
-  const [weightProjects, setWeightProjects] = useState(0.0);
-  const [weightAchievements, setWeightAchievements] = useState(0.0);
-  const [topN, setTopN] = useState("");
-  const [resumes, setResumes] = useState(null);
+    const [jdText, setJdText] = useState("");
+    const [techSkills, setTechSkills] = useState("");
+    const [softSkills, setSoftSkills] = useState("");
+    const [weightSkills, setWeightSkills] = useState(0.0);
+    const [weightExperience, setWeightExperience] = useState(0.0);
+    const [weightEducation, setWeightEducation] = useState(0.0);
+    const [weightProjects, setWeightProjects] = useState(0.0);
+    const [weightAchievements, setWeightAchievements] = useState(0.0);
+    const [topN, setTopN] = useState("");
+    const [resumes, setResumes] = useState(null);
 
-  const [results, setResults] = useState([]);
-  const [serverTechSkills, setServerTechSkills] = useState([]);
-  const [serverSoftSkills, setServerSoftSkills] = useState([]);
-  const [loading, setLoading] = useState(false);
+    const [results, setResults] = useState([]);
+    const [serverTechSkills, setServerTechSkills] = useState([]);
+    const [serverSoftSkills, setServerSoftSkills] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-  const handleUpload = (e) => {
-    if (e.target.files) setResumes(e.target.files);
-  };
-
-  const handleAnalyze = async () => {
-    if (!jdText || !resumes) {
-      alert("Please provide both Job Description and Resume files.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("jd_text", jdText);
-    formData.append("tech_skills", techSkills);
-    formData.append("soft_skills", softSkills);
-    formData.append("weight_skills", weightSkills.toString());
-    formData.append("weight_experience", weightExperience.toString());
-    formData.append("weight_education", weightEducation.toString());
-    formData.append("weight_projects", weightProjects.toString());
-    formData.append("weight_achievements", weightAchievements.toString());
-    if (topN) formData.append("top_n", topN);
-
-    Array.from(resumes).forEach((file) => formData.append("resumes", file));
-
-    setLoading(true);
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      setResults(data.results);
-      setServerTechSkills(data.tech_skills || []);
-      setServerSoftSkills(data.soft_skills || []);
-    } catch (err) {
-      console.error(err);
-      alert("Error analyzing resumes. Check backend logs.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const downloadCSV = () => {
-    const hasTech = serverTechSkills.length > 0;
-    const hasSoft = serverSoftSkills.length > 0;
-
-    const baseHeaders = ["file_name", "candidate_name", "email", "final_score"];
-    const headers = [
-      ...baseHeaders,
-      ...(hasTech ? serverTechSkills : []),
-      ...(hasSoft ? serverSoftSkills : []),
-    ];
-
-    const rows = results.map((r) => {
-      const baseCols = [r.file_name, r.candidate_name, r.email, r.final_score];
-      const techCols = hasTech
-        ? serverTechSkills.map((s) => r.tech_skills_scores?.[s] ?? 0)
-        : [];
-      const softCols = hasSoft
-        ? serverSoftSkills.map((s) => r.soft_skills_scores?.[s] ?? 0)
-        : [];
-      return [...baseCols, ...techCols, ...softCols];
-    });
-
-    const escape = (val) => {
-      const s = val == null ? "" : String(val);
-      if (s.includes(",") || s.includes("\n") || s.includes('"')) {
-        return `"${s.replace(/"/g, '""')}"`;
-      }
-      return s;
+    const handleUpload = (e) => {
+        if (e.target.files) setResumes(e.target.files);
     };
 
-    const csv =
-      headers.join(",") +
-      "\n" +
-      rows.map((row) => row.map(escape).join(",")).join("\n");
+    const handleAnalyze = async () => {
+        if (!jdText || !resumes) {
+            alert("Please provide both Job Description and Resume files.");
+            return;
+        }
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ranked_resumes.csv";
-    link.click();
-  };
+        const formData = new FormData();
+        formData.append("jd_text", jdText);
+        formData.append("tech_skills", techSkills);
+        formData.append("soft_skills", softSkills);
+        formData.append("weight_skills", weightSkills.toString());
+        formData.append("weight_experience", weightExperience.toString());
+        formData.append("weight_education", weightEducation.toString());
+        formData.append("weight_projects", weightProjects.toString());
+        formData.append("weight_achievements", weightAchievements.toString());
+        if (topN) formData.append("top_n", topN);
 
-  const features = [
-    {
-      icon: "🎯",
-      title: "Smart",
-      subtitle: "Skill Analysis",
-      description:
-        "AI-powered evaluation of technical and soft skills with precision scoring",
-    },
-    {
-      icon: "⚖️",
-      title: "Custom",
-      subtitle: "Weightings",
-      description: "Flexible criteria adjustment to match your specific hiring needs",
-    },
-    {
-      icon: "🚀",
-      title: "Instant",
-      subtitle: "Rankings",
-      description:
-        "Real-time candidate evaluation with comprehensive performance metrics",
-    },
-  ];
+        Array.from(resumes).forEach((file) => formData.append("resumes", file));
 
-  const weightControls = [
-    { label: "Skills Weight", value: weightSkills, set: setWeightSkills, icon: "🧪" },
-    { label: "Experience Weight", value: weightExperience, set: setWeightExperience, icon: "💼" },
-    { label: "Education Weight", value: weightEducation, set: setWeightEducation, icon: "🎓" },
-    { label: "Projects Weight", value: weightProjects, set: setWeightProjects, icon: "🚀" },
-    { label: "Achievements Weight", value: weightAchievements, set: setWeightAchievements, icon: "🏆" },
-  ];
+        setLoading(true);
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: formData,
+            });
 
-  const getRankBadgeStyle = (index) => {
-    if (index === 0)
-      return "bg-gradient-to-br from-[#79e708] to-[#5bb406] text-black font-black shadow-xl shadow-[#79e708]/40 border-2 border-[#79e708]/30";
-    if (index === 1)
-      return "bg-gradient-to-br from-gray-300 to-gray-500 text-black font-black shadow-xl shadow-gray-400/40 border-2 border-gray-300/30";
-    if (index === 2)
-      return "bg-gradient-to-br from-amber-400 to-orange-500 text-black font-black shadow-xl shadow-amber-400/40 border-2 border-amber-400/30";
-    return "bg-gradient-to-br from-gray-700 to-gray-800 text-white font-bold shadow-lg shadow-gray-700/20 border border-gray-600/50";
-  };
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
 
-  return (
+            const data = await response.json();
+            setResults(data.results);
+            setServerTechSkills(data.tech_skills || []);
+            setServerSoftSkills(data.soft_skills || []);
+        } catch (err) {
+            console.error(err);
+            alert("Error analyzing resumes. Check backend logs.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const downloadCSV = () => {
+        const hasTech = serverTechSkills.length > 0;
+        const hasSoft = serverSoftSkills.length > 0;
+
+        const baseHeaders = ["file_name", "candidate_name", "email", "final_score"];
+        const headers = [
+            ...baseHeaders,
+            ...(hasTech ? serverTechSkills : []),
+            ...(hasSoft ? serverSoftSkills : []),
+        ];
+
+        const rows = results.map((r) => {
+            const baseCols = [r.file_name, r.candidate_name, r.email, r.final_score];
+            const techCols = hasTech
+                ? serverTechSkills.map((s) => r.tech_skills_scores?.[s] ?? 0)
+                : [];
+            const softCols = hasSoft
+                ? serverSoftSkills.map((s) => r.soft_skills_scores?.[s] ?? 0)
+                : [];
+            return [...baseCols, ...techCols, ...softCols];
+        });
+
+        const escape = (val) => {
+            const s = val == null ? "" : String(val);
+            if (s.includes(",") || s.includes("\n") || s.includes('"')) {
+                return `"${s.replace(/"/g, '""')}"`;
+            }
+            return s;
+        };
+
+        const csv =
+            headers.join(",") +
+            "\n" +
+            rows.map((row) => row.map(escape).join(",")).join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "ranked_resumes.csv";
+        link.click();
+    };
+
+    const features = [
+        {
+            icon: "🎯",
+            title: "Smart",
+            subtitle: "Skill Analysis",
+            description:
+                "AI-powered evaluation of technical and soft skills with precision scoring",
+        },
+        {
+            icon: "⚖️",
+            title: "Custom",
+            subtitle: "Weightings",
+            description: "Flexible criteria adjustment to match your specific hiring needs",
+        },
+        {
+            icon: "🚀",
+            title: "Instant",
+            subtitle: "Rankings",
+            description:
+                "Real-time candidate evaluation with comprehensive performance metrics",
+        },
+    ];
+
+    const weightControls = [
+        { label: "Skills Weight", value: weightSkills, set: setWeightSkills, icon: "🧪" },
+        { label: "Experience Weight", value: weightExperience, set: setWeightExperience, icon: "💼" },
+        { label: "Education Weight", value: weightEducation, set: setWeightEducation, icon: "🎓" },
+        { label: "Projects Weight", value: weightProjects, set: setWeightProjects, icon: "🚀" },
+        { label: "Achievements Weight", value: weightAchievements, set: setWeightAchievements, icon: "🏆" },
+    ];
+
+    const getRankBadgeStyle = (index) => {
+        if (index === 0)
+            return "bg-gradient-to-br from-[#79e708] to-[#5bb406] text-black font-black shadow-xl shadow-[#79e708]/40 border-2 border-[#79e708]/30";
+        if (index === 1)
+            return "bg-gradient-to-br from-gray-300 to-gray-500 text-black font-black shadow-xl shadow-gray-400/40 border-2 border-gray-300/30";
+        if (index === 2)
+            return "bg-gradient-to-br from-amber-400 to-orange-500 text-black font-black shadow-xl shadow-amber-400/40 border-2 border-amber-400/30";
+        return "bg-gradient-to-br from-gray-700 to-gray-800 text-white font-bold shadow-lg shadow-gray-700/20 border border-gray-600/50";
+    };
+
+    return (
         <>
             <Navigation />
             <div className="min-h-screen bg-black relative overflow-hidden pt-20">
@@ -196,12 +196,11 @@ const ResumeRanker = () => {
                 <div className="relative z-10 px-6 py-12">
                     {/* Hero Section */}
                     <div className="text-center mb-16">
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#79e708] to-[#5bb406] rounded-2xl mb-8 shadow-2xl shadow-[#79e708]/30">
-                                <span className="text-3xl font-black text-black">AI</span>
-                            </div>
-
-                            <h1 className="text-6xl lg:text-7xl font-black mb-6 tracking-tight">
+                        <div className="flex justify-center mb-8">
+                            <h1 className="flex items-center gap-4 text-6xl lg:text-7xl font-black tracking-tight">
+                                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#79e708] to-[#5bb406] rounded-2xl shadow-2xl shadow-[#79e708]/30">
+                                    <span className="text-3xl font-black text-black">AI</span>
+                                </div>
                                 <span className="bg-gradient-to-r from-white via-[#79e708] to-white bg-clip-text text-transparent">
                                     Resume Ranker
                                 </span>

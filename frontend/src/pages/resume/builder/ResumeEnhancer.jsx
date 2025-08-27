@@ -1,45 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Sparkles, Loader2, UploadCloud } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import lottie from "lottie-web";
+import { Sparkles, Loader2, UploadCloud, CheckCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import axios from "axios";
-import lottie from "lottie-web";
 import { useNavigate } from "react-router-dom";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
+import { motion, AnimatePresence } from "framer-motion";
 import useResumeStore from "../../../store/useResumeStore";
 import LivePreview from "../../../components/resume/builder/LivePreview";
 import TemplateSelectionPopup from "../../../components/resume/builder/TemplateSelectionPopup";
 import useTemplateStore from "@/store/useTemplateStore";
+import Navigation from "../../../components/landing/Navigation";
+
+const steps = [
+    { id: "upload", label: "Upload Resume" },
+    { id: "enhance", label: "AI Enhance" },
+    { id: "preview", label: "Preview" },
+    { id: "download", label: "Download" },
+];
 
 const ResumeEnhancer = () => {
     const [resumeText, setResumeText] = useState("");
     const [loading, setLoading] = useState(false);
-    const [step, setStep] = useState("idle");
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-    const [isFadingOut, setIsFadingOut] = useState(false);
-    const lottieContainerRef = useRef(null);
+    const [currentStep, setCurrentStep] = useState("upload");
     const [selectedFile, setSelectedFile] = useState(null);
+    const [showTemplatePopup, setShowTemplatePopup] = useState(false);
     const navigate = useNavigate();
-
     const apiUrl = import.meta.env.VITE_API_PORT;
 
-    const [currentTipIndex, setCurrentTipIndex] = useState(0);
-    const [showTips, setShowTips] = useState(false);
-
-    // 👇 Template popup states
-    const [showTemplatePopup, setShowTemplatePopup] = useState(false);
-    const [popupShownOnce, setPopupShownOnce] = useState(false);
     const currentTemplate = useTemplateStore((state) => state.currentTemplate);
-
-    const resumeTips = [
-        "Tailor your resume for each job application.",
-        "Use action verbs like 'Led', 'Built', 'Achieved'.",
-        "Quantify accomplishments with metrics.",
-        "Keep it concise—ideally one page for < 10 years experience.",
-        "Highlight ATS-friendly keywords from job descriptions.",
-        "Avoid passive phrases like 'Responsible for...'",
-        "Include relevant side projects or contributions.",
-    ];
 
     const {
         updatePersonalInfo,
@@ -49,98 +38,33 @@ const ResumeEnhancer = () => {
         addProject,
     } = useResumeStore();
 
-    // ✅ Show tips animation
-    useEffect(() => {
-        let tipInterval;
-        if (step === "enhancing") {
-            setShowTips(true);
-            tipInterval = setInterval(() => {
-                setCurrentTipIndex((prev) => (prev + 1) % resumeTips.length);
-            }, 3500);
-        } else {
-            setShowTips(false);
-            clearInterval(tipInterval);
-        }
-        return () => clearInterval(tipInterval);
-    }, [step]);
-
-    // ✅ Lottie success animation
-    useEffect(() => {
-        if (!showSuccessMessage || !lottieContainerRef.current) return;
-        const animation = lottie.loadAnimation({
-            container: lottieContainerRef.current,
-            renderer: "svg",
-            loop: true,
-            autoplay: true,
-            path: "/Generate Resume.json",
-        });
-        return () => animation.destroy();
-    }, [showSuccessMessage]);
-
-    // ✅ Auto-show Template popup when Live Preview is ready
-    useEffect(() => {
-        if (step === "done" && !popupShownOnce && !currentTemplate) {
-            setShowTemplatePopup(true);
-            setPopupShownOnce(true);
-        }
-    }, [step, popupShownOnce, currentTemplate]);
-
-    const handleDownloadPDF = async () => {
-        try {
-            const html = document.querySelector("#resume-preview")?.outerHTML;
-            if (!html) {
-                alert("Resume preview not found.");
-                return;
-            }
-            const response = await fetch(`${apiUrl}/generate-pdf`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ html }),
-            });
-            if (!response.ok) throw new Error("Failed to generate PDF");
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", "resume.pdf");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Error downloading PDF:", error);
-            alert("Failed to download PDF.");
-        }
-    };
-
     const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
         setSelectedFile(file);
         const formData = new FormData();
         formData.append("resume", file);
-        setStep("uploading");
+        setLoading(true);
         try {
             const res = await axios.post(`${apiUrl}/api/resume/extract-text`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             setResumeText(res.data.text);
         } catch {
-            alert("Error extracting text. Is the backend running?");
-            setStep("idle");
+            alert("Error extracting text. Is backend running?");
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleEnhance = async () => {
         if (!resumeText.trim()) return;
         setLoading(true);
-        setStep("enhancing");
         try {
             const res = await axios.post(`${apiUrl}/api/resume/enhance-resume`, {
                 resumeText,
             });
 
-            console.log("Enhanced Resume Data:", res.data);
             const { personalInfo, experience, education, skills, projects } = res.data;
             Object.entries(personalInfo).forEach(([k, v]) => updatePersonalInfo(k, v));
             experience?.forEach(addExperience);
@@ -148,136 +72,192 @@ const ResumeEnhancer = () => {
             skills?.forEach(addSkill);
             projects?.forEach(addProject);
 
-            setStep("done");
-            setShowSuccessMessage(true);
-            setTimeout(() => setIsFadingOut(true), 3000);
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-                setIsFadingOut(false);
-            }, 3500);
+            setCurrentStep("preview");
+            if (!currentTemplate) setShowTemplatePopup(true);
         } catch {
             alert("Error enhancing resume. Check backend/API key.");
-            setStep("idle");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0d0d0d] via-[#1a1a1a] to-[#0d0d0d] text-white py-12 px-4">
-            {/* ✅ Show Template popup */}
-            {showTemplatePopup && <TemplateSelectionPopup />}
-
-            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 transition-all duration-500">
-                {/* Left: Upload/Enhance Form */}
-                <div
-                    className={`backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl shadow-2xl p-8 relative overflow-hidden transition-all duration-500 ${step === "done" ? "w-full lg:w-1/2" : "w-full"
-                        }`}
-                >
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#79e7081a] via-transparent to-transparent rounded-3xl pointer-events-none z-0" />
-                    <div className="relative z-10">
-                        <h1 className="text-4xl font-extrabold text-center mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent tracking-tight">
-                            AI Resume Enhancer
-                        </h1>
-                        <p className="text-center text-gray-400 mb-10 max-w-xl mx-auto">
-                            Upload your <span className="font-semibold text-white">PDF</span> or{" "}
-                            <span className="font-semibold text-white">DOCX</span> resume. Let our AI optimize it for better performance
-                            with Applicant Tracking Systems (ATS).
-                        </p>
-
-                        {/* Upload Box */}
-                        <div className="mb-8">
-                            <label
-                                htmlFor="resumeUpload"
-                                className="cursor-pointer border-2 border-dashed border-lime-400/50 rounded-2xl px-6 py-10 flex flex-col items-center justify-center gap-4 text-center hover:bg-lime-400/5 transition-all"
-                            >
-                                <UploadCloud className="w-10 h-10 text-lime-400" />
-                                <span className="text-white font-semibold text-lg">
-                                    Click to upload your resume
-                                </span>
-                                <span className="text-sm text-gray-400">
-                                    Accepted formats: <strong>PDF</strong>, <strong>DOCX</strong>
-                                </span>
-                                <Input
-                                    id="resumeUpload"
-                                    type="file"
-                                    accept=".pdf,.docx"
-                                    onChange={handleFileUpload}
-                                    className="hidden"
-                                />
-                            </label>
-
-                            {selectedFile && (
-                                <div className="mt-4 flex items-center justify-center gap-2 text-white text-sm">
-                                    <UploadCloud className="w-4 h-4 text-lime-400" />
-                                    <span>{selectedFile.name}</span>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex justify-center mb-6">
-                            <Button
-                                onClick={handleEnhance}
-                                disabled={loading || !resumeText}
-                                className="bg-gradient-to-r from-lime-400 to-green-500 hover:brightness-110 text-black font-bold px-8 py-3 rounded-full shadow-lg transition-all duration-300"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Enhancing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Sparkles className="w-4 h-4 mr-2" /> Enhance with AI
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-
-                        {showTips && (
-                            <div className="mt-6 text-center text-sm text-gray-400 min-h-[24px]">
-                                <SwitchTransition>
-                                    <CSSTransition
-                                        key={resumeTips[currentTipIndex]}
-                                        timeout={500}
-                                        classNames="fade"
-                                    >
-                                        <div>{resumeTips[currentTipIndex]}</div>
-                                    </CSSTransition>
-                                </SwitchTransition>
+        <>
+            <Navigation />
+            <div className="min-h-screen bg-black relative overflow-hidden mt-16">
+                {/* Steps + Heading */}
+                <div className="relative z-10 max-w-4xl mx-auto px-6 py-12">
+                    <div className="flex justify-center mb-8">
+                        <h1 className="flex items-center gap-4 text-6xl lg:text-7xl font-black tracking-tight">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#79e708] to-[#5bb406] rounded-2xl shadow-2xl shadow-[#79e708]/30">
+                                <span className="text-3xl font-black text-black">AI</span>
                             </div>
+                            <span className="bg-gradient-to-r from-white via-[#79e708] to-white bg-clip-text text-transparent">
+                                Resume Enhancer
+                            </span>
+                        </h1>
+                    </div>
+                    <p className="text-center text-gray-400 mb-12">
+                        Follow the steps below to upload, enhance, and preview your resume before continuing.
+                    </p>
+
+                    {/* Steps Indicator */}
+                    <div className="flex justify-between items-center mb-12">
+                        {steps.map((s, i) => {
+                            const activeIndex = steps.findIndex((st) => st.id === currentStep);
+                            const completed = i < activeIndex;
+                            const active = s.id === currentStep;
+                            return (
+                                <div key={s.id} className="flex flex-col items-center flex-1">
+                                    <div
+                                        className={`w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all ${completed
+                                            ? "bg-[#79e708] border-[#79e708] text-black"
+                                            : active
+                                                ? "border-[#79e708] text-[#79e708]"
+                                                : "border-gray-700 text-gray-500"
+                                            }`}
+                                    >
+                                        {completed ? <CheckCircle className="w-6 h-6" /> : i + 1}
+                                    </div>
+                                    <span
+                                        className={`mt-2 text-sm ${completed || active ? "text-white" : "text-gray-500"
+                                            }`}
+                                    >
+                                        {s.label}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Step Content */}
+                    <AnimatePresence mode="wait">
+                        {/* Upload Step */}
+                        {currentStep === "upload" && (
+                            <motion.div
+                                key="upload"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                                className="text-center"
+                            >
+                                <label
+                                    htmlFor="resumeUpload"
+                                    className="cursor-pointer border-2 border-dashed border-[#79e708]/50 rounded-2xl px-6 py-10 flex flex-col items-center justify-center gap-4 text-center hover:bg-[#79e708]/5 transition-all"
+                                >
+                                    <UploadCloud className="w-10 h-10 text-[#79e708]" />
+                                    <span className="text-white font-semibold text-lg">
+                                        Click to upload your resume
+                                    </span>
+                                    <span className="text-sm text-gray-400">
+                                        Accepted formats: <strong>PDF</strong>, <strong>DOCX</strong>
+                                    </span>
+                                    <Input
+                                        id="resumeUpload"
+                                        type="file"
+                                        accept=".pdf,.docx"
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                    />
+                                </label>
+                                {selectedFile && <p className="mt-4 text-white">{selectedFile.name}</p>}
+
+                                {/* Enhance Button (replaces Continue) */}
+                                <Button
+                                    onClick={() => {
+                                        setCurrentStep("enhance"); // move to loader step
+                                        handleEnhance(); // start enhancing
+                                    }}
+                                    disabled={!resumeText || loading}
+                                    className="mt-6 bg-gradient-to-r from-[#79e708] to-[#5bb406] hover:brightness-110 text-black font-semibold px-6 py-2 rounded-full shadow transition-all"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Enhancing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="w-4 h-4 mr-2" /> Enhance with AI
+                                        </>
+                                    )}
+                                </Button>
+
+                            </motion.div>
                         )}
 
-                        {step === "done" && (
-                            <>
-                                <div className="flex justify-center mt-6">
+
+                        {currentStep === "enhance" && (
+                            <motion.div
+                                key="enhance"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                                className="text-center"
+                            >
+                                <img src="/f8e57931-7a82-474f-980b-dc7951fcc4c7.gif" alt="" className="mx-auto" />
+                                <p className="mt-6 text-gray-400">Enhancing your resume with AI...</p>
+                            </motion.div>
+                        )}
+
+                        {currentStep === "preview" && (
+                            <motion.div
+                                key="preview"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                            >
+                                <LivePreview />
+                                <div className="flex justify-center mt-6 gap-4">
                                     <Button
                                         onClick={() => navigate("/ai-resume-builder/preview")}
                                         className="bg-white text-black font-semibold px-6 py-2 rounded-full shadow hover:bg-gray-200 transition-all"
                                     >
                                         Edit Resume
                                     </Button>
-                                </div>
-                                <div className="flex justify-center mt-4">
                                     <Button
-                                        onClick={handleDownloadPDF}
-                                        className="bg-gradient-to-r from-blue-400 to-purple-500 hover:brightness-110 text-white font-semibold px-6 py-2 rounded-full shadow transition-all"
+                                        onClick={() => setCurrentStep("download")}
+                                        className="bg-gradient-to-r from-[#79e708] to-[#5bb406] hover:brightness-110 text-black font-semibold px-6 py-2 rounded-full shadow transition-all"
                                     >
-                                        Download PDF
+                                        Continue
                                     </Button>
                                 </div>
-                            </>
+                            </motion.div>
                         )}
-                    </div>
+
+                        {currentStep === "download" && (
+                            <motion.div
+                                key="download"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -30 }}
+                                className="text-center text-white"
+                            >
+                                <h2 className="text-2xl font-bold mb-4">
+                                    🎉 Resume Process Completed!
+                                </h2>
+                                <p className="text-gray-400 mb-6">
+                                    You’re ready to move forward with your enhanced resume.
+                                </p>
+
+                                <Button
+                                    onClick={() => {
+                                        // replace this with your actual download logic
+                                        // e.g., calling backend API or generating PDF from template
+                                        alert("Downloading your resume...");
+                                    }}
+                                    className="bg-gradient-to-r from-[#79e708] to-[#5bb406] hover:brightness-110 text-black font-semibold px-6 py-3 rounded-full shadow-lg transition-all"
+                                >
+                                    Download Resume
+                                </Button>
+                            </motion.div>
+                        )}
+
+                    </AnimatePresence>
                 </div>
 
-                {/* Right: Live Preview */}
-                {step === "done" && (
-                    <div className="w-full lg:w-1/2 transition-all duration-500">
-                        <LivePreview />
-                    </div>
-                )}
+                {showTemplatePopup && <TemplateSelectionPopup />}
             </div>
-        </div>
+        </>
     );
 };
 

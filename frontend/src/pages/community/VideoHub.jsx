@@ -4,14 +4,7 @@ import { motion } from 'framer-motion';
 import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const {
-  FiVideo,
-  FiPlay,
-  FiUsers,
-  FiCalendar,
-  FiPlus,
-  FiLive,
-} = FiIcons;
+const { FiVideo, FiPlay, FiUsers, FiCalendar, FiPlus, FiLive } = FiIcons;
 
 const VideoHub = () => {
   const [activeTab, setActiveTab] = useState('library');
@@ -91,16 +84,14 @@ const VideoHub = () => {
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        {['All', 'Tutorials', 'Webinars', 'Live Sessions', 'Q&A'].map(
-          (filter) => (
-            <button
-              key={filter}
-              className="px-4 py-2 bg-gray-800 text-gray-300 rounded-full text-sm hover:bg-gray-700 transition-colors"
-            >
-              {filter}
-            </button>
-          ),
-        )}
+        {['All', 'Tutorials', 'Webinars', 'Live Sessions', 'Q&A'].map((filter) => (
+          <button
+            key={filter}
+            className="px-4 py-2 bg-zinc-900 border border-gray-700 rounded-full text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+          >
+            {filter}
+          </button>
+        ))}
       </div>
 
       {/* Video Grid */}
@@ -111,7 +102,7 @@ const VideoHub = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-gray-800 rounded-xl overflow-hidden shadow-md border border-gray-700 hover:shadow-lg transition-shadow"
+            className="bg-zinc-900 rounded-2xl overflow-hidden border border-gray-700 shadow-[0_0_15px_rgba(0,200,255,0.15)] hover:shadow-[0_0_25px_rgba(0,200,255,0.25)] transition-shadow"
           >
             <div className="relative">
               <img
@@ -121,10 +112,7 @@ const VideoHub = () => {
               />
               <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                 <button className="bg-white bg-opacity-90 rounded-full p-3 hover:bg-opacity-100 transition-all">
-                  <SafeIcon
-                    icon={FiPlay}
-                    className="w-6 h-6 text-gray-900"
-                  />
+                  <SafeIcon icon={FiPlay} className="w-6 h-6 text-black" />
                 </button>
               </div>
               <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
@@ -157,25 +145,19 @@ const VideoHub = () => {
     <div className="space-y-6">
       {/* Upcoming Events */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-4">
-          Upcoming Events
-        </h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Upcoming Events</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {upcomingEvents.map((event) => (
             <motion.div
               key={event.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700"
+              className="bg-zinc-900 rounded-2xl p-6 border border-gray-700 shadow-[0_0_15px_rgba(255,0,150,0.15)] hover:shadow-[0_0_25px_rgba(255,0,150,0.25)] transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h4 className="font-semibold text-white mb-1">
-                    {event.title}
-                  </h4>
-                  <p className="text-sm text-gray-400">
-                    Hosted by {event.host}
-                  </p>
+                  <h4 className="font-semibold text-white mb-1">{event.title}</h4>
+                  <p className="text-sm text-gray-400">Hosted by {event.host}</p>
                 </div>
                 <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs font-medium">
                   Live
@@ -203,41 +185,29 @@ const VideoHub = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700"
+        className="bg-zinc-900 rounded-2xl p-6 border border-gray-700 shadow-[0_0_15px_rgba(0,255,150,0.15)] hover:shadow-[0_0_25px_rgba(0,255,150,0.25)] transition-shadow"
       >
-        <h3 className="text-lg font-semibold text-white mb-4">
-          Start Live Session
-        </h3>
+        <h3 className="text-lg font-semibold text-white mb-4">Start Live Session</h3>
         <div className="space-y-4">
           <input
             type="text"
             placeholder="Session title..."
-            className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <textarea
             placeholder="Session description..."
             rows={3}
-            className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="text-primary-600 focus:ring-primary-500 rounded"
-                />
-                <span className="text-sm text-gray-300">
-                  Record session
-                </span>
+                <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded" />
+                <span className="text-sm text-gray-300">Record session</span>
               </label>
               <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="text-primary-600 focus:ring-primary-500 rounded"
-                />
-                <span className="text-sm text-gray-300">
-                  Send notifications
-                </span>
+                <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded" />
+                <span className="text-sm text-gray-300">Send notifications</span>
               </label>
             </div>
             <button className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2">
@@ -257,24 +227,15 @@ const VideoHub = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700"
+      className="bg-zinc-900 rounded-2xl p-6 border border-gray-700 shadow-[0_0_15px_rgba(0,150,255,0.15)] hover:shadow-[0_0_25px_rgba(0,150,255,0.25)] transition-shadow"
     >
-      <h3 className="text-lg font-semibold text-white mb-6">
-        Upload New Content
-      </h3>
+      <h3 className="text-lg font-semibold text-white mb-6">Upload New Content</h3>
       <div className="space-y-6">
         {/* Upload Area */}
-        <div className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center">
-          <SafeIcon
-            icon={FiVideo}
-            className="w-12 h-12 text-gray-500 mx-auto mb-4"
-          />
-          <h4 className="text-lg font-medium text-white mb-2">
-            Upload Video
-          </h4>
-          <p className="text-gray-400 mb-4">
-            Drag and drop your video file or click to browse
-          </p>
+        <div className="border-2 border-dashed border-gray-600 rounded-xl p-8 text-center bg-black">
+          <SafeIcon icon={FiVideo} className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+          <h4 className="text-lg font-medium text-white mb-2">Upload Video</h4>
+          <p className="text-gray-400 mb-4">Drag and drop your video file or click to browse</p>
           <button className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors">
             Choose File
           </button>
@@ -283,20 +244,16 @@ const VideoHub = () => {
         {/* Video Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Title
-            </label>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Title</label>
             <input
               type="text"
-              className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Enter video title..."
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Category
-            </label>
-            <select className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
+            <select className="w-full p-3 bg-black border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
               <option>Select category...</option>
               <option>Tutorial</option>
               <option>Webinar</option>
@@ -307,12 +264,10 @@ const VideoHub = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Description
-          </label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
           <textarea
             rows={4}
-            className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Describe your video content..."
           />
         </div>
@@ -320,20 +275,12 @@ const VideoHub = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                className="text-primary-600 focus:ring-primary-500 rounded"
-              />
+              <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded" />
               <span className="text-sm text-gray-300">Premium content</span>
             </label>
             <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                className="text-primary-600 focus:ring-primary-500 rounded"
-              />
-              <span className="text-sm text-gray-300">
-                Send notification to subscribers
-              </span>
+              <input type="checkbox" className="text-primary-600 focus:ring-primary-500 rounded" />
+              <span className="text-sm text-gray-300">Send notification to subscribers</span>
             </label>
           </div>
           <button className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors">
@@ -348,13 +295,11 @@ const VideoHub = () => {
   // Main Return
   // ---------------------------
   return (
-    <div className="space-y-6 bg-gray-900 min-h-screen p-6">
+    <div className="space-y-6 bg-black min-h-screen p-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Video Hub</h1>
-        <p className="text-gray-400 mt-1">
-          Manage video content and live sessions
-        </p>
+        <p className="text-gray-400 mt-1">Manage video content and live sessions</p>
       </div>
 
       {/* Tabs */}
@@ -364,10 +309,11 @@ const VideoHub = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+              className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === tab.id
                   ? 'border-primary-500 text-primary-400'
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
-                }`}
+              }`}
             >
               <SafeIcon icon={tab.icon} className="w-4 h-4" />
               <span>{tab.name}</span>

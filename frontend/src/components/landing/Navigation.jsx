@@ -91,6 +91,7 @@ const Navigation = () => {
                       { label: "Resume Builder", href: "./resume-builder" },
                       { label: "Resume Ranker", href: "./resume-ranker" },
                       { label: "Resume Analyzer", href: "./resume-analyzer" },
+                      { label: "Mock Interviewer", href: "./mock-interviewer" },
                     ].map((service, idx) => (
                       <a
                         key={idx}

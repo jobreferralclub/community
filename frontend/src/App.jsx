@@ -36,6 +36,9 @@ import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
 import AnalyzerResult from "./pages/resume/analyzer/AnalyzerResult";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
+import MockInterviewer from "./pages/mock-interviewer/mockinterviewer";
+import Interview from "./pages/mock-interviewer/Interview";
+import SummaryPage from "./pages/mock-interviewer/SummaryPage";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -51,7 +54,6 @@ function AppWrapper() {
         });
         if (res.status === 200 || res.status === 201) {
           const backendUser = res.data.user;
-          console.log("Backend user data:", backendUser);
           login({
             ...backendUser,
             avatar: backendUser.avatar || "/default-avatar.png",
@@ -68,12 +70,10 @@ function AppWrapper() {
       }
     }
     if (auth0user && !user) {
-      console.log("Auth0 user detected, syncing with backend:", auth0user);
       syncAuth0User();
     }
   }, [auth0user]);
 
-  console.log(user);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -196,6 +196,9 @@ function AppWrapper() {
         <Route path="/resume-ranker" element={<ResumeRanker />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
         <Route path="/analyzer-result" element={<AnalyzerResult />} />
+        <Route path="/mock-interviewer" element={<MockInterviewer />} />
+        <Route path="/mock-interviewer/interview" element={<Interview />} />
+        <Route path="/mock-interviewer/summary" element={<SummaryPage/>} />
         <Route path="*" element={<NotFound />} />
 
         {/* ✅ Public login route */}

@@ -115,18 +115,18 @@ const CommentModal = ({ post, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-gray-900 rounded-xl shadow-lg max-w-3xl w-full max-h-[90vh] flex flex-col"
+        className="bg-zinc-900 rounded-2xl border border-gray-800 shadow-[0_0_20px_rgba(121,231,8,0.15)] max-w-3xl w-full max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-700 p-6 flex-shrink-0">
+        <div className="flex items-center justify-between border-b border-zinc-800 p-6 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <img
               src={(post.createdBy?.avatar == null) ? "/default-avatar.jpg" : post.createdBy?.avatar}
@@ -137,37 +137,33 @@ const CommentModal = ({ post, onClose }) => {
               <span className="block font-semibold text-white">
                 {(post.createdBy?.name == null) ? post.author : post.createdBy?.name}
               </span>
-              <span className="text-xs text-gray-400">
-                {formatDistanceToNow(new Date(post.createdAt), {
-                  addSuffix: true,
-                })}
+              <span className="text-xs text-gray-500">
+                {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:text-red rounded-lg transition-colors"
           >
             <SafeIcon icon={FiX} className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
         {/* Post Preview */}
-        <div className="border-b border-gray-700 p-6 flex-shrink-0 bg-gray-800">
+        <div className="border-b border-gray-800 p-6 flex-shrink-0 bg-zinc-900">
           <h3 className="text-lg font-bold text-white">{post.title}</h3>
-
-          {/* Render HTML safely */}
           <div
-            className="mt-2 text-gray-300"
+            className="mt-2 text-gray-400"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
         </div>
 
         {/* Comments List */}
-        <div className="flex-1 p-6 overflow-y-auto bg-gray-900 text-gray-300">
+        <div className="flex-1 p-6 overflow-y-auto bg-zinc-900 text-gray-300">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#79e708]"></div>
             </div>
           ) : comments.length === 0 ? (
             <div className="text-center py-8">
@@ -175,39 +171,33 @@ const CommentModal = ({ post, onClose }) => {
                 icon={FiMessageCircle}
                 className="w-12 h-12 text-gray-600 mx-auto mb-3"
               />
-              <p className="text-gray-400">No comments yet. Be the first!</p>
+              <p className="text-gray-500">No comments yet. Be the first!</p>
             </div>
           ) : (
             <div className="space-y-4">
               {comments.map((comment) => (
                 <div key={comment._id} className="flex items-start space-x-3">
                   <img
-                    src={
-                      comment.avatar || "https://via.placeholder.com/32"
-                    }
+                    src={comment.avatar || "/default-avatar.jpg"}
                     alt={comment.author || "User"}
                     className="w-8 h-8 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 shadow-sm relative">
+                    <div className="bg-zinc-800 border border-zinc-800 rounded-s rounded-e p-3 shadow-sm relative">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-semibold text-white">
                           {comment.author || "Anonymous"}
                         </p>
                         <span className="text-xs text-gray-500">
-                          {formatDistanceToNow(new Date(comment.createdAt), {
-                            addSuffix: true,
-                          })}
+                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-300 mt-1">
-                        {comment.content}
-                      </p>
+                      <p className="text-sm text-gray-400 mt-1">{comment.content}</p>
                       {comment.imageUrl && (
                         <img
                           src={comment.imageUrl}
                           alt="Comment"
-                          className="mt-2 rounded-lg border border-gray-700"
+                          className="mt-2 rounded-lg border border-gray-800"
                         />
                       )}
 
@@ -222,7 +212,7 @@ const CommentModal = ({ post, onClose }) => {
                               );
                             }
                           }}
-                          className="absolute bottom-2 right-2 text-gray-400 hover:text-red-500 text-xs"
+                          className="absolute bottom-2 right-2 text-gray-500 hover:text-red-500 text-xs"
                         >
                           <FiTrash />
                         </button>
@@ -236,13 +226,13 @@ const CommentModal = ({ post, onClose }) => {
         </div>
 
         {/* Comment Input */}
-        <div className="p-4 border-t border-gray-700 bg-gray-900 flex-shrink-0 relative">
+        <div className="p-4 border-t border-gray-800 bg-zinc-900 flex-shrink-0 relative">
           <form
             onSubmit={handleSubmit}
             className="flex items-center space-x-3 w-full"
           >
             <img
-              src={user?.avatar || "https://via.placeholder.com/32"}
+              src={user?.avatar || "/default-avatar.jpg"}
               alt={user?.name || "User"}
               className="w-8 h-8 rounded-full object-cover flex-shrink-0"
             />
@@ -253,7 +243,8 @@ const CommentModal = ({ post, onClose }) => {
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment..."
                 rows={1}
-                className="w-full p-3 border border-gray-700 bg-gray-800 text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                className="w-full p-3 border border-gray-800 bg-black text-gray-100 rounded-s rounded-e 
+                         focus:ring-2 focus:ring-[#79e708] focus:border-transparent resize-none"
                 disabled={submitting}
               />
 
@@ -263,12 +254,12 @@ const CommentModal = ({ post, onClose }) => {
                   <img
                     src={commentImage}
                     alt="Preview"
-                    className="w-full rounded-lg border border-gray-700"
+                    className="w-full rounded-lg border border-gray-800"
                   />
                   <button
                     type="button"
                     onClick={removeImage}
-                    className="absolute top-2 right-2 bg-gray-900 p-1 rounded-full shadow"
+                    className="absolute top-2 right-2 bg-black p-1 rounded-full shadow"
                   >
                     <SafeIcon icon={FiX} className="w-4 h-4 text-gray-400" />
                   </button>
@@ -282,7 +273,7 @@ const CommentModal = ({ post, onClose }) => {
                 ref={emojiButtonRef}
                 type="button"
                 onClick={() => setShowEmojiPicker((prev) => !prev)}
-                className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
+                className="p-2 text-gray-500 hover:text-[#79e708] transition-colors"
               >
                 <SafeIcon icon={FiSmile} className="w-5 h-5" />
               </button>
@@ -310,18 +301,19 @@ const CommentModal = ({ post, onClose }) => {
               onClick={() =>
                 document.getElementById("comment-image-upload").click()
               }
-              className="p-2 text-gray-400 hover:text-gray-300 transition-colors"
+              className="p-2 text-gray-500 hover:text-[#79e708] transition-colors"
             >
               <SafeIcon icon={FiImage} className="w-5 h-5" />
             </button>
 
             {/* Submit Button */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
               type="submit"
               disabled={(!newComment.trim() && !commentImage) || submitting}
-              className="flex items-center bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+              className="flex items-center bg-[#79e708] text-black font-semibold px-4 py-3  rounded-s rounded-e
+                       rounded-lg hover:bg-[#6bd107] transition-colors disabled:opacity-50"
             >
               <SafeIcon icon={FiSend} className="w-4 h-4" />
             </motion.button>
@@ -330,6 +322,7 @@ const CommentModal = ({ post, onClose }) => {
       </motion.div>
     </motion.div>
   );
+
 };
 
 export default CommentModal;

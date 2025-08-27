@@ -252,7 +252,7 @@ export const resumeRanker = async (req, res) => {
 
 const ALLOWED_EXTENSIONS = [".pdf", ".docx"];
 function allowedFile(filename) {
-  return ALLOWED_EXTENSIONS.includes(path.extname(filename).toLowerCase());
+    return ALLOWED_EXTENSIONS.includes(path.extname(filename).toLowerCase());
 }
 
 export const resumeAnalyzer = async (req, res) => {
@@ -273,3 +273,95 @@ export const resumeAnalyzer = async (req, res) => {
         res.status(500).json({ success: false, error: "Error during resume analysis" });
     }
 }
+
+// --- MOCK INTERVIEW ---
+export const mockInterview = async (req, res) => {
+    const { resume, jobDescription } = req.body;
+
+    if (!resume || !jobDescription) {
+        return res.status(400).json({ success: false, error: "Resume and Job Description are required" });
+    }
+
+    console.log("Resume and Job Description are required");
+
+    try {
+        const prompt = `
+You are an expert interview question generator.
+Given a candidate's RESUME and a JOB DESCRIPTION (both as plain text strings), generate 10 interview questions that are highly relevant.
+Return strictly a JSON array of 10 strings (no extra text, no explanations).
+
+RESUME:
+${resume}
+
+JOB DESCRIPTION:
+${jobDescription}
+        `.trim();
+
+        const llmResponse = await getLLMResponse(prompt);
+
+        let questions;
+        try {
+            questions = JSON.parse(llmResponse);
+        } catch (err) {
+            console.error("❌ Failed to parse LLM response:", llmResponse);
+            return res.status(500).json({ success: false, error: "Invalid LLM response" });
+        }
+
+        res.json({
+            success: true,
+            questions
+        });
+    } catch (err) {
+        console.error("❌ Mock Interview Error:", err.message);
+        res.status(500).json({ success: false, error: "Something went wrong" });
+    }
+};
+
+export const analyzeInterview = async (req, res) => {
+    const { questions, answers, jobDescription } = req.body;
+
+    if (!questions || !answers || !jobDescription) {
+        return res.status(400).json({ success: false, error: "Questions, Answers, and Job Description are required" });
+    }
+
+    try {
+        const prompt = `
+You are an expert technical interviewer and career coach.
+Analyze the candidate's answers based on the given QUESTIONS and JOB DESCRIPTION.
+Highlight strengths, weaknesses, and give constructive feedback.
+
+Input:
+JOB DESCRIPTION: ${jobDescription}
+
+QUESTIONS & ANSWERS:
+${questions.map((q, i) => `Q${i + 1}: ${q}\nA${i + 1}: ${answers[i] || "(no answer)"}`).join("\n\n")}
+
+Return a JSON object with this exact structure:
+{
+  "overallScore": "string (e.g., 7.5/10)",
+  "strengths": ["list of strengths"],
+  "weaknesses": ["list of weaknesses"],
+  "recommendations": ["list of improvement tips"],
+  "summary": "short paragraph summarizing performance"
+}
+        `.trim();
+
+        const llmResponse = await getLLMResponse(prompt);
+
+        let report;
+        try {
+            report = JSON.parse(llmResponse);
+        } catch (err) {
+            console.error("❌ Failed to parse LLM response:", llmResponse);
+            return res.status(500).json({ success: false, error: "Invalid LLM response" });
+        }
+
+        res.json({
+            success: true,
+            report
+        });
+    } catch (err) {
+        console.error("❌ Analyze Interview Error:", err.message);
+        res.status(500).json({ success: false, error: "Something went wrong" });
+    }
+};

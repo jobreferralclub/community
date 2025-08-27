@@ -19,7 +19,7 @@ const Community = () => {
 
   const location = useLocation();
 
-  // Identify current community based on route
+  // Identify current community
   const currentCommunity =
     subCommunities.find((c) => location.pathname.startsWith(c.path)) || {
       id: null,
@@ -30,8 +30,8 @@ const Community = () => {
   useEffect(() => {
     setPage(1);
   }, [currentCommunity?.id]);
-  
-  // Fetch posts for this community with pagination
+
+  // Fetch posts
   useEffect(() => {
     if (!currentCommunity?.id) return;
 
@@ -39,15 +39,9 @@ const Community = () => {
       try {
         setLoading(true);
         const res = await fetch(
-          `${import.meta.env.VITE_API_PORT}/api/communities/${currentCommunity.id}/posts?page=${page}`, // 👈 page as query
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          `${import.meta.env.VITE_API_PORT}/api/communities/${currentCommunity.id}/posts?page=${page}`,
+          { method: "GET", headers: { "Content-Type": "application/json" } }
         );
-
         const data = await res.json();
         setPosts(data.posts || []);
         setTotalPages(data.totalPages || 1);
@@ -62,43 +56,28 @@ const Community = () => {
     fetchPosts();
   }, [currentCommunity?.id, page]);
 
-
   const filters = [
     { id: "all", name: "All Posts", count: posts.length },
-    {
-      id: "job-posting",
-      name: "Job Postings",
-      count: posts.filter((p) => p.type === "job-posting").length,
-    },
-    {
-      id: "success-story",
-      name: "Success Stories",
-      count: posts.filter((p) => p.type === "success-story").length,
-    },
-    {
-      id: "discussion",
-      name: "Discussions",
-      count: posts.filter((p) => p.type === "discussion").length,
-    },
+    { id: "job-posting", name: "Job Postings", count: posts.filter((p) => p.type === "job-posting").length },
+    { id: "success-story", name: "Success Stories", count: posts.filter((p) => p.type === "success-story").length },
+    { id: "discussion", name: "Discussions", count: posts.filter((p) => p.type === "discussion").length },
   ];
 
-  const filteredPosts = posts.filter(
-    (post) => filter === "all" || post.type === filter
-  );
+  const filteredPosts = posts.filter((post) => filter === "all" || post.type === filter);
 
   return (
-    <div className="bg-gray-900 text-gray-100 min-h-screen p-6 space-y-6">
+    <div className="bg-black text-gray-300 min-h-screen p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{currentCommunity.title}</h1>
+          <h1 className="text-3xl font-bold text-white">{currentCommunity.title}</h1>
           <p className="text-gray-400 mt-1">{currentCommunity.subtitle}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowCreatePost(true)}
-          className="mt-4 sm:mt-0 bg-[#79e708] !text-black px-4 py-2 rounded-lg font-medium hover:brightness-105 transition-colors flex items-center space-x-2"
+          className="mt-4 sm:mt-0 bg-[#79e708] !text-black px-4 py-2 rounded-s rounded-e font-medium hover:brightness-105 transition-colors flex items-center space-x-2"
         >
           <SafeIcon icon={FiPlus} className="w-5 h-5 !text-black" />
           <span className="!text-black font-medium">Create Post</span>
@@ -106,8 +85,9 @@ const Community = () => {
       </div>
 
       {/* Search + Filters */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          {/* Search */}
           <div className="relative flex-1 max-w-md">
             <SafeIcon
               icon={FiSearch}
@@ -116,21 +96,23 @@ const Community = () => {
             <input
               type="text"
               placeholder="Search posts, tags, or users..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 rounded-s rounded-e bg-zinc-800 text-gray-200 border border-zinc-700 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
             />
           </div>
 
+          {/* Filters */}
           <div className="flex items-center space-x-2">
             <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" />
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               {filters.map((filterOption) => (
                 <button
                   key={filterOption.id}
                   onClick={() => setFilter(filterOption.id)}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-                    ? "bg-[#79e708] !text-black"
-                    : "bg-gray-700 text-gray-400 hover:bg-gray-600"
-                    }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    filter === filterOption.id
+                      ? "bg-[#79e708] !text-black"
+                      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                  }`}
                 >
                   {filterOption.name} ({filterOption.count})
                 </button>
@@ -144,27 +126,21 @@ const Community = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-700"
+        className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800"
       >
         <div className="flex items-center space-x-2 mb-4">
-          <SafeIcon
-            icon={FiTrendingUp}
-            className="w-5 h-5"
-            style={{ color: "#79e708" }}
-          />
+          <SafeIcon icon={FiTrendingUp} className="w-5 h-5" style={{ color: "#79e708" }} />
           <h3 className="text-lg font-semibold text-white">Trending Topics</h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {["React", "Remote Work", "Google", "Meta", "Interview Tips", "Salary Negotiation"].map(
-            (tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 bg-[#79e708] !text-black rounded-full text-sm font-medium cursor-pointer hover:brightness-105"
-              >
-                #{tag}
-              </span>
-            )
-          )}
+          {["React", "Remote Work", "Google", "Meta", "Interview Tips", "Salary Negotiation"].map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 bg-[#79e708] !text-black rounded-full text-sm font-medium cursor-pointer hover:brightness-105"
+            >
+              #{tag}
+            </span>
+          ))}
         </div>
       </motion.div>
 
@@ -184,42 +160,34 @@ const Community = () => {
             </motion.div>
           ))
         ) : (
-          <div className="text-center text-gray-500 py-10">
-            No posts to display in this community.
-          </div>
+          <div className="text-center text-gray-500 py-10">No posts to display in this community.</div>
         )}
       </div>
 
       {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2 mt-6">
-          {/* Prev button */}
           {page > 1 && (
             <button
               onClick={() => setPage((prev) => prev - 1)}
-              className="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+              className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700"
             >
               Prev
             </button>
           )}
 
-          {/* Current page */}
-          <span className="px-3 py-1 rounded-lg bg-[#79e708] text-[#000] font-medium">
-            {page}
-          </span>
+          <span className="px-3 py-1 rounded-lg bg-[#79e708] !text-black font-medium">{page}</span>
 
-          {/* Next button */}
           {page < totalPages && (
             <button
               onClick={() => setPage((prev) => prev + 1)}
-              className="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+              className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700"
             >
               Next
             </button>
           )}
         </div>
       )}
-
 
       {showCreatePost && <CreatePost onClose={() => setShowCreatePost(false)} />}
     </div>

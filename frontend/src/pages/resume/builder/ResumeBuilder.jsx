@@ -18,83 +18,105 @@ const ResumeBuilder = () => {
     else navigate("/resume-builder/questionnaire");
   };
 
+  const options = [
+    {
+      title: "Enhance Existing Resume",
+      description: "Give your old resume a fresh, AI-powered makeover.",
+      icon: <Sparkles className="text-[#79e708] w-7 h-7" />,
+      action: "enhance",
+    },
+    {
+      title: "Import from LinkedIn",
+      description: "Auto-fill your resume using your LinkedIn profile.",
+      icon: <Linkedin className="text-[#79e708] w-7 h-7" />,
+      action: "linkedin",
+    },
+    {
+      title: "Start from Scratch",
+      description: "Build a professional resume step-by-step with AI.",
+      icon: <FilePlus className="text-[#79e708] w-7 h-7" />,
+      action: "scratch",
+    },
+  ];
+
   return (
     <>
       <Navigation />
-      <div className="h-screen bg-black text-white relative overflow-hidden font-sans">
-        {/* Grid Background & Radial Glow */}
-        <div className="absolute inset-0 z-0 opacity-10 bg-[radial-gradient(circle,_rgba(121,231,8,0.15)_1px,_transparent_1px)] bg-[size:50px_50px]" />
-        <div className="absolute inset-0 z-0 bg-gradient-radial from-[#79e708]/15 to-transparent" />
-
-        {/* Main Content */}
-        <div className="relative z-10 h-full flex flex-col justify-center items-center px-4 text-center">
-          <motion.div
-            className="max-w-3xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-[#79e708] to-[#5bc406] bg-clip-text text-transparent mb-2">
-              JobReferral.Club
-            </h1>
-            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-6">
-              AI Resume Builder
-            </h2>
-            <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-xl mx-auto">
-              Whether you're starting from scratch, importing from LinkedIn, or
-              enhancing an old resume — we've got you covered with AI-powered tools.
-            </p>
-
-            {/* CTA Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left w-full max-w-4xl">
-              <OptionCard
-                title="Enhance Existing Resume"
-                icon={<Sparkles className="text-[#79e708] w-6 h-6" />}
-                description="Give your old resume a fresh, AI-powered makeover."
-                onClick={() => handleOptionClick("enhance")}
-              />
-              <OptionCard
-                title="Import from LinkedIn"
-                icon={<Linkedin className="text-[#79e708] w-6 h-6" />}
-                description="Auto-fill your resume using your LinkedIn profile."
-                onClick={() => handleOptionClick("linkedin")}
-              />
-              <OptionCard
-                title="Start from Scratch"
-                icon={<FilePlus className="text-[#79e708] w-6 h-6" />}
-                description="Build a professional resume step-by-step with AI."
-                onClick={() => handleOptionClick("scratch")}
-              />
-            </div>
-          </motion.div>
+      <div className="min-h-screen bg-black relative overflow-hidden pt-20">
+        {/* Background Effects (copied from Ranker) */}
+        <div className="absolute inset-0">
+          {/* Grid */}
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(121, 231, 8, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(121, 231, 8, 0.03) 1px, transparent 1px)
+              `,
+              backgroundSize: "60px 60px",
+            }}
+          />
+          {/* Orbs */}
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-[#79e708]/5 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-[#79e708]/8 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#79e708]/6 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
 
-        {/* Extra CSS */}
-        <style>
-          {`
-          .bg-gradient-radial {
-            background: radial-gradient(circle at 50% 50%, var(--tw-gradient-stops));
-          }
-        `}
-        </style>
+        {/* Content */}
+        <div className="relative z-10 px-6 py-12 text-center">
+          {/* Title Section */}
+          <div className="mb-16">
+
+            <div className="flex justify-center mb-8">
+              <h1 className="flex items-center gap-4 text-6xl lg:text-7xl font-black tracking-tight">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#79e708] to-[#5bb406] rounded-2xl shadow-2xl shadow-[#79e708]/30">
+                  <span className="text-3xl font-black text-black">AI</span>
+                </div>
+                <span className="bg-gradient-to-r from-white via-[#79e708] to-white bg-clip-text text-transparent">
+                  Resume Builder
+                </span>
+              </h1>
+            </div>
+
+            <p className="text-xl text-gray-400 mb-12 font-light max-w-3xl mx-auto leading-relaxed">
+              Whether you’re{" "}
+              <span className="text-[#79e708] font-semibold">enhancing</span> your old resume,
+              importing from{" "}
+              <span className="text-[#79e708] font-semibold">LinkedIn</span>, or{" "}
+              <span className="text-[#79e708] font-semibold">starting fresh</span> —
+              our AI-powered tools have you covered.
+            </p>
+          </div>
+
+          {/* Option Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {options.map((opt, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ scale: 1.05 }}
+                className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-xl border border-[#79e708]/20 rounded-3xl p-8 text-left hover:border-[#79e708]/40 hover:-translate-y-3 hover:scale-105 transition-all duration-500 overflow-hidden cursor-pointer"
+                onClick={() => handleOptionClick(opt.action)}
+              >
+                {/* Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#79e708]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+                {/* Shimmer */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#79e708]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-3xl"></div>
+
+                <div className="relative z-10">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#79e708]/20 to-[#79e708]/10 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                    {opt.icon}
+                  </div>
+                  <h3 className="text-white text-xl font-bold mb-3 group-hover:text-[#79e708] transition-colors">
+                    {opt.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{opt.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
-  );
-};
-
-const OptionCard = ({ title, description, icon, onClick }) => {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 cursor-pointer hover:border-[#79e708] transition-all duration-300"
-      onClick={onClick}
-    >
-      <div className="flex items-center gap-3 mb-3">
-        {icon}
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-      </div>
-      <p className="text-sm text-gray-300">{description}</p>
-    </motion.div>
   );
 };
 

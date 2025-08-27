@@ -1,7 +1,7 @@
 // routes/resume.js
 import express from "express";
 import multer from "multer";
-import { jdAnalyze, extractText, enhanceResume, formatPdf, resumeRanker, resumeAnalyzer } from "../controllers/resume.controller.js";
+import { jdAnalyze, extractText, enhanceResume, formatPdf, resumeRanker, resumeAnalyzer, mockInterview, analyzeInterview } from "../controllers/resume.controller.js";
 
 const router = express.Router();
 
@@ -13,5 +13,7 @@ router.post("/format-pdf", formatPdf);
 router.post("/extract-text", upload.single("resume"), extractText);
 router.post("/enhance-resume", enhanceResume);
 router.post("/jd-analyze", jdAnalyze);
+router.post("/mock-interview", mockInterview);
+router.post("/analyze-interview", analyzeInterview);
 
 export default router;

@@ -130,7 +130,7 @@ const PostCard = ({ post }) => {
 
   const getPostTypeColor = (type) => {
     switch (type) {
-      case 'job-posting': return 'bg-blue-800 text-blue-300';
+      case 'job-posting': return 'bg-blue-800 text-white';
       case 'success-story': return 'bg-green-800 text-green-300';
       case 'discussion': return 'bg-purple-800 text-purple-300';
       default: return 'bg-gray-800 text-gray-300';
@@ -172,7 +172,7 @@ const PostCard = ({ post }) => {
       {/* Post Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-700 hover:shadow-md transition-all text-gray-100"
+        className="bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-700 hover:shadow-md transition-all text-gray-100"
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
@@ -183,14 +183,14 @@ const PostCard = ({ post }) => {
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h4 className="font-semibold text-white">{(post.createdBy?.name == null) ? post.author : post.createdBy?.name}</h4>
+              <h4 className="font-semibold text-xl text-white">{(post.createdBy?.name == null) ? post.author : post.createdBy?.name}</h4>
               <p className="text-sm text-gray-400">
                 {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2 relative">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPostTypeColor(post.type)}`}>
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPostTypeColor(post.type)} !text-zinc-100`}>
               {post.type?.replace('-', ' ') || 'discussion'}
             </span>
 
@@ -226,7 +226,7 @@ const PostCard = ({ post }) => {
 
         {/* Content */}
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
+          <h3 className="text-2xl font-semibold text-white mb-2">{post.title}</h3>
           <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: post.content }} />
         </div>
 

@@ -11,14 +11,14 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <div className="flex h-screen bg-gray-900 text-gray-100">
+      <div className="flex h-screen bg-black text-gray-100">
         <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
-        <div className="flex-1 flex flex-col overflow-hidden bg-gray-800">
+        <div className="flex-1 flex flex-col overflow-hidden bg-black">
           <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
           <motion.main
-            className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-800 p-6"
+            className="flex-1 overflow-x-hidden overflow-y-auto bg-black"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}

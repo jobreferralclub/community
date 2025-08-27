@@ -31,6 +31,7 @@ export const menuItems = [
                 name: "India Jobs",
                 region: "india",
                 children: [
+                    { name: "Freshers", path: "/community/in/freshers" },
                     { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
                     { name: "Program and Project Management", path: "/community/in/program" },
                     { name: "Product Management", path: "/community/in/product" },
@@ -41,7 +42,6 @@ export const menuItems = [
                     { name: "Human Resources", path: "/community/in/hr" },
                     { name: "Analytics", path: "/community/in/analyst" },
                     { name: "Strategy and Consulting", path: "/community/in/strategy" },
-                    { name: "Freshers", path: "/community/in/freshers" }
                 ],
             },
             {
@@ -62,13 +62,6 @@ export const menuItems = [
             },
         ],
     },
-    { name: "Analytics", icon: FiBarChart3, path: "/community/analytics" },
-    { name: "Email Broadcast", icon: FiMail, path: "/community/email" },
-    { name: "Events", icon: FiVideo, path: "/community/videos" },
-    { name: "Gamification", icon: FiAward, path: "/community/gamification" },
-    { name: "Monetization", icon: FiDollarSign, path: "/community/monetization" },
-    { name: "Coaching", icon: FiCalendar, path: "/community/coaching" },
-    { name: "Course Builder", icon: FiBook, path: "/community/courses" },
     {
         name: "Free Tools",
         icon: FiIcons.FiTool,
@@ -79,16 +72,24 @@ export const menuItems = [
                 children: [
                     { name: "Resume Builder", path: "/resume-builder" },
                     { name: "Resume Analyzer", path: "/resume-analyzer" },
+                    { name: "Mock Interviewer", path: "/mock-interviewer" },
                 ],
             },
             {
-                name: "Referrers",
+                name: "Recruiters",
                 children: [
                     { name: "Resume Ranker", path: "/resume-ranker" },
                 ],
             },
         ]
     },
+    { name: "Analytics", icon: FiBarChart3, path: "/community/analytics" },
+    { name: "Email Broadcast", icon: FiMail, path: "/community/email" },
+    { name: "Events", icon: FiVideo, path: "/community/videos" },
+    { name: "Gamification", icon: FiAward, path: "/community/gamification" },
+    { name: "Monetization", icon: FiDollarSign, path: "/community/monetization" },
+    { name: "Coaching", icon: FiCalendar, path: "/community/coaching" },
+    { name: "Course Builder", icon: FiBook, path: "/community/courses" },
 ];
 
 export const adminOnly = [

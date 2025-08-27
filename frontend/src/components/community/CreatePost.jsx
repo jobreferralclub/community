@@ -120,12 +120,12 @@ const CreatePost = ({ onClose }) => {
 
   return (
     <motion.div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <motion.div className="bg-gray-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <motion.div className="bg-zinc-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">Create New Post</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-zinc-800 rounded-s rounded-e transition-colors">
             <SafeIcon icon={FiX} className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -137,7 +137,7 @@ const CreatePost = ({ onClose }) => {
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="discussion">Discussion</option>
               <option value="job-posting">Job Posting</option>
@@ -152,7 +152,7 @@ const CreatePost = ({ onClose }) => {
               type="text"
               value={formData.community}
               readOnly
-              className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-gray-100"
+              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100"
             />
           </div>
 
@@ -163,7 +163,7 @@ const CreatePost = ({ onClose }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Enter a compelling title..."
               required
             />
@@ -176,7 +176,7 @@ const CreatePost = ({ onClose }) => {
               theme="snow"
               value={formData.content}
               onChange={(content) => setFormData({ ...formData, content })}
-              className="mb-4 bg-gray-800 text-gray-100"
+              className="mb-4 bg-zinc-800 text-gray-100"
               style={{ borderRadius: '0.5rem' }}
             />
           </div>
@@ -197,14 +197,14 @@ const CreatePost = ({ onClose }) => {
                       addTag();
                     }
                   }}
-                  className="w-full pl-9 pr-4 py-2 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Add tags..."
                 />
               </div>
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-zinc-800 text-gray-200 rounded-s rounded-e hover:bg-gray-700 transition-colors"
               >
                 Add
               </button>
@@ -236,12 +236,12 @@ const CreatePost = ({ onClose }) => {
                   }
                 }}
                 placeholder="Add link (https://...)"
-                className="w-full p-3 border border-gray-700 rounded-lg bg-gray-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               <button
                 type="button"
                 onClick={addLink}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-zinc-800 text-gray-200 rounded-s rounded-e hover:bg-gray-700 transition-colors"
               >
                 Add
               </button>
@@ -278,11 +278,11 @@ const CreatePost = ({ onClose }) => {
             </button>
             {formData.imageUrl && (
               <div className="mt-3 relative">
-                <img src={formData.imageUrl} alt="Preview" className="w-full rounded-lg border border-gray-700" />
+                <img src={formData.imageUrl} alt="Preview" className="w-full rounded-s rounded-e border border-gray-700" />
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 bg-gray-800 p-1 rounded-full shadow"
+                  className="absolute top-2 right-2 bg-zinc-800 p-1 rounded-full shadow"
                 >
                   <SafeIcon icon={FiX} className="w-4 h-4 text-gray-400" />
                 </button>
@@ -295,7 +295,7 @@ const CreatePost = ({ onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-200 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 text-gray-200 bg-zinc-900 rounded-s rounded-e hover:bg-gray-700 transition-colors"
             >
               Cancel
             </button>
@@ -303,7 +303,7 @@ const CreatePost = ({ onClose }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="px-6 py-2 bg-zinc-800 text-white rounded-s rounded-e hover:bg-primary-700 transition-colors"
             >
               Post
             </motion.button>
