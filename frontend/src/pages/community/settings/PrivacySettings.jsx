@@ -16,7 +16,7 @@ const PrivacySettings = () => {
       className="space-y-6"
     >
       {/* Privacy Settings */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">Privacy Settings</h3>
         <div className="space-y-4">
           {[
@@ -41,7 +41,7 @@ const PrivacySettings = () => {
                 <p className="font-medium text-white">{item.name}</p>
                 <p className="text-sm text-gray-400">{item.description}</p>
               </div>
-              <select className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <select className="bg-black border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                 {item.options.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -54,7 +54,7 @@ const PrivacySettings = () => {
       </div>
 
       {/* Security Settings */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">Security Settings</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between py-3">

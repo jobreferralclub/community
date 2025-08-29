@@ -52,7 +52,7 @@ const IntegrationSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700"
+      className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700"
     >
       <h3 className="text-lg font-semibold text-white mb-6">
         Connected Integrations

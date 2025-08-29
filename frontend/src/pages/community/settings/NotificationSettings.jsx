@@ -18,7 +18,7 @@ const NotificationSettings = () => {
       className="space-y-6"
     >
       {/* Email Notifications */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <div className="flex items-center space-x-3 mb-4">
           <SafeIcon icon={FiMail} className="w-5 h-5 text-primary-500" />
           <h3 className="text-lg font-semibold text-white">Email Notifications</h3>
@@ -64,7 +64,7 @@ const NotificationSettings = () => {
       </div>
 
       {/* Push Notifications */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <div className="flex items-center space-x-3 mb-4">
           <SafeIcon icon={FiSmartphone} className="w-5 h-5 text-primary-500" />
           <h3 className="text-lg font-semibold text-white">Push Notifications</h3>

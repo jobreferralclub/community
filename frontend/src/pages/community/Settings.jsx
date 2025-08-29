@@ -66,7 +66,7 @@ const Settings = () => {
   // MAIN RETURN (DARK MODE WRAPPER)
   // ------------------------------------------
   return (
-    <div className="space-y-6 bg-gray-900 min-h-screen p-6">
+    <div className="space-y-6 bg-black min-h-screen p-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white">Settings</h1>
@@ -78,20 +78,20 @@ const Settings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-800 rounded-xl p-4 shadow-md border border-gray-700">
+          <div className="bg-zinc-900 rounded-s rounded-e p-4 shadow-md border border-gray-700">
             <nav className="space-y-2">
               {tabs.map((tab) =>
                 adminOnly.includes(tab.name) && role !== "admin" ? null : (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${activeTab === tab.id
-                        ? "bg-primary-700 text-primary-300"
+                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-s rounded-e text-left transition-colors ${activeTab === tab.id
+                        ? "bg-primary-green !text-black"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white"
                       }`}
                   >
                     <SafeIcon icon={tab.icon} className="w-5 h-5" />
-                    <span className="font-medium">{tab.name}</span>
+                    <span className={`font-medium ${activeTab == tab.id ? "!text-black":""}`}>{tab.name}</span>
                   </button>
                 )
               )}

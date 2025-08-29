@@ -246,10 +246,10 @@ const Analytics = () => {
   };
 
   return (
-    <div className="space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen px-6 py-8">
+    <div className="space-y-8 bg-gray-50 dark:bg-black min-h-screen px-6 py-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 sm:mb-0">
+        <h1 className="text-3xl font-extrabold text-black dark:text-white mb-4 sm:mb-0">
           Analytics Dashboard
         </h1>
         <div className="flex items-center space-x-2">
@@ -265,7 +265,7 @@ const Analytics = () => {
             id="timeRange"
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 bg-white dark:bg-zinc-900 text-black dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Select time range"
           >
             <option value="7d">Last 7 days</option>
@@ -292,7 +292,7 @@ const Analytics = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow flex justify-between items-center"
+            className="p-6 bg-white dark:bg-zinc-900 rounded-xl shadow flex justify-between items-center"
           >
             <div>
               <p className="text-sm text-gray-500">{m.name}</p>
@@ -311,13 +311,13 @@ const Analytics = () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <article
           aria-label="User Growth Chart"
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow"
         >
           <ReactECharts option={userGrowthOptions} style={{ height: 360 }} />
         </article>
         <article
           aria-label="User Engagement Chart"
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow"
         >
           <ReactECharts option={rolesOptions} style={{ height: 360 }} />
         </article>
@@ -327,7 +327,7 @@ const Analytics = () => {
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <article
           aria-label="Daily Posts and Comments Activity"
-          className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-6 shadow"
+          className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-xl p-6 shadow"
         >
           <ReactECharts option={activityOptions} style={{ height: 360 }} />
         </article>
@@ -339,7 +339,7 @@ const Analytics = () => {
 >
   <h2 className="text-xl font-bold mb-3 text-gray-100">Top Active Users</h2>
   {/* Column Headings */}
-  <div className="flex items-center justify-between px-3 py-1 bg-gray-800 mb-2 text-xs rounded">
+  <div className="flex items-center justify-between px-3 py-1 bg-zinc-900 mb-2 text-xs rounded">
     <span className="font-semibold text-gray-300 w-6 text-center">#</span>
     <span className="font-semibold text-gray-300 flex-1 mx-2">User</span>
     <span className="font-semibold text-gray-300 min-w-[40px] flex items-center justify-center">

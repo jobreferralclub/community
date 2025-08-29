@@ -8,7 +8,7 @@ import 'react-calendar/dist/Calendar.css';
 // Dark mode calendar overrides
 const calendarDarkStyle = `
   .dark .react-calendar {
-    background-color: #1f2937; /* Tailwind: bg-gray-800 */
+    background-color: #1f2937; /* Tailwind: bg-zinc-900 */
     color: #d1d5db;           /* Tailwind: text-gray-300 */
     border: none;
     border-radius: 0.75rem;
@@ -133,18 +133,18 @@ const Coaching = () => {
       case 'confirmed': return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-300';
       case 'pending': return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200';
       case 'cancelled': return 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-300';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+      default: return 'bg-gray-100 dark:bg-gray-700 text-zinc-900 dark:text-gray-300';
     }
   };
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen px-4 py-6 transition-colors">
+    <div className="space-y-6 bg-gray-50 dark:bg-black min-h-screen px-4 py-6 transition-colors">
       {/* Dark calendar style */}
       <style>{calendarDarkStyle}</style>
       {/* Header section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Coaching & Mentorship</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white">Coaching & Mentorship</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Book 1-on-1 sessions with industry experts
           </p>
@@ -168,10 +168,10 @@ const Coaching = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm 
                        border border-gray-200 dark:border-gray-700"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Sessions</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Upcoming Sessions</h3>
             <div className="space-y-4">
               {upcomingSessions.map((session) => (
                 <div key={session.id} className="flex items-center justify-between p-4 
@@ -185,7 +185,7 @@ const Coaching = () => {
                       />
                     </div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">{session.topic}</h4>
+                      <h4 className="font-medium text-black dark:text-white">{session.topic}</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400">with {session.coach}</p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400 mt-1">
                         <span className="flex items-center space-x-1">
@@ -215,10 +215,10 @@ const Coaching = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm 
                        border border-gray-200 dark:border-gray-700"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Coaches</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Available Coaches</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {coaches.map((coach) => (
                 <div key={coach.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg
@@ -226,7 +226,7 @@ const Coaching = () => {
                   <div className="flex items-start space-x-3">
                     <img src={coach.avatar} alt={coach.name} className="w-12 h-12 rounded-full object-cover" />
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-white">{coach.name}</h4>
+                      <h4 className="font-medium text-black dark:text-white">{coach.name}</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{coach.title}</p>
                       {/* Stars */}
                       <div className="flex items-center space-x-2 mb-2">
@@ -250,7 +250,7 @@ const Coaching = () => {
                       {/* Price + button */}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">${coach.hourlyRate}/hour</p>
+                          <p className="text-sm font-medium text-black dark:text-white">${coach.hourlyRate}/hour</p>
                           <p className="text-xs text-green-600 dark:text-green-400">{coach.availability}</p>
                         </div>
                         <button
@@ -270,9 +270,9 @@ const Coaching = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Schedule</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Schedule</h3>
           <div className="calendar-container">
             <Calendar
               onChange={setSelectedDate}
@@ -282,7 +282,7 @@ const Coaching = () => {
           </div>
           {/* Time Slots */}
           <div className="mt-6">
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">Available Times</h4>
+            <h4 className="font-medium text-black dark:text-white mb-3">Available Times</h4>
             <div className="grid grid-cols-2 gap-2">
               {timeSlots.map((time) => (
                 <button
@@ -297,19 +297,19 @@ const Coaching = () => {
           </div>
           {/* Quick Stats */}
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h4 className="font-medium text-gray-900 dark:text-white mb-3">This Month</h4>
+            <h4 className="font-medium text-black dark:text-white mb-3">This Month</h4>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">Sessions Booked</span>
-                <span className="font-medium text-gray-900 dark:text-white">8</span>
+                <span className="font-medium text-black dark:text-white">8</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">Hours Scheduled</span>
-                <span className="font-medium text-gray-900 dark:text-white">12.5</span>
+                <span className="font-medium text-black dark:text-white">12.5</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">Total Spent</span>
-                <span className="font-medium text-gray-900 dark:text-white">$1,850</span>
+                <span className="font-medium text-black dark:text-white">$1,850</span>
               </div>
             </div>
           </div>
@@ -327,14 +327,14 @@ const Coaching = () => {
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 w-full max-w-md"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Book a Session</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Book a Session</h3>
             <div className="space-y-4">
               {/* Coach Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Coach</label>
-                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500">
                   <option>Choose a coach...</option>
                   {coaches.map((coach) => (
                     <option key={coach.id} value={coach.id}>
@@ -346,7 +346,7 @@ const Coaching = () => {
               {/* Session Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Type</label>
-                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500">
                   <option>Video Call</option>
                   <option>Phone Call</option>
                   <option>In-Person</option>
@@ -355,7 +355,7 @@ const Coaching = () => {
               {/* Duration */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duration</label>
-                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500">
                   <option>30 minutes</option>
                   <option>60 minutes</option>
                   <option>90 minutes</option>
@@ -366,7 +366,7 @@ const Coaching = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Topic/Goals</label>
                 <textarea
                   rows={3}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500"
                   placeholder="Describe what you'd like to focus on..."
                 />
               </div>

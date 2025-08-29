@@ -79,7 +79,7 @@ const CourseBuilder = () => {
       case 'published': return 'bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-300';
       case 'draft': return 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200';
       case 'scheduled': return 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-300';
-      default: return 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300';
+      default: return 'bg-gray-100 dark:bg-gray-700 text-zinc-900 dark:text-gray-300';
     }
   };
 
@@ -99,14 +99,14 @@ const CourseBuilder = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border 
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border 
                        border-gray-200 dark:border-gray-700 text-center"
           >
             <div className={`w-12 h-12 bg-${stat.color}-50 dark:bg-${stat.color}-900 
                              rounded-lg flex items-center justify-center mx-auto mb-3`}>
               <SafeIcon icon={stat.icon} className={`w-6 h-6 text-${stat.color}-600 dark:text-${stat.color}-300`} />
             </div>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+            <p className="text-2xl font-bold text-black dark:text-white">{stat.value}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
           </motion.div>
         ))}
@@ -120,7 +120,7 @@ const CourseBuilder = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm 
+            className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden shadow-sm 
                        border border-gray-200 dark:border-gray-700 hover:shadow-md transition"
           >
             <div className="relative">
@@ -141,9 +141,9 @@ const CourseBuilder = () => {
                                  text-primary-700 dark:text-primary-300 rounded text-xs font-medium">
                   {course.category}
                 </span>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">${course.price}</span>
+                <span className="text-lg font-bold text-black dark:text-white">${course.price}</span>
               </div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{course.title}</h3>
+              <h3 className="font-semibold text-black dark:text-white mb-2 line-clamp-2">{course.title}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{course.description}</p>
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
                 <span className="flex items-center space-x-1">
@@ -181,10 +181,10 @@ const CourseBuilder = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm 
+      className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm 
                  border border-gray-200 dark:border-gray-700"
     >
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Create New Course</h3>
+      <h3 className="text-lg font-semibold text-black dark:text-white mb-6">Create New Course</h3>
       <div className="space-y-6">
         {/* Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -192,12 +192,12 @@ const CourseBuilder = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Course Title</label>
             <input type="text" placeholder="Enter title..."
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"/>
+                         bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500"/>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
             <select className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500">
+                               bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500">
               <option>Select...</option><option>Interview Prep</option><option>Career Dev</option><option>Leadership</option>
             </select>
           </div>
@@ -207,7 +207,7 @@ const CourseBuilder = () => {
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
           <textarea rows={4} placeholder="Describe course..."
             className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500"/>
+                       bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary-500"/>
         </div>
         {/* Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -229,7 +229,7 @@ const CourseBuilder = () => {
         </div>
         {/* Settings */}
         <div className="space-y-4">
-          <h4 className="font-medium text-gray-900 dark:text-white">Settings</h4>
+          <h4 className="font-medium text-black dark:text-white">Settings</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {['Enable drip content', 'Require approval', 'Issue certificates', 'Enable forums'].map((opt, i) => (
               <label key={i} className="flex items-center space-x-3">
@@ -255,9 +255,9 @@ const CourseBuilder = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Drip Schedule</h3>
+        <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Drip Schedule</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div><label className="block text-sm text-gray-700 dark:text-gray-300 mb-2">Release</label>
             <select className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700"><option>Daily</option></select></div>
@@ -271,10 +271,10 @@ const CourseBuilder = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
       >
         <div className="flex justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Timeline</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white">Timeline</h3>
           <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 flex items-center space-x-2">
             <SafeIcon icon={FiPlus} className="w-4 h-4" /><span>Add</span>
           </button>
@@ -291,7 +291,7 @@ const CourseBuilder = () => {
                 </div>
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-gray-900 dark:text-white">{c.title}</h4>
+                <h4 className="font-medium text-black dark:text-white">{c.title}</h4>
                 <div className="flex space-x-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
                   <span className="flex items-center space-x-1"><SafeIcon icon={c.type === 'video' ? FiPlay : FiBook} className="w-3 h-3" /><span>{c.type}</span></span>
                   <span className="flex items-center space-x-1"><SafeIcon icon={FiClock} className="w-3 h-3" /><span>{c.duration}</span></span>
@@ -313,10 +313,10 @@ const CourseBuilder = () => {
 
   // ================= MAIN =================
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen px-4 py-6 transition">
+    <div className="space-y-6 bg-gray-50 dark:bg-black min-h-screen px-4 py-6 transition">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Course Builder</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Course Builder</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">Create and manage educational content with drip scheduling</p>
       </div>
       {/* Tabs */}

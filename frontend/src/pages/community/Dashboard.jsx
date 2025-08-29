@@ -81,7 +81,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-2xl font-bold text-black mt-1">{stat.value}</p>
                 <p className="text-sm text-green-600 mt-1">{stat.change} from last month</p>
               </div>
               <div className={`p-3 rounded-lg bg-${stat.color}-50`}>
@@ -108,7 +108,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, x: 0 }}
           className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
         >
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-black mb-4">Recent Activity</h3>
           <div className="space-y-4">
             {recentActivity.map((activity, index) => (
               <div key={index} className="flex items-center space-x-3">
@@ -118,7 +118,7 @@ const Dashboard = () => {
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-900">
+                  <p className="text-sm text-black">
                     <span className="font-medium">{activity.user}</span> {activity.action}
                   </p>
                   <p className="text-xs text-gray-500">{activity.time}</p>
@@ -135,7 +135,7 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-xl p-6 shadow-sm border border-gray-200"
       >
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-black mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { name: 'New Post', icon: FiMessageSquare, color: 'blue' },

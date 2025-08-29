@@ -85,11 +85,11 @@ const EmailBroadcast = () => {
   const selectedRecipientOption = recipientOptions.find(opt => opt.id === emailData.recipients);
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen px-4 py-6 transition-colors">
+    <div className="space-y-6 bg-gray-50 dark:bg-black min-h-screen px-4 py-6 transition-colors">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Email Broadcast</h1>
+          <h1 className="text-2xl font-bold text-black dark:text-white">Email Broadcast</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Send targeted emails to your community
           </p>
@@ -97,7 +97,7 @@ const EmailBroadcast = () => {
         <div className="mt-4 sm:mt-0 flex items-center space-x-3">
           <button
             onClick={() => setPreviewMode(!previewMode)}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-zinc-900 text-zinc-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition"
           >
             <SafeIcon icon={FiEye} className="w-4 h-4" />
             <span>Preview</span>
@@ -120,54 +120,54 @@ const EmailBroadcast = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
           >
             {/* Editor Header */}
             <div className="flex items-center space-x-2 mb-6">
               <SafeIcon icon={FiEdit3} className="w-5 h-5 text-primary-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Compose Email</h2>
+              <h2 className="text-lg font-semibold text-black dark:text-white">Compose Email</h2>
             </div>
 
             {/* Form Fields */}
             <div className="space-y-4">
               {/* Subject */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-800 dark:text-gray-300 mb-2">
                   Subject Line
                 </label>
                 <input
                   type="text"
                   value={emailData.subject}
                   onChange={(e) => setEmailData({ ...emailData, subject: e.target.value })}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter email subject..."
                 />
               </div>
 
               {/* Body */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-800 dark:text-gray-300 mb-2">
                   Email Content
                 </label>
                 <textarea
                   value={emailData.content}
                   onChange={(e) => setEmailData({ ...emailData, content: e.target.value })}
                   rows={12}
-                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500"
+                  className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-gray-100 focus:ring-2 focus:ring-primary-500"
                   placeholder="Write your email content here..."
                 />
               </div>
 
               {/* Templates */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <div className="border-t border-gray-200 dark:border-zinc-800 pt-4">
+                <h4 className="text-sm font-medium text-zinc-800 dark:text-gray-300 mb-3">
                   Quick Templates
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {['Weekly Newsletter', 'Job Alert', 'Welcome Email'].map((template) => (
                     <button
                       key={template}
-                      className="p-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                      className="p-2 text-sm bg-gray-100 dark:bg-zinc-800 text-zinc-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                       onClick={() => setEmailData({ ...emailData, subject: template, content: `Template for ${template}` })}
                     >
                       {template}
@@ -183,15 +183,15 @@ const EmailBroadcast = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+              className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Email Preview</h3>
-              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+              <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Email Preview</h3>
+              <div className="border border-gray-200 dark:border-zinc-800 rounded-lg p-4 bg-gray-50 dark:bg-black">
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 dark:text-gray-400">Subject:</p>
-                  <p className="font-medium text-gray-900 dark:text-white">{emailData.subject || 'No subject'}</p>
+                  <p className="font-medium text-black dark:text-white">{emailData.subject || 'No subject'}</p>
                 </div>
-                <div className="prose max-w-none text-gray-800 dark:text-gray-200">
+                <div className="prose max-w-none text-zinc-900 dark:text-gray-200">
                   <div className="whitespace-pre-wrap">
                     {emailData.content || 'No content'}
                   </div>
@@ -207,11 +207,11 @@ const EmailBroadcast = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
           >
             <div className="flex items-center space-x-2 mb-4">
               <SafeIcon icon={FiUsers} className="w-5 h-5 text-primary-600" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recipients</h3>
+              <h3 className="text-lg font-semibold text-black dark:text-white">Recipients</h3>
             </div>
             <div className="space-y-3">
               {recipientOptions.map(option => (
@@ -225,13 +225,13 @@ const EmailBroadcast = () => {
                     className="text-primary-600 focus:ring-primary-500"
                   />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{option.name}</p>
+                    <p className="text-sm font-medium text-black dark:text-gray-100">{option.name}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{option.count.toLocaleString()} members</p>
                   </div>
                 </label>
               ))}
             </div>
-            <div className="mt-4 p-3 bg-primary-50 dark:bg-gray-700 rounded-lg">
+            <div className="mt-4 p-3 bg-primary-50 dark:bg-zinc-800 rounded-lg">
               <p className="text-sm text-primary-700 dark:text-primary-300">
                 <span className="font-medium">
                   {selectedRecipientOption?.count.toLocaleString()}
@@ -245,11 +245,11 @@ const EmailBroadcast = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
           >
             <div className="flex items-center space-x-2 mb-4">
               <SafeIcon icon={FiFilter} className="w-5 h-5 text-primary-600" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Additional Filters</h3>
+              <h3 className="text-lg font-semibold text-black dark:text-white">Additional Filters</h3>
             </div>
             <div className="space-y-3">
               {filterOptions.map(filter => (
@@ -260,7 +260,7 @@ const EmailBroadcast = () => {
                     onChange={() => toggleFilter(filter.id)}
                     className="text-primary-600 focus:ring-primary-500 rounded"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{filter.name}</span>
+                  <span className="text-sm text-zinc-800 dark:text-gray-300">{filter.name}</span>
                 </label>
               ))}
             </div>
@@ -271,13 +271,13 @@ const EmailBroadcast = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Campaigns</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Campaigns</h3>
             <div className="space-y-4">
               {recentCampaigns.map(camp => (
-                <div key={camp.id} className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{camp.subject}</p>
+                <div key={camp.id} className="p-3 border border-gray-200 dark:border-zinc-800 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
+                  <p className="text-sm font-medium text-black dark:text-white mb-1">{camp.subject}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{camp.sent} • {camp.recipients.toLocaleString()} recipients</p>
                   <div className="flex justify-between text-xs">
                     <span className="text-green-600 dark:text-green-400">Open: {camp.openRate}</span>

@@ -51,15 +51,15 @@ const Gamification = () => {
       case 'rare': return 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300';
       case 'epic': return 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-300';
       case 'legendary': return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300';
-      default: return 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400';
+      default: return 'bg-gray-100 dark:bg-zinc-900 text-gray-600 dark:text-gray-400';
     }
   };
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen px-4 py-6 transition-colors">
+    <div className="space-y-6 bg-gray-50 dark:bg-black min-h-screen px-4 py-6 transition-colors">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gamification</h1>
+        <h1 className="text-2xl font-bold text-black dark:text-white">Gamification</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">Track your progress and earn rewards</p>
       </div>
 
@@ -76,12 +76,12 @@ const Gamification = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.name}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stat.value}</p>
+                <p className="text-2xl font-bold text-black dark:text-white mt-1">{stat.value}</p>
               </div>
               <div className={`p-3 rounded-lg bg-${stat.color}-50 dark:bg-${stat.color}-900`}>
                 <SafeIcon icon={stat.icon} className={`w-6 h-6 text-${stat.color}-600 dark:text-${stat.color}-300`} />
@@ -97,9 +97,9 @@ const Gamification = () => {
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Badges</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Badges</h3>
           <div className="space-y-4">
             {badges.map((badge, index) => (
               <div key={badge.name} className="flex items-center space-x-3">
@@ -107,7 +107,7 @@ const Gamification = () => {
                   <SafeIcon icon={badge.icon} className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium ${badge.earned ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-500'}`}>
+                  <p className={`text-sm font-medium ${badge.earned ? 'text-black dark:text-gray-100' : 'text-gray-500 dark:text-gray-500'}`}>
                     {badge.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{badge.description}</p>
@@ -126,9 +126,9 @@ const Gamification = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Leaderboard</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Leaderboard</h3>
           <div className="space-y-3">
             {leaderboard.map((user) => (
               <div
@@ -142,7 +142,7 @@ const Gamification = () => {
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${user.rank === 1
                       ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-300'
                       : user.rank === 2
-                        ? 'bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200'
+                        ? 'bg-gray-100 dark:bg-gray-600 text-zinc-900 dark:text-gray-200'
                         : user.rank === 3
                           ? 'bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-300'
                           : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
@@ -152,7 +152,7 @@ const Gamification = () => {
                 </div>
                 <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
                 <div className="flex-1">
-                  <p className={`text-sm font-medium ${user.isCurrentUser ? 'text-primary-900 dark:text-primary-300' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <p className={`text-sm font-medium ${user.isCurrentUser ? 'text-primary-900 dark:text-primary-300' : 'text-black dark:text-gray-100'}`}>
                     {user.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{user.points} points</p>
@@ -166,14 +166,14 @@ const Gamification = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+          className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Active Challenges</h3>
+          <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Active Challenges</h3>
           <div className="space-y-4">
             {challenges.map((challenge, index) => (
               <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 dark:text-white">{challenge.title}</h4>
+                  <h4 className="font-medium text-black dark:text-white">{challenge.title}</h4>
                   <span className="text-xs bg-secondary-100 dark:bg-secondary-800 text-secondary-800 dark:text-secondary-300 px-2 py-1 rounded-full">
                     +{challenge.reward} pts
                   </span>
@@ -201,9 +201,9 @@ const Gamification = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Points Activity</h3>
+        <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Points Activity</h3>
         <div className="space-y-3">
           {pointsHistory.map((activity, index) => (
             <div
@@ -211,7 +211,7 @@ const Gamification = () => {
               className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
             >
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{activity.action}</p>
+                <p className="text-sm font-medium text-black dark:text-gray-100">{activity.action}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{activity.date}</p>
               </div>
               <span className="text-sm font-bold text-green-600 dark:text-green-400">+{activity.points} pts</span>

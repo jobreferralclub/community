@@ -82,7 +82,7 @@ const ProfileSettings = ({ user }) => {
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700"
+      className="bg-zinc-900 rounded-s rounded-e p-6 shadow-md border border-gray-700"
     >
       <h3 className="text-lg font-semibold text-white mb-6">Profile</h3>
 
@@ -98,7 +98,7 @@ const ProfileSettings = ({ user }) => {
           <div className="flex space-x-3">
             <label
               htmlFor="avatar-upload"
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 cursor-pointer transition-colors"
+              className="bg-primary-600 text-white px-4 py-2 rounded-s rounded-e hover:bg-primary-700 cursor-pointer transition-colors"
             >
               Upload New
             </label>
@@ -131,7 +131,7 @@ const ProfileSettings = ({ user }) => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
 
@@ -144,7 +144,7 @@ const ProfileSettings = ({ user }) => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
 
@@ -158,7 +158,7 @@ const ProfileSettings = ({ user }) => {
             placeholder="Senior Software Engineer"
             value={formData.job_title}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
 
@@ -172,7 +172,7 @@ const ProfileSettings = ({ user }) => {
             placeholder="Tech Corp"
             value={formData.company}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
 
@@ -186,7 +186,7 @@ const ProfileSettings = ({ user }) => {
             placeholder="San Francisco, CA"
             value={formData.location}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
 
@@ -200,7 +200,7 @@ const ProfileSettings = ({ user }) => {
             placeholder="+1 (555) 123-4567"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
       </div>
@@ -214,7 +214,7 @@ const ProfileSettings = ({ user }) => {
           placeholder="Tell us about yourself..."
           value={formData.bio}
           onChange={handleChange}
-          className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       </div>
 
@@ -222,7 +222,7 @@ const ProfileSettings = ({ user }) => {
       <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          className="bg-primary-600 text-white px-6 py-2 rounded-s rounded-e hover:bg-primary-700 transition-colors"
         >
           Save Changes
         </button>

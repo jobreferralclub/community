@@ -30,6 +30,7 @@ const MockInterviewer = () => {
     const { loginWithPopup } = useAuth0();
     const [extractedText, setExtractedText] = useState("");
 
+
     const handleFileUpload = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -129,6 +130,7 @@ const MockInterviewer = () => {
             ...prev,
             resume: resumeContent
         }));
+        console.log(interviewData.resume);
     };
 
     return (
@@ -233,15 +235,15 @@ const MockInterviewer = () => {
 
                                             {/* Check for missing sections */}
                                             {(!user.education?.length ||
-                                                !user.certifications?.length ||
+                                                !user.certificates?.length ||
                                                 !user.skills?.length ||
-                                                !user.workExperience?.length) && (
+                                                !user.work?.length) && (
                                                     <p className="text-yellow-400 text-sm mb-4">
                                                         ⚠️ Your saved resume is missing some sections:{" "}
                                                         {!user.education?.length && "Education, "}
-                                                        {!user.certifications?.length && "Certifications, "}
+                                                        {!user.certificates?.length && "Certifications, "}
                                                         {!user.skills?.length && "Skills, "}
-                                                        {!user.workExperience?.length && "Work Experience"}
+                                                        {!user.work?.length && "Work Experience"}
                                                         .{" "}Do you want to continue?
                                                     </p>
                                                 )}
@@ -249,12 +251,13 @@ const MockInterviewer = () => {
                                             <div className="flex flex-row gap-2">
                                                 <Button
                                                     onClick={() => {
-                                                        const combinedResume = `
-                                                        ${(user.education || []).join("\n")}
-                                                        ${(user.certifications || []).join("\n")}
-                                                        ${(user.skills || []).join("\n")}
-                                                        ${(user.workExperience || []).join("\n")}
-                                                        `;
+                                                        const combinedResume = `${(user.education || [])
+                                                                .map(edu => `${edu.degree || ""} at ${edu.institution || ""} (${edu.startDate || ""} - ${edu.endDate || ""})`)
+                                                                .join("\n")} ${(user.certificates || [])
+                                                                .map(cert => `${cert.name || ""} - ${cert.issuer || ""} (${cert.date || ""})`)
+                                                                .join("\n")} ${(user.skills || []).map(skill => skill.name || skill).join(", ")} ${(user.work || [])
+                                                                .map(job => `${job.title || ""} at ${job.company || ""} (${job.startDate || ""} - ${job.endDate || ""}) ${job.description || ""}`)
+                                                                .join("\n\n")}`;
                                                         handleUseResume(combinedResume);
                                                         setCurrentStep("jobDesc"); // go to JD step
                                                     }}

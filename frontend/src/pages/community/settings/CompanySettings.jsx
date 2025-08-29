@@ -67,7 +67,7 @@ const CompanySettings = () => {
       className="space-y-6"
     >
       {/* Form to Add Company */}
-      <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+      <div className="bg-zinc-900 p-6 rounded-xl shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">Add New Company</h3>
         <form
           onSubmit={handleAddCompany}
@@ -76,7 +76,7 @@ const CompanySettings = () => {
           <input
             type="text"
             placeholder="Company Name"
-            className="p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400"
+            className="p-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400"
             value={newCompany.name}
             onChange={(e) =>
               setNewCompany({ ...newCompany, name: e.target.value })
@@ -85,7 +85,7 @@ const CompanySettings = () => {
           <input
             type="text"
             placeholder="Company Domain (e.g. example.com)"
-            className="p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400"
+            className="p-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400"
             value={newCompany.domain}
             onChange={(e) =>
               setNewCompany({ ...newCompany, domain: e.target.value })
@@ -104,12 +104,12 @@ const CompanySettings = () => {
       </div>
 
       {/* Search & List Companies */}
-      <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700">
+      <div className="bg-zinc-900 p-6 rounded-xl shadow-md border border-gray-700">
         <div className="mb-4">
           <input
             type="text"
             placeholder="Search by name or domain..."
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-400"
+            className="w-full p-3 bg-black border border-gray-700 rounded-lg text-white placeholder-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

@@ -201,7 +201,7 @@ const DataExportSettings = () => {
       className="space-y-6"
     >
       {/* Data Export Section */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">Export Your Data</h3>
         <p className="text-gray-400 mb-6">Download a copy of your data in CSV format.</p>
 
@@ -232,7 +232,7 @@ const DataExportSettings = () => {
       </div>
 
       {/* Account Deletion Section */}
-      <div className="bg-gray-900 rounded-xl p-6 shadow-md border border-red-700">
+      <div className="bg-black rounded-xl p-6 shadow-md border border-red-700">
         <h3 className="text-lg font-semibold text-red-500 mb-4">Delete Account</h3>
         <p className="text-gray-400 mb-6">
           Permanently delete your account and all associated data.{" "}

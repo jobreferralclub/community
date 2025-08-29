@@ -39,7 +39,7 @@ const ApiSettings = () => {
       className="space-y-6"
     >
       {/* API Keys Section */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">API Keys</h3>
         <p className="text-gray-400 mb-6">
           Generate API keys to integrate with third-party applications.
@@ -75,7 +75,7 @@ const ApiSettings = () => {
       </div>
 
       {/* API Documentation Section */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-md border border-gray-700">
+      <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">API Documentation</h3>
         <p className="text-gray-400 mb-4">
           Learn how to integrate with our API endpoints.
