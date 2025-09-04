@@ -37,6 +37,26 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  postsCount: {
+    type: Number,
+    default: 0,
+  },
+  commentsCount: {
+    type: Number,
+    default: 0,
+  },
+  likesCount: {
+    type: Number,
+    default: 0,
+  },
+  profileUpdatesCount: {
+    type: Number,
+    default: 0,
+  },
+  resumeUpdatesCount: {
+    type: Number,
+    default: 0,
+  },
   job_title: String,
   company: String,
   location: String,

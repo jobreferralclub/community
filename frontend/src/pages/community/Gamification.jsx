@@ -1,16 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 import { useAuthStore } from '../../store/authStore';
 
 // Extract icons
-const { FiAward, FiTrophy, FiStar, FiTarget, FiTrendingUp, FiUsers } = FiIcons;
+const { FiAward, FiTrophy, FiStar, FiTarget, FiUsers } = FiIcons;
 
 const Gamification = () => {
   const { user } = useAuthStore();
 
-  // Badges earned/unlocked system
+  // State to hold user action counts fetched from backend
+  const [actions, setActions] = useState({
+    posts: 0,
+    comments: 0,
+    likes: 0,
+    profileUpdates: 0,
+    resumeUpdates: 0,
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    // Fetch gamification stats from backend API
+    fetch(`/api/users/${user._id}/gamification`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('Fetched gamification data:', data);  // Verify data received
+        setActions({
+          posts: data.postsCount || 0,
+          comments: data.commentsCount || 0,
+          likes: data.likesCount || 0,
+          profileUpdates: data.profileUpdatesCount || 0,
+          resumeUpdates: data.resumeUpdatesCount || 0,
+        });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch gamification data:', err);
+        setLoading(false);
+      });
+  }, [user?._id]);
+
+  if (loading) return <div>Loading gamification...</div>;
+
+  // Calculate total points dynamically based on fetched actions
+  const totalPoints =
+    (actions.posts * 10) +
+    (actions.comments * 5) +
+    (actions.likes * 5) +
+    (actions.profileUpdates * 15) +
+    (actions.resumeUpdates * 15);
+
+  // Static badges - replace or enhance with real backend data as needed
   const badges = [
     { name: 'First Referral', description: 'Made your first job referral', icon: FiStar, earned: true, rarity: 'common' },
     { name: 'Top Contributor', description: 'Top 10% community contributor', icon: FiTrophy, earned: true, rarity: 'rare' },
@@ -19,31 +63,32 @@ const Gamification = () => {
     { name: 'Success Story', description: 'Helped someone land their dream job', icon: FiAward, earned: false, rarity: 'legendary' },
   ];
 
-  // Leaderboard - top users
+  // Leaderboard example - use real data or fetch as needed
   const leaderboard = [
     { rank: 1, name: 'Sarah Chen', points: 3420, avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1e5?w=40&h=40&fit=crop&crop=face' },
-    { rank: 2, name: 'You', points: 2450, avatar: user.avatar, isCurrentUser: true },
+    { rank: 2, name: 'You', points: totalPoints, avatar: user.avatar, isCurrentUser: true },
     { rank: 3, name: 'Mike Rodriguez', points: 2340, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face' },
     { rank: 4, name: 'Emily Davis', points: 2180, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face' },
     { rank: 5, name: 'David Kim', points: 1950, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face' },
   ];
 
-  // Ongoing challenges
+  // Sample challenges - replace with real dynamic data as needed
   const challenges = [
     { title: 'Weekly Referral Goal', description: 'Make 3 job referrals this week', progress: 2, total: 3, reward: 150, deadline: '3 days left' },
     { title: 'Community Helper', description: 'Answer 5 questions in the community', progress: 3, total: 5, reward: 100, deadline: '1 week left' },
     { title: 'Networking Master', description: 'Connect with 10 new professionals', progress: 7, total: 10, reward: 200, deadline: '5 days left' }
   ];
 
-  // History of earned points
+  // Generate points history entries from fetched actions
   const pointsHistory = [
-    { action: 'Made a successful referral', points: 250, date: '2 hours ago' },
-    { action: 'Answered community question', points: 50, date: '1 day ago' },
-    { action: 'Completed mentorship session', points: 100, date: '2 days ago' },
-    { action: 'Posted job opportunity', points: 75, date: '3 days ago' },
+    ...(actions.posts > 0 ? [{ action: `Created ${actions.posts} ${actions.posts > 1 ? 'posts' : 'post'}`, points: actions.posts * 10, date: 'recently' }] : []),
+    ...(actions.comments > 0 ? [{ action: `Made ${actions.comments} ${actions.comments > 1 ? 'comments' : 'comment'}`, points: actions.comments * 5, date: 'recently' }] : []),
+    ...(actions.likes > 0 ? [{ action: `Received ${actions.likes} ${actions.likes > 1 ? 'likes' : 'like'}`, points: actions.likes * 5, date: 'recently' }] : []),
+    ...(actions.profileUpdates > 0 ? [{ action: `Profile Updated`, points: actions.profileUpdates * 15, date: 'recently' }] : []),
+    ...(actions.resumeUpdates > 0 ? [{ action: `Resume Updated`, points: actions.resumeUpdates * 15, date: 'recently' }] : []),
   ];
 
-  // Badge rarity colors
+  // Badge color helper function
   const getBadgeColor = (rarity, earned) => {
     if (!earned) return 'bg-gray-100 dark:bg-gray-700 text-gray-400';
     switch (rarity) {
@@ -60,13 +105,15 @@ const Gamification = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-black dark:text-white">Gamification</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Track your progress and earn rewards</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          Track your progress and earn rewards based on posts, comments, likes, and profile updates
+        </p>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { name: 'Total Points', value: user.points, icon: FiStar, color: 'blue' },
+          { name: 'Total Points', value: totalPoints, icon: FiStar, color: 'blue' },
           { name: 'Current Rank', value: '#2', icon: FiTrophy, color: 'yellow' },
           { name: 'Badges Earned', value: badges.filter(b => b.earned).length, icon: FiAward, color: 'purple' },
           { name: 'Referrals Made', value: '12', icon: FiTarget, color: 'green' },
@@ -101,7 +148,7 @@ const Gamification = () => {
         >
           <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Badges</h3>
           <div className="space-y-4">
-            {badges.map((badge, index) => (
+            {badges.map((badge) => (
               <div key={badge.name} className="flex items-center space-x-3">
                 <div className={`p-2 rounded-lg ${getBadgeColor(badge.rarity, badge.earned)}`}>
                   <SafeIcon icon={badge.icon} className="w-5 h-5" />
@@ -134,18 +181,18 @@ const Gamification = () => {
               <div
                 key={user.rank}
                 className={`flex items-center space-x-3 p-3 rounded-lg transition ${user.isCurrentUser
-                    ? 'bg-primary-50 dark:bg-primary-900 border border-primary-200 dark:border-primary-600'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary-50 dark:bg-primary-900 border border-primary-200 dark:border-primary-600'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${user.rank === 1
-                      ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-300'
-                      : user.rank === 2
-                        ? 'bg-gray-100 dark:bg-gray-600 text-zinc-900 dark:text-gray-200'
-                        : user.rank === 3
-                          ? 'bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-300'
-                          : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                    ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-300'
+                    : user.rank === 2
+                      ? 'bg-gray-100 dark:bg-gray-600 text-zinc-900 dark:text-gray-200'
+                      : user.rank === 3
+                        ? 'bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-300'
+                        : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                     }`}
                 >
                   {user.rank}
@@ -205,18 +252,22 @@ const Gamification = () => {
       >
         <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Recent Points Activity</h3>
         <div className="space-y-3">
-          {pointsHistory.map((activity, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
-            >
-              <div>
-                <p className="text-sm font-medium text-black dark:text-gray-100">{activity.action}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{activity.date}</p>
+          {pointsHistory.length > 0 ? (
+            pointsHistory.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+              >
+                <div>
+                  <p className="text-sm font-medium text-black dark:text-gray-100">{activity.action}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{activity.date}</p>
+                </div>
+                <span className="text-sm font-bold text-green-600 dark:text-green-400">+{activity.points} pts</span>
               </div>
-              <span className="text-sm font-bold text-green-600 dark:text-green-400">+{activity.points} pts</span>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-xs text-gray-500 dark:text-gray-400">No recent activity</p>
+          )}
         </div>
       </motion.div>
     </div>

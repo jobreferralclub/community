@@ -2,6 +2,7 @@
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import Community from "../models/Community.js";
+import User from "../models/User.js";
 
 // ========== POSTS ==========
 
@@ -64,6 +65,9 @@ export const createPost = async (req, res) => {
     });
 
     const savedPost = await post.save();
+    if (userId) {
+  await User.findByIdAndUpdate(userId, { $inc: { postsCount: 1 } });
+}
 
     // ✅ Attach post to community & increment postCount
     if (communityId) {
@@ -205,6 +209,9 @@ export const addComment = async (req, res) => {
     });
 
     const savedComment = await comment.save();
+    if (userId) {
+  await User.findByIdAndUpdate(userId, { $inc: { commentsCount: 1 } });
+}
 
     // Increment comment count
     await Post.findByIdAndUpdate(postId, { $inc: { comments: 1 } });
