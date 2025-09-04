@@ -149,7 +149,7 @@ export const deletePost = async (req, res) => {
 // Toggle like on a post
 export const toggleLike = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // post ID
     const { userId } = req.body;
 
     if (!userId) {
@@ -160,17 +160,25 @@ export const toggleLike = async (req, res) => {
     if (!post) return res.status(404).json({ error: "Post not found" });
 
     const userIndex = post.likedBy.indexOf(userId);
+    let incrementLikes = 0;
 
     if (userIndex === -1) {
       // Like
       post.likedBy.push(userId);
+      incrementLikes = 1;
     } else {
       // Unlike
       post.likedBy.splice(userIndex, 1);
+      incrementLikes = -1;
     }
 
     post.likes = post.likedBy.length;
     await post.save();
+
+    // Update the user's likesCount counter
+    if (incrementLikes !== 0) {
+      await User.findByIdAndUpdate(userId, { $inc: { likesCount: incrementLikes } });
+    }
 
     res.json(post);
   } catch (error) {
@@ -178,6 +186,7 @@ export const toggleLike = async (req, res) => {
     res.status(500).json({ error: "Failed to toggle like" });
   }
 };
+
 
 // ========== COMMENTS ==========
 
