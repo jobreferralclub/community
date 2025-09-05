@@ -47,6 +47,8 @@ function AppWrapper() {
   const [authChecked, setAuthChecked] = useState(false);
   const { user: auth0user, isAuthenticated: auth0authenticated, loginWithPopup, logout: auth0logout } = useAuth0();
 
+  console.log(user);
+
   useEffect(() => {
     const syncAuth0User = async () => {
       try {
