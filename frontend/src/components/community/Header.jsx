@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
@@ -8,6 +8,22 @@ const { FiMenu, FiBell, FiSearch, FiMessageSquare, FiAward, FiLogOut } = FiIcons
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuthStore();
+
+  const [points, setPoints] = useState(user?.points || 0);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    fetch(`http://localhost:5000/api/users/${user._id}/gamification`)
+      .then((res) => res.json())
+      .then((data) => {
+        // Update points from fetched data totalPoints
+        setPoints(data.totalPoints);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch gamification points:", err);
+      });
+  }, [user?._id]);
 
   return (
     <motion.header
@@ -45,9 +61,7 @@ const Header = ({ onMenuClick }) => {
           {/* Points */}
           <div className="hidden sm:flex items-center space-x-2 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800">
             <SafeIcon icon={FiAward} className="w-4 h-4 text-[#79e708]" />
-            <span className="text-sm font-medium text-gray-300">
-              {user.points} pts
-            </span>
+            <span className="text-sm font-medium text-gray-300">{points} pts</span>
           </div>
 
           {/* Notifications */}

@@ -25,7 +25,7 @@ const Gamification = () => {
     if (!user?._id) return;
 
     // Fetch gamification stats from backend API
-    fetch(`/api/users/${user._id}/gamification`)
+    fetch(`http://localhost:5000/api/users/${user._id}/gamification`)
       .then((res) => res.json())
       .then((data) => {
         console.log('Fetched gamification data:', data);  // Verify data received
