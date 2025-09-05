@@ -36,7 +36,7 @@ import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
 import AnalyzerResult from "./pages/resume/analyzer/AnalyzerResult";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import MockInterviewer from "./pages/mock-interviewer/mockinterviewer";
+import MockInterviewer from "./pages/mock-interviewer/MockInterviewer";
 import Interview from "./pages/mock-interviewer/Interview";
 import SummaryPage from "./pages/mock-interviewer/SummaryPage";
 import CoverLetterPage from "./pages/application-kit/CoverLetterPage";
