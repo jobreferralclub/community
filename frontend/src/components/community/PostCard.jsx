@@ -7,11 +7,13 @@ import { useCommunity } from '../../hooks/useCommunity';
 import CommentModal from './CommentModal';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
+import { useNavigate } from "react-router-dom";
 
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
 const PostCard = ({ post }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const postIdFromUrl = queryParams.get('postid');
 
@@ -29,6 +31,10 @@ const PostCard = ({ post }) => {
 
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
+
+  const [loadingJD, setLoadingJD] = useState(false);
+  const [jobDescription, setJobDescription] = useState("");
+  const [generatingKit, setGeneratingKit] = useState(false);
 
   const { toggleLike, updatePost, deletePost } = useCommunity();
   const { user } = useAuthStore();
@@ -75,7 +81,7 @@ const PostCard = ({ post }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           resume: resumeData,
-          jobDescription: post.job_description
+          jobDescription: jobDescription,
         }),
       });
 
@@ -164,6 +170,112 @@ const PostCard = ({ post }) => {
       setShowDeleteModal(false);
     } catch {
       toast.error('Failed to delete post');
+    }
+  };
+
+  useEffect(() => {
+    const fetchJD = async () => {
+      if (showResumeModal && post._id) {
+        setLoadingJD(true);
+        try {
+          const res = await fetch(`${apiUrl}/api/posts/${post._id}/job-description`);
+          if (!res.ok) throw new Error("Failed to fetch job description");
+          const data = await res.json();
+          setJobDescription(data.job_description || "");
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to fetch job description");
+        } finally {
+          setLoadingJD(false);
+        }
+      }
+    };
+
+    fetchJD();
+  }, [showResumeModal, post._id, apiUrl]);
+
+  // Extract fields from post.content (HTML)
+  const extractJobDetails = (htmlString, jobDescription) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    let companyName = "";
+    let jobTitle = "";
+
+    // Loop over all <p> tags
+    doc.querySelectorAll("p").forEach(p => {
+      const strong = p.querySelector("strong");
+      if (!strong) return;
+
+      const label = strong.textContent?.trim();
+
+      if (label.startsWith("Company Name")) {
+        // Company name is the text of the <p> without the <strong> part
+        companyName = p.textContent.replace(label, "").trim();
+      }
+
+      if (label.startsWith("Job Role")) {
+        jobTitle = p.textContent.replace(label, "").trim();
+      }
+    });
+
+    // Fallback: use first non-empty line from jobDescription
+    if (!jobTitle && jobDescription) {
+      const firstLine = jobDescription.split("\n").map(l => l.trim()).find(l => l.length > 0);
+      jobTitle = firstLine || "Unknown Job Title";
+    }
+
+    if (!companyName) {
+      companyName = "Unknown Company";
+    }
+
+    return { companyName, jobTitle };
+  };
+
+  // Generate Application Kit Handler
+  const handleGenerateApplicationKit = async () => {
+    try {
+      setGeneratingKit(true);
+
+      const { companyName, jobTitle } = extractJobDetails(post.content);
+
+      const resumeData = {
+        name: user.name || "",
+        email: user.email || "",
+        education: user.education || [],
+        skills: user.skills || [],
+        certificates: user.certificates || [],
+        work: user.work || []
+      };
+
+      const response = await fetch(`${apiUrl}/api/resume/generate-application-kit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resume: resumeData,
+          jobDescription,
+          jobTitle,
+          companyName
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate application kit");
+
+      const data = await response.json();
+
+      navigate("/profile/cover-letter", {
+        state: {
+          coverLetter: data.coverLetter,
+          jobTitle: data.jobTitle,
+          companyName: data.companyName,
+        },
+      });
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to generate application kit");
+    } finally {
+      setGeneratingKit(false);
     }
   };
 
@@ -306,13 +418,13 @@ const PostCard = ({ post }) => {
             </motion.button>
 
             {/* NEW: Check Resume Compatibility Button */}
-            {post.type === "job-posting" && post.job_description && (
+            {post.type === "job-posting" && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowResumeModal(true)}
                 className="flex items-center space-x-2 hover:text-[#79e708] px-3 py-1 rounded transition-colors text-sm"
               >
-                Check Resume Compatibility
+                Generate Application Kit
               </motion.button>
             )}
 
@@ -322,89 +434,63 @@ const PostCard = ({ post }) => {
       </motion.div>
 
       {showResumeModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100 my-10">
-            <h3 className="text-lg font-semibold mb-4">Resume Compatibility</h3>
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto"
+          onClick={() => setShowResumeModal(false)} // close when clicking backdrop
+        >
+          <div
+            className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100 my-10 relative"
+            onClick={(e) => e.stopPropagation()} // prevent backdrop close on inside click
+          >
+            {/* Cross button */}
+            <button
+              onClick={() => setShowResumeModal(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-200 text-xl"
+            >
+              ✕
+            </button>
+
+            {/* Header */}
+            <h3 className="text-lg font-semibold mb-4">Generate a new application kit</h3>
             <p className="text-gray-300 mb-4">
               Checking your resume against this job description:
             </p>
+
+            {/* Job Description */}
             <div className="bg-gray-800 p-4 rounded mb-4 max-h-40 overflow-y-auto text-sm">
-              {post.job_description}
+              {loadingJD ? (
+                <span className="text-gray-400">⏳ Loading job description...</span>
+              ) : (
+                jobDescription || "No job description available."
+              )}
             </div>
 
-            {/* Warning if details missing */}
-            {(!user.skills?.length || !user.education?.length || !user.certificates?.length || !user.work?.length) && (() => {
-              const missingFields = [];
-              if (!user.skills?.length) missingFields.push("Skills");
-              if (!user.education?.length) missingFields.push("Education");
-              if (!user.certificates?.length) missingFields.push("Certificates");
-              if (!user.work?.length) missingFields.push("Work Experience");
+            {/* Missing fields warning */}
+            {(!user.skills?.length ||
+              !user.education?.length ||
+              !user.certificates?.length ||
+              !user.work?.length) &&
+              (() => {
+                const missingFields = [];
+                if (!user.skills?.length) missingFields.push("Skills");
+                if (!user.education?.length) missingFields.push("Education");
+                if (!user.certificates?.length) missingFields.push("Certificates");
+                if (!user.work?.length) missingFields.push("Work Experience");
 
-              return (
-                <div className="bg-[#facc15]/10 p-4 rounded mb-4 text-yellow-500">
-                  ⚠️ Your profile is missing some details: {missingFields.join(", ")}.
-                  <br />
-                  Do you want to proceed analyzing resume?
-                </div>
-              );
-            })()}
-
-            {/* Loader */}
-            {loadingAnalysis && (
-              <div className="text-center text-gray-400 mb-4">
-                ⏳ Please wait, analyzing your resume...
-              </div>
-            )}
-
-            {/* Analysis Result */}
-            {/* Analysis Result */}
-            {analysisResult && (
-              <div className="bg-gray-800 p-4 rounded mb-4 text-sm text-gray-200">
-                {/* Match Score */}
-                <div className="mb-4">
-                  <p className="text-lg font-semibold">
-                    Resume to JD Match Score:{" "}
-                    <span
-                      className={`font-bold ${analysisResult.matchScore >= 70
-                          ? "text-green-400"
-                          : analysisResult.matchScore >= 40
-                            ? "text-yellow-400"
-                            : "text-red-400"
-                        }`}
-                    >
-                      {analysisResult.matchScore}%
-                    </span>
-                  </p>
-                  <div className="w-full bg-gray-700 h-3 rounded mt-2">
-                    <div
-                      className={`h-3 rounded ${analysisResult.matchScore >= 70
-                          ? "bg-green-400"
-                          : analysisResult.matchScore >= 40
-                            ? "bg-yellow-400"
-                            : "bg-red-400"
-                        }`}
-                      style={{ width: `${analysisResult.matchScore}%` }}
-                    ></div>
+                return (
+                  <div className="bg-[#facc15]/10 p-4 rounded mb-4 text-yellow-500">
+                    ⚠️ Your profile is missing some details:{" "}
+                    {missingFields.join(", ")}.
+                    <br />
+                    Do you want to proceed analyzing resume?
                   </div>
-                </div>
+                );
+              })()}
 
-                {/* Suggestions */}
-                {analysisResult.suggestions?.length > 0 && (
-                  <div>
-                    <p className="font-medium mb-2">Suggestions for Improvement:</p>
-                    <ul className="list-disc list-inside space-y-1 text-gray-300">
-                      {analysisResult.suggestions.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-
+            {/* Footer Actions */}
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => window.open('/profile', '_blank')}
+                onClick={() => window.open("/profile", "_blank")}
                 className="px-4 py-2 bg-gray-900 text-yellow-400 rounded hover:bg-gray-800 transition-colors"
               >
                 Edit Resume
@@ -416,14 +502,16 @@ const PostCard = ({ post }) => {
                 Close
               </button>
               <button
-                onClick={handleAnalyzeResume}
-                disabled={loadingAnalysis}
-                className="px-4 py-2 bg-[#79e708] text-black rounded disabled:opacity-50"
+                onClick={handleGenerateApplicationKit}
+                disabled={generatingKit}
+                className={`px-4 py-2 rounded ${generatingKit
+                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                    : "bg-[#79e708] text-black hover:bg-[#66c206]"
+                  }`}
               >
-                {loadingAnalysis ? "Analyzing..." : "Analyze Resume"}
+                {generatingKit ? "⏳ Generating..." : "Generate Application Kit"}
               </button>
             </div>
-
           </div>
         </div>
       )}

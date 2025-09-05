@@ -10,6 +10,7 @@ import {
   addComment,
   deleteComment,
   getCommentCountByUser,
+  getJobDescriptionByPostId,
 } from "../controllers/posts.controller.js";
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.post("/", createPost);
 router.patch("/:id", updatePost);
 router.delete("/:id", deletePost);
 router.patch("/:id/like", toggleLike);
+router.get("/:postId/job-description", getJobDescriptionByPostId);
 
 // Comments getComments
 router.get("/:postId/comments", getComments);

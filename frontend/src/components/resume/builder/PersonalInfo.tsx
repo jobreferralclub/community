@@ -1,13 +1,26 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import useResumeStore from "../../../store/useResumeStore";
 
-const PersonalInfo = () => {
-  const {
-    personalInfo,
-    updatePersonalInfo,
-  } = useResumeStore();
+interface PersonalInfoProps {
+  data?: any; // comes from authStore.user
+}
 
-  // Define a reusable handler for input changes
+const PersonalInfo: React.FC<PersonalInfoProps> = ({ data }) => {
+  const { personalInfo, updatePersonalInfo } = useResumeStore();
+
+  // ✅ Prefill from authStore.user when component mounts or user changes
+  useEffect(() => {
+    if (data) {
+      if (data.name) updatePersonalInfo("fullName", data.name);
+      if (data.email) updatePersonalInfo("email", data.email);
+      if (data.phone) updatePersonalInfo("phone", data.phone);
+      if (data.location) updatePersonalInfo("location", data.location);
+      if (data.website) updatePersonalInfo("website", data.website);
+      if (data.bio) updatePersonalInfo("summary", data.bio);
+    }
+  }, [data, updatePersonalInfo]);
+
+  // Input change handler
   const handleChange = (
     field: keyof typeof personalInfo,
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

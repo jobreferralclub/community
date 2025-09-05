@@ -39,6 +39,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import MockInterviewer from "./pages/mock-interviewer/mockinterviewer";
 import Interview from "./pages/mock-interviewer/Interview";
 import SummaryPage from "./pages/mock-interviewer/SummaryPage";
+import CoverLetterPage from "./pages/application-kit/CoverLetterPage";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -198,7 +199,7 @@ function AppWrapper() {
         <Route path="/analyzer-result" element={<AnalyzerResult />} />
         <Route path="/mock-interviewer" element={<MockInterviewer />} />
         <Route path="/mock-interviewer/interview" element={<Interview />} />
-        <Route path="/mock-interviewer/summary" element={<SummaryPage/>} />
+        <Route path="/mock-interviewer/summary" element={<SummaryPage />} />
         <Route path="*" element={<NotFound />} />
 
         {/* ✅ Public login route */}
@@ -208,7 +209,10 @@ function AppWrapper() {
         />
 
         {isAuthenticated ? (
-          <Route path="/profile" element={<ProfilePage />} />
+          <>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/cover-letter" element={<CoverLetterPage/>} />
+          </>
         ) : (
           <Route path="/profile" element={<Navigate to="/login" replace />} />
         )}

@@ -11,6 +11,9 @@ import {
     FileText,
 } from "lucide-react";
 import useResumeStore from "../../../store/useResumeStore";
+import { useAuthStore } from "../../../store/authStore";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const ResumeBuilderQuestionnaire = () => {
     const [currentStep, setCurrentStep] = useState(0);
@@ -21,6 +24,9 @@ const ResumeBuilderQuestionnaire = () => {
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [isFadingOut, setIsFadingOut] = useState(false);
     const inputRefs = useRef([]);
+
+    const { user, updateUser } = useAuthStore();
+
 
     const { personalInfo, updatePersonalInfo } = useResumeStore();
     const navigate = useNavigate();
@@ -68,14 +74,38 @@ const ResumeBuilderQuestionnaire = () => {
     useEffect(() => {
         const prefill = {};
         currentGroup.fields.forEach((field) => {
-            prefill[field.id] = personalInfo[field.id] || "";
+            // Prefer auth user data, fallback to resume store
+            switch (field.id) {
+                case "fullName":
+                    prefill[field.id] = user?.name || personalInfo.fullName || "";
+                    break;
+                case "email":
+                    prefill[field.id] = user?.email || personalInfo.email || "";
+                    break;
+                case "phone":
+                    prefill[field.id] = user?.phone || personalInfo.phone || "";
+                    break;
+                case "location":
+                    prefill[field.id] = user?.location || personalInfo.location || "";
+                    break;
+                case "website":
+                    prefill[field.id] = user?.portfolio || personalInfo.website || "";
+                    break;
+                case "summary":
+                    prefill[field.id] = personalInfo.summary || "";
+                    break;
+                default:
+                    prefill[field.id] = personalInfo[field.id] || "";
+            }
         });
         setCurrentInput(prefill);
+
         setTimeout(() => {
             inputRefs.current[0]?.focus();
         }, 100);
+
         setErrors({});
-    }, [currentStep]);
+    }, [currentStep, user]);
 
     useEffect(() => {
         if (!showSuccessMessage) return;
@@ -149,8 +179,20 @@ const ResumeBuilderQuestionnaire = () => {
         setIsAnimating(true);
         setShowInput(false);
 
+        // ✅ Update both Resume Store and Auth Store
         currentGroup.fields.forEach((field) => {
-            updatePersonalInfo(field.id, currentInput[field.id] || "");
+            const value = currentInput[field.id] || "";
+            updatePersonalInfo(field.id, value);
+
+            // Map resume fields to auth fields
+            let mappedKey = field.id;
+            if (field.id === "fullName") mappedKey = "name";
+            if (field.id === "website") mappedKey = "portfolio";
+
+            updateUser((prevUser) => ({
+                ...prevUser,
+                [mappedKey]: value,
+            }));
         });
 
         if (currentStep === groupedQuestions.length - 1) {
