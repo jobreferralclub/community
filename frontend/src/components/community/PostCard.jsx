@@ -13,7 +13,7 @@ import "react-quill/dist/quill.snow.css";
 
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, onDelete }) => {
 
   const [localPost, setLocalPost] = useState(post);
   const location = useLocation();
