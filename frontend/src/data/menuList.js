@@ -96,7 +96,6 @@ export const adminOnly = [
     "Dashboard",
     "Analytics",
     "Email Broadcast",
-    "Gamification",
     "Monetization",
     "Coaching",
     "Course Builder",

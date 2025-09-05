@@ -3,7 +3,6 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import Community from "../models/Community.js";
 import User from "../models/User.js";
-
 // ========== POSTS ==========
 
 // Get all posts (newest first)
@@ -187,6 +186,22 @@ export const toggleLike = async (req, res) => {
   }
 };
 
+// Get job description by postId
+export const getJobDescriptionByPostId = async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const post = await Post.findById(postId).select("job_description");
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json({ postId, job_description: post.job_description });
+  } catch (error) {
+    console.error("Error fetching job description:", error);
+    res.status(500).json({ error: "Failed to fetch job description" });
+  }
+};
 
 // ========== COMMENTS ==========
 

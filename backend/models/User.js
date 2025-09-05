@@ -57,6 +57,14 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  referralsCount: {
+    type: Number,
+    default: 0,
+  },
+  totalPointsCount: {
+    type: Number,
+    default: 0,
+  },
   job_title: String,
   company: String,
   location: String,

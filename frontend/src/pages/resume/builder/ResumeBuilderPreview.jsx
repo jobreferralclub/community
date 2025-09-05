@@ -9,7 +9,9 @@ import ProjectsInfo from "../../../components/resume/builder/ProjectsInfo";
 import LivePreview from "../../../components/resume/builder/LivePreview";
 import ResumeDownloadButton from "../../../components/resume/builder/ResumeDownloadButton";
 import TemplateSelectionPopup from "../../../components/resume/builder/TemplateSelectionPopup";
+
 import useTemplateStore from "@/store/useTemplateStore";
+import { useAuthStore } from "@/store/authStore";
 
 const sections = [
   "Personal Info",
@@ -17,7 +19,7 @@ const sections = [
   "Education",
   "Skills",
   "Projects",
-  "Preview Resume", // ✅ new section
+  "Preview Resume",
 ];
 
 const ResumeBuilderPreview = () => {
@@ -25,7 +27,10 @@ const ResumeBuilderPreview = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showTemplatePopup, setShowTemplatePopup] = useState(false);
   const [popupShownOnce, setPopupShownOnce] = useState(false);
+
   const currentTemplate = useTemplateStore((state) => state.currentTemplate);
+  const { user } = useAuthStore(); // ✅ get auth user
+  console.log(user);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -41,22 +46,23 @@ const ResumeBuilderPreview = () => {
     }
   }, [currentTemplate, popupShownOnce]);
 
+  // ✅ Pass user data as props to each section for prefill
   const renderSection = () => {
     switch (sections[currentStep]) {
       case "Personal Info":
-        return <PersonalInfo />;
+        return <PersonalInfo data={user} />;
       case "Experience":
-        return <ExperienceInfo />;
+        return <ExperienceInfo data={user?.work || []} />;
       case "Education":
-        return <EducationInfo />;
+        return <EducationInfo data={user?.education || []} />;
       case "Skills":
-        return <SkillsInfo />;
+        return <SkillsInfo data={user?.skills || []} />;
       case "Projects":
-        return <ProjectsInfo />;
+        return <ProjectsInfo data={user?.projects || []} />;
       case "Preview Resume":
         return (
           <div className="flex flex-col items-center justify-center w-1/2 mx-auto">
-            <LivePreview />
+            <LivePreview user={user} />
             <div className="mt-4">
               <ResumeDownloadButton />
             </div>
@@ -144,7 +150,7 @@ const ResumeBuilderPreview = () => {
                     </h2>
                   </div>
                   <div className="flex justify-center items-center p-4 bg-gradient-to-r to-black from-gray-900">
-                    <LivePreview />
+                    <LivePreview user={user} />
                   </div>
                 </div>
               </div>

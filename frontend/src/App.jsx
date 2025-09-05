@@ -36,15 +36,18 @@ import ResumeAnalyzer from "./pages/resume/analyzer/ResumeAnalyszer";
 import AnalyzerResult from "./pages/resume/analyzer/AnalyzerResult";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
-import MockInterviewer from "./pages/mock-interviewer/mockinterviewer";
+import MockInterviewer from "./pages/mock-interviewer/MockInterviewer";
 import Interview from "./pages/mock-interviewer/Interview";
 import SummaryPage from "./pages/mock-interviewer/SummaryPage";
+import CoverLetterPage from "./pages/application-kit/CoverLetterPage";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const { user: auth0user, isAuthenticated: auth0authenticated, loginWithPopup, logout: auth0logout } = useAuth0();
+
+  console.log(user);
 
   useEffect(() => {
     const syncAuth0User = async () => {
@@ -198,7 +201,7 @@ function AppWrapper() {
         <Route path="/analyzer-result" element={<AnalyzerResult />} />
         <Route path="/mock-interviewer" element={<MockInterviewer />} />
         <Route path="/mock-interviewer/interview" element={<Interview />} />
-        <Route path="/mock-interviewer/summary" element={<SummaryPage/>} />
+        <Route path="/mock-interviewer/summary" element={<SummaryPage />} />
         <Route path="*" element={<NotFound />} />
 
         {/* ✅ Public login route */}
@@ -208,7 +211,10 @@ function AppWrapper() {
         />
 
         {isAuthenticated ? (
-          <Route path="/profile" element={<ProfilePage />} />
+          <>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/cover-letter" element={<CoverLetterPage/>} />
+          </>
         ) : (
           <Route path="/profile" element={<Navigate to="/login" replace />} />
         )}

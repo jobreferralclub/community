@@ -275,6 +275,7 @@ export const resumeAnalyzer = async (req, res) => {
 }
 
 // --- MOCK INTERVIEW ---
+
 export const mockInterview = async (req, res) => {
     const { resume, jobDescription } = req.body;
 
@@ -363,5 +364,118 @@ Return a JSON object with this exact structure:
     } catch (err) {
         console.error("❌ Analyze Interview Error:", err.message);
         res.status(500).json({ success: false, error: "Something went wrong" });
+    }
+};
+
+// --- APPLICATION KIT ---
+// Generate Application Kit (Cover Letter)
+export const generateCoverLetter = async (req, res) => {
+    try {
+        const { jobDescription, resume, jobTitle, companyName } = req.body;
+
+        if (!jobDescription || !resume || !jobTitle || !companyName) {
+            return res
+                .status(400)
+                .json({ error: "Job title, company name, job description, and resume are required" });
+        }
+
+        // Prompt for LLM
+        const prompt = `
+You are an expert career coach.
+Write a personalized cover letter in **HTML snippet** format for use inside a rich text editor.
+
+Inputs:
+- Job Title: ${jobTitle}
+- Company Name: ${companyName}
+- Job Description: ${jobDescription}
+- Candidate Resume: ${JSON.stringify(resume, null, 2)}
+
+⚠️ Very important:
+- Do NOT include <html>, <head>, or <body> tags.
+- Only return the cover letter content using <p>, <h2>, <strong>, <ul>, <li>, and <br> where appropriate.
+- Keep formatting clean and professional.
+        `.trim();
+
+        // Call your existing LLM wrapper
+        const htmlSnippet = await getLLMResponse(prompt);
+
+        // Return JSON response
+        res.status(200).json({
+            jobTitle,
+            companyName,
+            coverLetter: htmlSnippet,
+        });
+    } catch (error) {
+        console.error("❌ Error generating application kit:", error);
+        res.status(500).json({ error: "Failed to generate application kit" });
+    }
+};
+
+// --- GENERATE TAILORED RESUME ---
+export const generateJDResume = async (req, res) => {
+    try {
+        const { masterResume, jobDescription, jobTitle, companyName } = req.body;
+
+        if (!masterResume || !jobDescription || !jobTitle || !companyName) {
+            return res.status(400).json({
+                error: "Master resume, job description, job title, and company name are required"
+            });
+        }
+
+        const prompt = `
+You are an expert career coach and resume optimization specialist.
+Given the MASTER RESUME (in JSON format) and the JOB DESCRIPTION,
+generate a tailored resume optimized for this job.
+
+⚠️ Very important:
+- Only use existing information from the master resume.
+- Reorder, highlight, or omit details to maximize relevance.
+- Do NOT invent new experiences, education, or skills.
+
+Return strictly valid JSON matching this exact structure:
+
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "job_title": "string",
+  "company": "string",
+  "location": "string",
+  "bio": "string",
+  "education": [...],
+  "work": [...],
+  "projects": [...],
+  "skills": [...],
+  "certificates": [...]
+}
+
+MASTER RESUME:
+${JSON.stringify(masterResume, null, 2)}
+
+JOB TITLE: ${jobTitle}
+COMPANY NAME: ${companyName}
+JOB DESCRIPTION:
+${jobDescription}
+        `.trim();
+
+        const llmResponse = await getLLMResponse(prompt);
+
+        let tailoredResume;
+        try {
+            const cleaned = llmResponse.trim().replace(/```json|```/g, "");
+            const repairedJson = jsonrepair(cleaned);
+            tailoredResume = JSON.parse(repairedJson);
+        } catch (err) {
+            console.error("❌ Failed to parse tailored resume JSON:", llmResponse);
+            return res.status(500).json({ error: "Invalid LLM response while generating resume" });
+        }
+
+        res.status(200).json({
+            success: true,
+            tailoredResume,
+        });
+    } catch (error) {
+        console.error("❌ Error generating tailored resume:", error);
+        res.status(500).json({ error: "Failed to generate tailored resume" });
     }
 };
