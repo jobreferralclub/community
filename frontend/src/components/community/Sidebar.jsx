@@ -56,7 +56,7 @@ const Sidebar = ({ open, setOpen }) => {
   });
 
   // Classes for shadow/highlight
-  const activeClass = "bg-[#79e708] !text-black rounded-s  rounded-e overflow-hidden";
+  const activeClass = "shadow-lg shadow-[0px_0px_10px_var(--primary-green)] text-[#79e708] rounded-s  rounded-e overflow-hidden";
   const hoverClass =
     "hover:bg-gray-900 hover:text-white dark:hover:bg-gray-900 dark:hover:text-white transition-all";
 
@@ -84,16 +84,16 @@ const Sidebar = ({ open, setOpen }) => {
           onClick={() => handleToggleSubMenu(item.name)}
           className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 ${isSubMenuActive(item)
               ? activeClass
-              : `!text-black ${hoverClass}`
+              : `!text-[#79e708] ${hoverClass}`
             }`}
         >
           <div className="flex items-center space-x-3">
-            <SafeIcon icon={item.icon} className={`w-5 h-5 flex-shrink-0 ${isSubMenuActive(item) ? "!text-black" : "text-gray-300"}`} />
+            <SafeIcon icon={item.icon} className={`w-5 h-5 flex-shrink-0 ${isSubMenuActive(item) ? "!text-[#79e708]" : "text-gray-300"}`} />
             {open && (
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isSubMenuActive(item) ? "!text-black" : "text-gray-700"
+                className={`font-medium ${isSubMenuActive(item) ? "!text-[#79e708]" : "text-gray-700"
                   }`}
               >
                 {item.name}
@@ -104,7 +104,7 @@ const Sidebar = ({ open, setOpen }) => {
             <SafeIcon
               icon={FiChevronLeft}
               className={`w-4 h-4 transition-transform ${openSubMenus.includes(item.name) ? "rotate-90" : ""
-                } ${isSubMenuActive(item) ? "!text-black": "text-gray-300"}`}
+                } ${isSubMenuActive(item) ? "!text-[#79e708]": "text-gray-300"}`}
             />
           )}
         </button>
@@ -128,7 +128,7 @@ const Sidebar = ({ open, setOpen }) => {
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isActive ? "!text-black" : "text-gray-300"
+                className={`font-medium ${isActive ? "!text-[#79e708]" : "text-gray-300"
                   }`}
               >
                 {item.name}

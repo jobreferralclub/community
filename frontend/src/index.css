@@ -189,12 +189,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-green);
+  background: var(--gray-600);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6bd206;
+  background: var(--gray-300);
 }
 
 /* Selection color */
