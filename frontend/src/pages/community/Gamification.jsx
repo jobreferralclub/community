@@ -5,7 +5,7 @@ import * as FiIcons from 'react-icons/fi';
 import { useAuthStore } from '../../store/authStore';
 
 const { FiAward, FiTrophy, FiStar, FiTarget } = FiIcons;
-const apiBaseUrl = import.meta.env.VITE_API_PORT || 'http://localhost:5000';
+const apiBaseUrl = 'http://localhost:5000';
 
 const Gamification = () => {
   const { user } = useAuthStore();
@@ -43,14 +43,15 @@ const Gamification = () => {
       });
   }, [user?._id]);
 
-  // ✅ Fetch leaderboard
+  // ✅ Fetch leaderboard (top 5 participants)
   useEffect(() => {
     if (!user?._id) return;
 
     fetch(`${apiBaseUrl}/api/users/leadersboard/${user._id}`)
       .then((res) => res.json())
       .then((data) => {
-        setLeaderboard(data.leaderboard || []);
+        const top5 = (data.leaderboard || []).slice(0, 5);
+        setLeaderboard(top5);
       })
       .catch((err) => {
         console.error('Failed to fetch leaderboard:', err);
@@ -125,18 +126,18 @@ const Gamification = () => {
               <div
                 key={lbUser.id}
                 className={`flex items-center space-x-3 p-3 rounded-lg transition ${lbUser.id === user._id
-                    ? 'bg-primary-50 dark:bg-primary-900 border border-primary-200 dark:border-primary-600'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ? 'bg-primary-50 dark:bg-primary-900 border border-primary-200 dark:border-primary-600'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${lbUser.rank === 1
-                      ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-300'
-                      : lbUser.rank === 2
-                        ? 'bg-gray-100 dark:bg-gray-600 text-zinc-900 dark:text-gray-200'
-                        : lbUser.rank === 3
-                          ? 'bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-300'
-                          : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                    ? 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-300'
+                    : lbUser.rank === 2
+                      ? 'bg-gray-100 dark:bg-gray-600 text-zinc-900 dark:text-gray-200'
+                      : lbUser.rank === 3
+                        ? 'bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-300'
+                        : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                     }`}
                 >
                   {lbUser.rank}
@@ -211,7 +212,6 @@ const Gamification = () => {
           </div>
         </motion.div>
       </div>
-
     </div>
   );
 };
