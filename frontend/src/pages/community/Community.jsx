@@ -108,11 +108,10 @@ const Community = () => {
                 <button
                   key={filterOption.id}
                   onClick={() => setFilter(filterOption.id)}
-                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                    filter === filterOption.id
-                      ? "bg-[#79e708] !text-black"
-                      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
-                  }`}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
+                    ? "bg-[#79e708] !text-black"
+                    : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                    }`}
                 >
                   {filterOption.name} ({filterOption.count})
                 </button>
@@ -156,11 +155,23 @@ const Community = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <PostCard post={post} />
+              <PostCard
+                post={post}
+                onUpdate={(updatedPost) =>
+                  setPosts((prev) =>
+                    prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
+                  )
+                }
+                onDelete={(id) =>
+                  setPosts((prev) => prev.filter((p) => p._id !== id))
+                }
+              />
             </motion.div>
           ))
         ) : (
-          <div className="text-center text-gray-500 py-10">No posts to display in this community.</div>
+          <div className="text-center text-gray-500 py-10">
+            No posts to display in this community.
+          </div>
         )}
       </div>
 
@@ -189,7 +200,12 @@ const Community = () => {
         </div>
       )}
 
-      {showCreatePost && <CreatePost onClose={() => setShowCreatePost(false)} />}
+      {showCreatePost && <CreatePost
+        onClose={() => {
+          setShowCreatePost(false);
+          setPage(1); // reset to first page
+        }}
+      />}
     </div>
   );
 };

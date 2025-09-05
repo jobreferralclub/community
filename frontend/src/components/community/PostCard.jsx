@@ -8,10 +8,14 @@ import CommentModal from './CommentModal';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const { FiHeart, FiMessageCircle, FiShare2, FiMoreHorizontal } = FiIcons;
 
 const PostCard = ({ post }) => {
+
+  const [localPost, setLocalPost] = useState(post);
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
@@ -19,14 +23,14 @@ const PostCard = ({ post }) => {
 
   const apiUrl = import.meta.env.VITE_API_PORT;
 
-  const [liked, setLiked] = useState(post.likedByUser || false);
+  const [liked, setLiked] = useState(localPost.likedByUser || false);
   const [showComments, setShowComments] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likes || 0);
-  const [commentCount, setCommentCount] = useState(post.comments || 0);
+  const [likeCount, setLikeCount] = useState(localPost.likes || 0);
+  const [commentCount, setCommentCount] = useState(localPost.comments || 0);
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editData, setEditData] = useState({ title: post.title, content: post.content });
+  const [editData, setEditData] = useState({ title: localPost.title, content: localPost.content });
   const [showResumeModal, setShowResumeModal] = useState(false);
 
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
@@ -36,20 +40,24 @@ const PostCard = ({ post }) => {
   const [jobDescription, setJobDescription] = useState("");
   const [generatingKit, setGeneratingKit] = useState(false);
 
+  useEffect(() => {
+    setLocalPost(post); // keep sync if parent updates it
+  }, [post]);
+
   const { toggleLike, updatePost, deletePost } = useCommunity();
   const { user } = useAuthStore();
   const menuRef = useRef(null);
 
   useEffect(() => {
-    if (postIdFromUrl && postIdFromUrl === post._id) {
+    if (postIdFromUrl && postIdFromUrl === localPost._id) {
       setShowComments(true);
     }
-  }, [postIdFromUrl, post._id]);
+  }, [postIdFromUrl, localPost._id]);
 
   useEffect(() => {
-    setLiked(post.likedBy?.includes(user?._id) || false);
-    setLikeCount(post.likes || 0);
-    setCommentCount(post.comments || 0);
+    setLiked(localPost.likedBy?.includes(user?._id) || false);
+    setLikeCount(localPost.likes || 0);
+    setCommentCount(localPost.comments || 0);
   }, [post, user?._id]);
 
   useEffect(() => {
@@ -102,7 +110,7 @@ const PostCard = ({ post }) => {
       const wasLiked = liked;
       setLiked(!liked);
       setLikeCount(prev => (wasLiked ? prev - 1 : prev + 1));
-      await toggleLike(post._id);
+      await toggleLike(localPost._id);
     } catch (error) {
       setLiked(liked);
       setLikeCount(prev => (liked ? prev + 1 : prev - 1));
@@ -112,10 +120,10 @@ const PostCard = ({ post }) => {
 
   const handleShare = async () => {
     try {
-      const postUrl = `${window.location.origin}${window.location.pathname}?postid=${post._id}`;
+      const postUrl = `${window.location.origin}${window.location.pathname}?postid=${localPost._id}`;
       const shareContent = {
-        title: post.title,
-        text: `${post.title}\n\n${post.content}`,
+        title: localPost.title,
+        text: `${localPost.title}\n\n${localPost.content}`,
         url: postUrl,
       };
 
@@ -125,12 +133,12 @@ const PostCard = ({ post }) => {
         return;
       }
 
-      const textToShare = `${post.title}\n\n${post.content}\n\nShared from JobReferral.Club\n${postUrl}`;
+      const textToShare = `${localPost.title}\n\n${localPost.content}\n\nShared from JobReferral.Club\n${postUrl}`;
       await navigator.clipboard.writeText(textToShare);
       toast.success('Post content copied to clipboard!');
     } catch (error) {
       console.error('Error sharing post:', error);
-      toast.error('Failed to share post. Please try again.');
+      toast.error('Failed to share localPost. Please try again.');
     }
   };
 
@@ -155,8 +163,12 @@ const PostCard = ({ post }) => {
 
   const confirmEdit = async () => {
     try {
-      await updatePost(post._id, editData);
+      const updated = await updatePost(localPost._id, editData);
       toast.success('Post updated!');
+
+      // 🔥 Update local state so UI updates instantly
+      setLocalPost({ ...localPost, ...editData });
+
       setShowEditModal(false);
     } catch {
       toast.error('Failed to update post');
@@ -165,8 +177,12 @@ const PostCard = ({ post }) => {
 
   const confirmDelete = async () => {
     try {
-      await deletePost(post._id);
+      await deletePost(localPost._id);
       toast.success('Post deleted!');
+
+      // 🔥 Call parent callback so it removes this card from list
+      onDelete?.(localPost._id);
+
       setShowDeleteModal(false);
     } catch {
       toast.error('Failed to delete post');
@@ -175,10 +191,10 @@ const PostCard = ({ post }) => {
 
   useEffect(() => {
     const fetchJD = async () => {
-      if (showResumeModal && post._id) {
+      if (showResumeModal && localPost._id) {
         setLoadingJD(true);
         try {
-          const res = await fetch(`${apiUrl}/api/posts/${post._id}/job-description`);
+          const res = await fetch(`${apiUrl}/api/posts/${localPost._id}/job-description`);
           if (!res.ok) throw new Error("Failed to fetch job description");
           const data = await res.json();
           setJobDescription(data.job_description || "");
@@ -192,9 +208,9 @@ const PostCard = ({ post }) => {
     };
 
     fetchJD();
-  }, [showResumeModal, post._id, apiUrl]);
+  }, [showResumeModal, localPost._id, apiUrl]);
 
-  // Extract fields from post.content (HTML)
+  // Extract fields from localPost.content (HTML)
   const extractJobDetails = (htmlString, jobDescription) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -237,7 +253,7 @@ const PostCard = ({ post }) => {
     try {
       setGeneratingKit(true);
 
-      const { companyName, jobTitle } = extractJobDetails(post.content);
+      const { companyName, jobTitle } = extractJobDetails(localPost.content);
 
       const resumeData = {
         name: user.name || "",
@@ -290,23 +306,23 @@ const PostCard = ({ post }) => {
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
           <div className="flex items-center space-x-3">
             <img
-              src={(post.createdBy?.avatar == null) ? "/default-avatar.jpg" : post.createdBy?.avatar}
+              src={(localPost.createdBy?.avatar == null) ? "/default-avatar.jpg" : localPost.createdBy?.avatar}
               alt="image"
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h4 className="font-semibold text-xl text-white">{(post.createdBy?.name == null) ? post.author : post.createdBy?.name}</h4>
+              <h4 className="font-semibold text-xl text-white">{(localPost.createdBy?.name == null) ? localPost.author : localPost.createdBy?.name}</h4>
               <p className="text-sm text-gray-400">
-                {post.timestamp || new Date(post.createdAt).toLocaleDateString()}
+                {localPost.timestamp || new Date(localPost.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2 relative">
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPostTypeColor(post.type)} !text-zinc-100`}>
-              {post.type?.replace('-', ' ') || 'discussion'}
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPostTypeColor(localPost.type)} !text-zinc-100`}>
+              {localPost.type?.replace('-', ' ') || 'discussion'}
             </span>
 
-            {post.createdBy === user?._id && (
+            {localPost.createdBy._id === user?._id && (
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(prev => !prev)}
@@ -338,15 +354,15 @@ const PostCard = ({ post }) => {
 
         {/* Content */}
         <div className="mb-4">
-          <h3 className="text-2xl font-semibold text-white mb-2">{post.title}</h3>
-          <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <h3 className="text-2xl font-semibold text-white mb-2">{localPost.title}</h3>
+          <p className="text-gray-300" dangerouslySetInnerHTML={{ __html: localPost.content }} />
         </div>
 
         {/* Image Preview */}
-        {post.imageUrl && (
+        {localPost.imageUrl && (
           <div className="mb-4 relative overflow-visible">
             <img
-              src={post.imageUrl}
+              src={localPost.imageUrl}
               alt="Post attachment"
               className="block w-full max-h-96 object-contain rounded-lg border border-gray-700"
             />
@@ -354,9 +370,9 @@ const PostCard = ({ post }) => {
         )}
 
         {/* Tags */}
-        {post.tags?.length > 0 && (
+        {localPost.tags?.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {post.tags.map(tag => (
+            {localPost.tags.map(tag => (
               <span
                 key={tag}
                 className="px-2 py-1 bg-gray-800 text-gray-400 rounded-md text-sm"
@@ -368,9 +384,9 @@ const PostCard = ({ post }) => {
         )}
 
         {/* Links */}
-        {post.links?.length > 0 && (
+        {localPost.links?.length > 0 && (
           <div className="flex flex-col gap-1 mb-4">
-            {post.links.map(link => (
+            {localPost.links.map(link => (
               <a
                 key={link}
                 href={link}
@@ -418,7 +434,7 @@ const PostCard = ({ post }) => {
             </motion.button>
 
             {/* NEW: Check Resume Compatibility Button */}
-            {post.type === "job-posting" && (
+            {/* {localPost.type === "job-posting" && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowResumeModal(true)}
@@ -426,7 +442,7 @@ const PostCard = ({ post }) => {
               >
                 Generate Application Kit
               </motion.button>
-            )}
+            )} */}
 
           </div>
         </div>
@@ -505,8 +521,8 @@ const PostCard = ({ post }) => {
                 onClick={handleGenerateApplicationKit}
                 disabled={generatingKit}
                 className={`px-4 py-2 rounded ${generatingKit
-                    ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-                    : "bg-[#79e708] text-black hover:bg-[#66c206]"
+                  ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+                  : "bg-[#79e708] text-black hover:bg-[#66c206]"
                   }`}
               >
                 {generatingKit ? "⏳ Generating..." : "Generate Application Kit"}
@@ -524,6 +540,8 @@ const PostCard = ({ post }) => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg w-full max-w-md text-gray-100">
             <h3 className="text-lg font-semibold mb-4">Edit Post</h3>
+
+            {/* Title input */}
             <input
               type="text"
               value={editData.title}
@@ -531,18 +549,29 @@ const PostCard = ({ post }) => {
               className="w-full border border-gray-700 rounded p-2 mb-3 bg-gray-800 text-gray-100"
               placeholder="Post title"
             />
-            <textarea
-              value={editData.content}
-              onChange={(e) => setEditData({ ...editData, content: e.target.value })}
-              className="w-full border border-gray-700 rounded p-2 mb-4 bg-gray-800 text-gray-100"
-              rows="4"
-              placeholder="Post content"
-            />
+
+            {/* Rich Text Editor for Content */}
+            <div className="mb-4">
+              <ReactQuill
+                value={editData.content}
+                onChange={(value) => setEditData({ ...editData, content: value })}
+                className="bg-gray-800 text-gray-100 rounded"
+                theme="snow"
+              />
+            </div>
+
+            {/* Actions */}
             <div className="flex justify-end gap-2">
-              <button onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-700 rounded text-gray-200">
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="px-4 py-2 bg-gray-700 rounded text-gray-200"
+              >
                 Cancel
               </button>
-              <button onClick={confirmEdit} className="px-4 py-2 bg-green-600 text-white rounded">
+              <button
+                onClick={confirmEdit}
+                className="px-4 py-2 bg-green-600 text-white rounded"
+              >
                 Save
               </button>
             </div>

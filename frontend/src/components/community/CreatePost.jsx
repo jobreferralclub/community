@@ -115,7 +115,7 @@ const CreatePost = ({ onClose }) => {
       avatar: user?.avatar,
       userId: user?._id
     });
-    onClose();
+    onClose(true);
   };
 
   return (

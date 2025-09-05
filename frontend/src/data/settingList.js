@@ -28,4 +28,6 @@ export const adminOnly = [
     "Data & Export",
     "Registered Companies",
     "Users",
+    "Notifications",
+    "Privacy & Security",
 ];

@@ -31,7 +31,7 @@ export const menuItems = [
                 name: "India Jobs",
                 region: "india",
                 children: [
-                    { name: "Freshers", path: "/community/in/freshers" },
+                    { name: "Fresher Jobs", path: "/community/in/freshers" },
                     { name: "Operations and Supply Chain Management", path: "/community/in/operations" },
                     { name: "Program and Project Management", path: "/community/in/program" },
                     { name: "Product Management", path: "/community/in/product" },
@@ -99,4 +99,6 @@ export const adminOnly = [
     "Monetization",
     "Coaching",
     "Course Builder",
+    "Gamification",
+    "Events"
 ];

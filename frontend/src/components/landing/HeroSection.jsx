@@ -118,7 +118,7 @@ const HeroSection = () => {
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.8 }}
@@ -127,7 +127,7 @@ const HeroSection = () => {
         <div className="w-6 h-10 border-2 border-gray-600 rounded-full flex justify-center">
           <div className="w-1 h-3 bg-primary-green rounded-full mt-2 animate-bounce" />
         </div>
-      </motion.div>
+      </motion.div> */}
     </section>
   );
 };

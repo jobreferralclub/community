@@ -4,11 +4,13 @@ import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut } = FiIcons;
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuthStore();
+  const { user: auth0user, logout: auth0logout, loginWithPopup} = useAuth0();
   const navigate = useNavigate();
 
   const apiBaseUrl = import.meta.env.VITE_API_PORT || "http://localhost:5000";
@@ -101,11 +103,10 @@ const Header = ({ onMenuClick }) => {
                       <button
                         key={n.id}
                         onClick={() => handleNotificationClick(n.id, n.action)}
-                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${
-                          n.read
+                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${n.read
                             ? "text-gray-500 hover:bg-gray-800"
                             : "text-gray-300 hover:bg-gray-700 font-medium"
-                        }`}
+                          }`}
                       >
                         {n.message}
                       </button>
@@ -133,9 +134,22 @@ const Header = ({ onMenuClick }) => {
               </div>
             </div>
 
-            <div className="absolute right-0 top-9 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
+            <div className="absolute right-0 top-6 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
               <button
-                onClick={logout}
+                onClick={() => {
+                  navigate("/profile");
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+              >
+                <SafeIcon icon={FiLogOut} className="w-4 h-4 text-gray-400" />
+                User Profile
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  auth0logout({ returnTo: '/' });
+                  navigate("/");
+                }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
               >
                 <SafeIcon icon={FiLogOut} className="w-4 h-4 text-gray-400" />
