@@ -90,7 +90,7 @@ const Header = ({ onMenuClick }) => {
             </div>
 
             {/* Dropdown on hover */}
-            <div className="absolute right-0 top-9 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
+            <div className="absolute right-0 top-9 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
               <button
                 onClick={logout}
                 className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"

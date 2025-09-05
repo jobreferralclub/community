@@ -55,10 +55,12 @@ const Sidebar = ({ open, setOpen }) => {
     return item;
   });
 
-  // Classes for shadow/highlight
-  const activeClass = "bg-[#79e708] !text-black rounded-s  rounded-e overflow-hidden";
+  // Subtle transparent highlight for active
+  const activeClass =
+    "bg-white/10 dark:bg-white/10 !text-white rounded-s rounded-e overflow-hidden backdrop-blur";
+
   const hoverClass =
-    "hover:bg-gray-900 hover:text-white dark:hover:bg-gray-900 dark:hover:text-white transition-all";
+    "hover:bg-white/5 hover:text-white dark:hover:bg-white/20 dark:hover:text-white transition-all";
 
   // Check if submenu (like "Community") has an active child route
   const isSubMenuActive = (item) => {
@@ -82,19 +84,27 @@ const Sidebar = ({ open, setOpen }) => {
       return (
         <button
           onClick={() => handleToggleSubMenu(item.name)}
-          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 ${isSubMenuActive(item)
-              ? activeClass
-              : `!text-black ${hoverClass}`
+          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200
+            ${
+              isSubMenuActive(item)
+                ? activeClass
+                : `!text-white ${hoverClass}`
             }`}
         >
           <div className="flex items-center space-x-3">
-            <SafeIcon icon={item.icon} className={`w-5 h-5 flex-shrink-0 ${isSubMenuActive(item) ? "!text-black" : "text-gray-300"}`} />
+            <SafeIcon
+              icon={item.icon}
+              className={`w-5 h-5 flex-shrink-0 ${
+                isSubMenuActive(item) ? "!text-white" : "text-gray-300"
+              }`}
+            />
             {open && (
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isSubMenuActive(item) ? "!text-black" : "text-gray-700"
-                  }`}
+                className={`font-medium ${
+                  isSubMenuActive(item) ? "!text-white" : "text-gray-300"
+                }`}
               >
                 {item.name}
               </motion.span>
@@ -103,8 +113,9 @@ const Sidebar = ({ open, setOpen }) => {
           {open && (
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-4 h-4 transition-transform ${openSubMenus.includes(item.name) ? "rotate-90" : ""
-                } ${isSubMenuActive(item) ? "!text-black": "text-gray-300"}`}
+              className={`w-4 h-4 transition-transform ${
+                openSubMenus.includes(item.name) ? "rotate-90" : ""
+              } ${isSubMenuActive(item) ? "!text-white" : "text-gray-300"}`}
             />
           )}
         </button>
@@ -115,9 +126,10 @@ const Sidebar = ({ open, setOpen }) => {
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${isActive
-            ? activeClass
-            : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
+            isActive
+              ? activeClass
+              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
           }`
         }
       >
@@ -128,8 +140,9 @@ const Sidebar = ({ open, setOpen }) => {
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isActive ? "!text-black" : "text-gray-300"
-                  }`}
+                className={`font-medium ${
+                  isActive ? "!text-white" : "text-gray-300"
+                }`}
               >
                 {item.name}
               </motion.span>
@@ -140,13 +153,13 @@ const Sidebar = ({ open, setOpen }) => {
     );
   };
 
-
   return (
     <motion.div
       initial={{ x: -300 }}
       animate={{ x: 0 }}
-      className={`${open ? "w-82" : "w-20"
-        } bg-black border-e border-gray-600 transition-all duration-300 ease-in-out flex flex-col`}
+      className={`${
+        open ? "w-82" : "w-20"
+      } bg-black border-e border-gray-600 transition-all duration-300 ease-in-out flex flex-col`}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -173,8 +186,9 @@ const Sidebar = ({ open, setOpen }) => {
           >
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-5 h-5 text-gray-400 transition-transform ${!open ? "rotate-180" : ""
-                }`}
+              className={`w-5 h-5 text-gray-400 transition-transform ${
+                !open ? "rotate-180" : ""
+              }`}
             />
           </button>
         </div>
@@ -196,16 +210,18 @@ const Sidebar = ({ open, setOpen }) => {
                   <div key={region.name}>
                     <button
                       onClick={() => handleToggleRegion(region.name)}
-                      className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 ${isRegionActive(region)
+                      className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+                        isRegionActive(region)
                           ? activeClass
-                          : `text-black dark:text-gray-300 ${hoverClass}`
-                        }`}
+                          : `text-white dark:text-gray-300 ${hoverClass}`
+                      }`}
                     >
                       {region.name}
                       <SafeIcon
                         icon={FiChevronLeft}
-                        className={`w-4 h-4 transition-transform ${openRegions.includes(region.name) ? "rotate-90" : ""
-                          }`}
+                        className={`w-4 h-4 transition-transform ${
+                          openRegions.includes(region.name) ? "rotate-90" : ""
+                        }`}
                       />
                     </button>
                     {region.children &&
@@ -220,9 +236,10 @@ const Sidebar = ({ open, setOpen }) => {
                               key={sub.name}
                               to={sub.path}
                               className={({ isActive }) =>
-                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${isActive
-                                  ? activeClass
-                                  : `text-gray-400 dark:text-gray-400 ${hoverClass}`
+                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                  isActive
+                                    ? activeClass
+                                    : `text-gray-400 dark:text-gray-400 ${hoverClass}`
                                 }`
                               }
                             >
@@ -244,9 +261,10 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/community/settings"
           className={({ isActive }) =>
-            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${isActive
-              ? activeClass
-              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
+              isActive
+                ? activeClass
+                : `text-gray-300 dark:text-gray-300 ${hoverClass}`
             }`
           }
         >
