@@ -13,6 +13,17 @@ const {
   HUMAN_RESOURCES_INDIA_SHEET_ID,
   ANALYTICS_INDIA_SHEET_ID,
   STRATEGY_INDIA_SHEET_ID,
+
+  OPERATIONS_US_SHEET_ID,
+  PROGRAM_AND_PROJECT_US_SHEET_ID,
+  PRODUCT_US_SHEET_ID,
+  MARKETING_US_SHEET_ID,
+  CATEGORY_AND_VENDOR_US_SHEET_ID,
+  SALES_AND_ACCOUNT_US_SHEET_ID,
+  FINANCE_US_SHEET_ID,
+  HUMAN_RESOURCES_US_SHEET_ID,
+  ANALYTICS_US_SHEET_ID,
+  STRATEGY_US_SHEET_ID,
   SHEET_RANGE,
 } = require('./config.cjs');
 
@@ -63,28 +74,46 @@ async function fetchData(spreadsheetId, range) {
   });
 }
 
-// Create post by calling backend API
-async function createPost(title, content, job_description, community) {
-  try {
-    const response = await axios.post('http://localhost:5000/api/posts/', {
-      title,
-      content,
-      userId: '68983120b0b01c3a69f54851', // Adjust if needed
-      community,
-      job_description,
-      type: "job-posting",
-    });
-    console.log(`Post created: ${response.data._id}`);
-    return true;
-  } catch (error) {
-    if (error.response) {
-      console.error('Error creating post:', error.response.status, error.response.data);
-    } else if (error.request) {
-      console.error('No response received:', error.message);
-    } else {
-      console.error('Error setting up request:', error.message);
+// Create post by calling backend API with retries and detailed logging
+async function createPost(title, content, job_description, community, maxRetries = 3) {
+  let attempt = 0;
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+
+  while (attempt < maxRetries) {
+    try {
+      const response = await axios.post('http://localhost:5000/api/posts/', {
+        title,
+        content,
+        userId: '68983120b0b01c3a69f54851', // Adjust if needed
+        community,
+        job_description,
+        type: "job-posting",
+      }, {
+        timeout: 10000 // 10 seconds
+      });
+
+      console.log(`Post created: ${response.data._id}`);
+      return true;
+
+    } catch (error) {
+      attempt++;
+      if (error.response) {
+        console.error(`Attempt ${attempt} - API error (${error.response.status}):`, error.response.data);
+      } else if (error.request) {
+        console.error(`Attempt ${attempt} - No response received:`, error.message);
+      } else {
+        console.error(`Attempt ${attempt} - Request setup error:`, error.message);
+      }
+
+      if (attempt < maxRetries) {
+        const backoff = 500 * Math.pow(2, attempt); // exponential backoff: 1s, 2s, 4s
+        console.log(`Retrying after ${backoff}ms...`);
+        await delay(backoff);
+      } else {
+        console.error('Max retries reached, skipping this job post.');
+        return false;
+      }
     }
-    return false;
   }
 }
 
@@ -100,6 +129,17 @@ const sheetsToProcess = [
   { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
   { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
   { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
+
+  { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
+  { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
+  { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
+  { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
+  { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
+  { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
+  { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
+  { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
+  { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
+  { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
 // Main function to generate posts ensuring no duplicates and starting from the next job ID
@@ -113,11 +153,11 @@ async function generatePostsAll() {
 
     if (!lastJobIdLog[sheet.community]) lastJobIdLog[sheet.community] = null;
 
+    // Process posts sequentially for concurrency control and stability
     for (const row of data) {
       const jobId = (row['Job ID'] || row['Job ID '] || '').trim();
       if (!jobId) continue;
 
-      // Skip jobs already processed by comparing Job IDs lexicographically
       if (!isJobIdNewer(jobId, lastJobIdLog[sheet.community])) {
         console.log(`Skipping Job ID ${jobId} <= last posted Job ID ${lastJobIdLog[sheet.community]}`);
         continue;
@@ -125,7 +165,6 @@ async function generatePostsAll() {
 
       const title = 'Job Referral Opportunity';
       const job_description = row['About the Job'];
-
       const message = `
 <p><strong>Job ID:</strong> ${jobId}</p>
 <p><strong>Company Name:</strong> ${row['Company Name']}</p>
@@ -138,10 +177,11 @@ async function generatePostsAll() {
 `;
 
       console.log(`Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
+
       const success = await createPost(title, message, job_description, sheet.community);
 
       if (success) {
-        lastJobIdLog[sheet.community] = jobId; // Update log with latest posted job ID
+        lastJobIdLog[sheet.community] = jobId;
         await saveLastJobIdLog(lastJobIdLog);
       }
     }
