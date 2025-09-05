@@ -13,6 +13,17 @@ const {
   HUMAN_RESOURCES_INDIA_SHEET_ID,
   ANALYTICS_INDIA_SHEET_ID,
   STRATEGY_INDIA_SHEET_ID,
+
+  OPERATIONS_US_SHEET_ID,
+  PROGRAM_AND_PROJECT_US_SHEET_ID,
+  PRODUCT_US_SHEET_ID,
+  MARKETING_US_SHEET_ID,  
+  CATEGORY_AND_VENDOR_US_SHEET_ID,
+  SALES_AND_ACCOUNT_US_SHEET_ID,
+  FINANCE_US_SHEET_ID,
+  HUMAN_RESOURCES_US_SHEET_ID,
+  ANALYTICS_US_SHEET_ID,
+  STRATEGY_US_SHEET_ID,
   SHEET_RANGE,
 } = require('./config.cjs');
 
@@ -100,6 +111,17 @@ const sheetsToProcess = [
   { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
   { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
   { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
+
+  { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
+  { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
+  { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
+  { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
+  { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
+  { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
+  { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
+  { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
+  { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
+  { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
 // Main function to generate posts ensuring no duplicates and starting from the next job ID
