@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import useResumeStore from "../../../store/useResumeStore";
 import { useAuthStore } from "../../../store/authStore";
-import axios from "axios";
-import toast from "react-hot-toast";
 
 const ResumeBuilderQuestionnaire = () => {
     const [currentStep, setCurrentStep] = useState(0);
@@ -92,7 +90,7 @@ const ResumeBuilderQuestionnaire = () => {
                     prefill[field.id] = user?.portfolio || personalInfo.website || "";
                     break;
                 case "summary":
-                    prefill[field.id] = personalInfo.summary || "";
+                    prefill[field.id] = user?.bio || "";
                     break;
                 default:
                     prefill[field.id] = personalInfo[field.id] || "";

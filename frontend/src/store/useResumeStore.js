@@ -13,42 +13,51 @@ const useResumeStore = create((set) => ({
     summary: "",
     location: "",
   },
-  experience: [],
+  experience: [], // now aligned with workSchema
   education: [],
   skills: [],
   projects: [],
 
+  // ================= PERSONAL INFO =================
   updatePersonalInfo: (field, value) =>
     set((state) => ({
       personalInfo: { ...state.personalInfo, [field]: value },
     })),
 
+  // ================= EXPERIENCE =================
   addExperience: (exp = {}) =>
     set((state) => ({
       experience: [
         ...state.experience,
         {
-          id: exp.id ?? uuidv4(),
-          company: exp.company ?? "",
-          position: exp.position ?? "",
+          id: exp.id ?? uuidv4(), // keep client-side id for React rendering
+          workType: exp.workType ?? "fullTime",
+          designation: exp.designation ?? "",
+          profile: exp.profile ?? "",
+          organization: exp.organization ?? "",
+          location: exp.location ?? "",
+          isRemote: exp.isRemote ?? false,
           startDate: exp.startDate ?? "",
           endDate: exp.endDate ?? "",
+          currentlyWorking: exp.currentlyWorking ?? false,
           description: exp.description ?? "",
-          current: exp.current ?? false,
         },
       ],
     })),
+
   updateExperience: (id, field, value) =>
     set((state) => ({
       experience: state.experience.map((exp) =>
         exp.id === id ? { ...exp, [field]: value } : exp
       ),
     })),
+
   removeExperience: (id) =>
     set((state) => ({
       experience: state.experience.filter((exp) => exp.id !== id),
     })),
 
+  // ================= EDUCATION =================
   addEducation: (edu = {}) =>
     set((state) => ({
       education: [
@@ -75,6 +84,7 @@ const useResumeStore = create((set) => ({
       education: state.education.filter((edu) => edu.id !== id),
     })),
 
+  // ================= SKILLS =================
   addSkill: (skill = {}) =>
     set((state) => ({
       skills: [
@@ -97,6 +107,7 @@ const useResumeStore = create((set) => ({
       skills: state.skills.filter((skill) => skill.id !== id),
     })),
 
+  // ================= PROJECTS =================
   addProject: (project = {}) =>
     set((state) => ({
       projects: [

@@ -52,7 +52,7 @@ const ResumeBuilderPreview = () => {
       case "Personal Info":
         return <PersonalInfo data={user} />;
       case "Experience":
-        return <ExperienceInfo data={user?.work || []} />;
+        return <ExperienceInfo data={user || []} />;
       case "Education":
         return <EducationInfo data={user?.education || []} />;
       case "Skills":

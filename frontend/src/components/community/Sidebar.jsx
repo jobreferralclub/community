@@ -56,7 +56,7 @@ const Sidebar = ({ open, setOpen }) => {
   });
 
   // Classes for shadow/highlight
-  const activeClass = "shadow-lg shadow-[0px_0px_10px_#79e708] text-[#79e708] rounded-s  rounded-e overflow-hidden";
+  const activeClass = "shadow-lg !shadow-[0px_0px_10px_var(--primary-green)] text-[#79e708] rounded-s  rounded-e overflow-hidden";
   const hoverClass =
     "hover:bg-white/5 hover:text-white dark:hover:bg-white/20 dark:hover:text-white transition-all";
 
