@@ -5,7 +5,6 @@ import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
 import { menuItems, adminOnly } from "../../data/menuList";
-
 const { FiSettings, FiChevronLeft } = FiIcons;
 
 const Sidebar = ({ open, setOpen }) => {
@@ -13,7 +12,6 @@ const Sidebar = ({ open, setOpen }) => {
   const role = useAuthStore((state) => state.role);
   const currentLocation = useAuthStore((state) => state.location);
 
-  // Instead of string, store arrays of open menus/regions (so multiple can be open)
   const [openSubMenus, setOpenSubMenus] = React.useState(["Community"]);
   const [openRegions, setOpenRegions] = React.useState([
     "Community Hub",
@@ -37,7 +35,6 @@ const Sidebar = ({ open, setOpen }) => {
     );
   };
 
-  // Filter menus based on role
   const filteredMenu =
     role === "admin"
       ? menuItems
@@ -55,12 +52,8 @@ const Sidebar = ({ open, setOpen }) => {
     return item;
   });
 
-  // Classes for shadow/highlight
-  const activeClass = "shadow-lg !shadow-[0px_0px_10px_var(--primary-green)] text-[#79e708] rounded-s  rounded-e overflow-hidden";
-  const hoverClass =
-    "hover:bg-white/5 hover:text-white dark:hover:bg-white/20 dark:hover:text-white transition-all";
+  const activeClass = "text-[#79e708]"; // neon green for active
 
-  // Check if submenu (like "Community") has an active child route
   const isSubMenuActive = (item) => {
     if (!item.children) return false;
     const allPaths = item.children.flatMap((region) =>
@@ -69,7 +62,6 @@ const Sidebar = ({ open, setOpen }) => {
     return allPaths.some((p) => location.pathname.startsWith(p));
   };
 
-  // Check if region ("India Jobs") has any active child
   const isRegionActive = (region) => {
     if (!region.children) return false;
     return region.children.some((sub) =>
@@ -82,29 +74,42 @@ const Sidebar = ({ open, setOpen }) => {
       return (
         <button
           onClick={() => handleToggleSubMenu(item.name)}
-          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 ${isSubMenuActive(item)
-              ? activeClass
-              : `!text-[#79e708] ${hoverClass}`
-            }`}
+          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 relative ${
+            isSubMenuActive(item)
+              ? "text-[#79e708]"
+              : "text-white hover:text-[#79e708]"
+          }`}
         >
           <div className="flex items-center space-x-3">
-            <SafeIcon icon={item.icon} className={`w-5 h-5 flex-shrink-0 ${isSubMenuActive(item) ? "!text-[#79e708]" : "text-gray-300"}`} />
+            <SafeIcon
+              icon={item.icon}
+              className={`w-5 h-5 flex-shrink-0 ${
+                isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
+              }`}
+            />
             {open && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isSubMenuActive(item) ? "!text-[#79e708]" : "text-gray-700"
+              <>
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`font-medium ${isSubMenuActive(item) ? "text-[#79e708]" : "text-white"}`}
+                >
+                  {item.name}
+                </motion.span>
+                <span
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                    isSubMenuActive(item) ? "w-full" : "w-0 hover:w-full"
                   }`}
-              >
-                {item.name}
-              </motion.span>
+                />
+              </>
             )}
           </div>
           {open && (
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-4 h-4 transition-transform ${openSubMenus.includes(item.name) ? "rotate-90" : ""
-                } ${isSubMenuActive(item) ? "!text-[#79e708]": "text-gray-300"}`}
+              className={`w-4 h-4 transition-transform ${
+                openSubMenus.includes(item.name) ? "rotate-90" : ""
+              } ${isSubMenuActive(item) ? "text-[#79e708]" : "text-white"}`}
             />
           )}
         </button>
@@ -115,25 +120,29 @@ const Sidebar = ({ open, setOpen }) => {
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 ${
-            isActive
-              ? activeClass
-              : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+          `group flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 relative ${
+            isActive ? activeClass : "text-white hover:text-[#79e708]"
           }`
         }
       >
         {({ isActive }) => (
           <div className="flex items-center space-x-3">
-            <SafeIcon icon={item.icon} className="w-5 h-5 flex-shrink-0" />
+            <SafeIcon icon={item.icon} className="w-5 h-5 flex-shrink-0 text-white" />
             {open && (
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`font-medium ${isActive ? "!text-[#79e708]" : "text-gray-300"
+              <>
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`font-medium ${isActive ? "text-[#79e708]" : "text-white"}`}
+                >
+                  {item.name}
+                </motion.span>
+                <span
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 w-0 group-hover:w-full ${
+                    location.pathname.startsWith(item.path) ? "w-full" : ""
                   }`}
-              >
-                {item.name}
-              </motion.span>
+                />
+              </>
             )}
           </div>
         )}
@@ -162,9 +171,7 @@ const Sidebar = ({ open, setOpen }) => {
                 <img src="/logo.jpg" alt="" />
               </div>
               <a href="/">
-                <span className="font-bold text-gray-100">
-                  JobReferral.Club
-                </span>
+                <span className="font-bold text-white">JobReferral.Club</span>
               </a>
             </motion.div>
           )}
@@ -174,20 +181,16 @@ const Sidebar = ({ open, setOpen }) => {
           >
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-5 h-5 text-gray-400 transition-transform ${
-                !open ? "rotate-180" : ""
-              }`}
+              className={`w-5 h-5 text-gray-400 transition-transform ${!open ? "rotate-180" : ""}`}
             />
           </button>
         </div>
       </div>
-
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {filteredCommunity.map((item) => (
           <div key={item.name}>
             {renderMenuItem(item)}
-            {/* Submenu rendering */}
             {item.children && openSubMenus.includes(item.name) && open && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
@@ -198,10 +201,10 @@ const Sidebar = ({ open, setOpen }) => {
                   <div key={region.name}>
                     <button
                       onClick={() => handleToggleRegion(region.name)}
-                      className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+                      className={`group flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 relative ${
                         isRegionActive(region)
-                          ? activeClass
-                          : `text-white dark:text-gray-300 ${hoverClass}`
+                          ? "text-[#79e708]"
+                          : "text-white hover:text-[#79e708]"
                       }`}
                     >
                       {region.name}
@@ -209,33 +212,42 @@ const Sidebar = ({ open, setOpen }) => {
                         icon={FiChevronLeft}
                         className={`w-4 h-4 transition-transform ${
                           openRegions.includes(region.name) ? "rotate-90" : ""
+                        } ${isRegionActive(region) ? "text-[#79e708]" : "text-white"}`}
+                      />
+                      <span
+                        className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                          isRegionActive(region) ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       />
                     </button>
-                    {region.children &&
-                      openRegions.includes(region.name) && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          className="ml-6 mt-1 space-y-1"
-                        >
-                          {region.children.map((sub) => (
-                            <NavLink
-                              key={sub.name}
-                              to={sub.path}
-                              className={({ isActive }) =>
-                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                                  isActive
-                                    ? activeClass
-                                    : `text-gray-400 dark:text-gray-400 ${hoverClass}`
-                                }`
-                              }
-                            >
-                              {sub.name}
-                            </NavLink>
-                          ))}
-                        </motion.div>
-                      )}
+                    {region.children && openRegions.includes(region.name) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        className="ml-6 mt-1 space-y-1"
+                      >
+                        {region.children.map((sub) => (
+                          <NavLink
+                            key={sub.name}
+                            to={sub.path}
+                            className={({ isActive }) =>
+                              `block px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${
+                                isActive
+                                  ? activeClass
+                                  : "text-gray-400 hover:text-[#79e708]"
+                              }`
+                            }
+                          >
+                            {sub.name}
+                            <span
+                              className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 w-0 group-hover:w-full ${
+                                location.pathname.startsWith(sub.path) ? "w-full" : ""
+                              }`}
+                            />
+                          </NavLink>
+                        ))}
+                      </motion.div>
+                    )}
                   </div>
                 ))}
               </motion.div>
@@ -243,28 +255,34 @@ const Sidebar = ({ open, setOpen }) => {
           </div>
         ))}
       </nav>
-
       {/* Settings at Bottom */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <NavLink
           to="/community/settings"
           className={({ isActive }) =>
-            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 ${
+            `flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative ${
               isActive
                 ? activeClass
-                : `text-gray-300 dark:text-gray-300 ${hoverClass}`
+                : "text-white hover:text-[#79e708] transition-colors duration-300"
             }`
           }
         >
-          <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0" />
+          <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0 text-white" />
           {open && (
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="ml-3 font-medium"
-            >
-              Settings
-            </motion.span>
+            <>
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="ml-3 font-medium text-white"
+              >
+                Settings
+              </motion.span>
+              <span
+                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                  location.pathname === "/community/settings" ? "w-full" : "w-0 group-hover:w-full"
+                }`}
+              />
+            </>
           )}
         </NavLink>
       </div>
