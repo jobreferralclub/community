@@ -88,7 +88,7 @@ const Community = () => {
       <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
+          {/* <div className="relative flex-1 max-w-md">
             <SafeIcon
               icon={FiSearch}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -98,11 +98,11 @@ const Community = () => {
               placeholder="Search posts, tags, or users..."
               className="w-full pl-10 pr-4 py-2 rounded-s rounded-e bg-zinc-800 text-gray-200 border border-zinc-700 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
             />
-          </div>
+          </div> */}
 
           {/* Filters */}
           <div className="flex items-center space-x-2">
-            <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" />
+            {/* <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" /> */}
             <div className="flex flex-wrap gap-2">
               {filters.map((filterOption) => (
                 <button
@@ -121,7 +121,7 @@ const Community = () => {
         </div>
       </div>
 
-      {/* Trending Topics */}
+      {/* Trending Topics
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -141,7 +141,7 @@ const Community = () => {
             </span>
           ))}
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Posts */}
       <div className="space-y-6">
