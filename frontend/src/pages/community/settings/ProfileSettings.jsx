@@ -218,11 +218,11 @@ const ProfileSettings = ({ user }) => {
         />
       </div>
 
-      {/* Save button */}
+      {/* Save button with border */}
       <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="bg-primary-600 text-white px-6 py-2 rounded-s rounded-e hover:bg-primary-700 transition-colors"
+          className="border border-[#79e708] text-[#79e708] px-6 py-2 rounded-s rounded-e hover:bg-[#79e708] hover:text-black transition-colors duration-300"
         >
           Save Changes
         </button>
