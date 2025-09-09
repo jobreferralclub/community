@@ -140,7 +140,7 @@ const Navigation = () => {
                           href="/profile"
                           className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
                         >
-                          Your Profile
+                          My Profile
                         </a>
                         <button
                           onClick={() => {
@@ -217,7 +217,7 @@ const Navigation = () => {
                       className="text-gray-300 hover:text-primary-green transition-colors duration-300 font-medium"
                       onClick={() => setMenuOpen(false)}
                     >
-                      Your Profile
+                      My Profile
                     </a>
                     <button
                       onClick={() => {
