@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 const ProfileSettings = ({ user }) => {
-  // Controlled form state initialized with user prop values
   const [formData, setFormData] = useState({
     name: user.name || "",
     email: user.email || "",
@@ -14,18 +13,31 @@ const ProfileSettings = ({ user }) => {
     avatar: user.avatar || "",
   });
 
+  const [phoneError, setPhoneError] = useState(""); // New: error for phone validation
+
   const apiUrl = import.meta.env.VITE_API_PORT;
 
-  // Handle input change for all fields except file uploads
+  // Mandatory asterisk styling class
+  const star = <span className="text-red-500">*</span>;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Phone: Only allow digits, max 10 characters
+    if (name === "phone") {
+      if (!/^\d{0,10}$/.test(value)) return;
+      // Validation live error
+      if (value && value.length !== 10) {
+        setPhoneError("Phone number must be 10 digits");
+      } else {
+        setPhoneError("");
+      }
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // Handle avatar image upload
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -42,7 +54,6 @@ const ProfileSettings = ({ user }) => {
       if (!res.ok) throw new Error("Image upload failed");
 
       const data = await res.json();
-      // Update avatar URL to the one returned by the upload endpoint
       setFormData((prev) => ({
         ...prev,
         avatar: data.imageUrl,
@@ -52,9 +63,17 @@ const ProfileSettings = ({ user }) => {
     }
   };
 
-  // Submit updated profile to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.name || !formData.email) {
+      alert("Full Name and Email are mandatory.");
+      return;
+    }
+    if (formData.phone && formData.phone.length !== 10) {
+      setPhoneError("Phone number must be exactly 10 digits.");
+      return;
+    }
 
     try {
       const response = await fetch(`${apiUrl}/api/users/${user._id}`, {
@@ -65,13 +84,10 @@ const ProfileSettings = ({ user }) => {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
+      if (!response.ok) throw new Error("Failed to update profile");
 
       const updatedUser = await response.json();
       alert("Profile updated successfully!");
-      // Optionally, update local user state or refetch user data here
     } catch (error) {
       alert(`Error updating profile: ${error.message}`);
     }
@@ -84,7 +100,7 @@ const ProfileSettings = ({ user }) => {
       animate={{ opacity: 1, y: 0 }}
       className="bg-zinc-900 rounded-s rounded-e p-6 shadow-md border border-gray-700"
     >
-      <h3 className="text-lg font-semibold text-white mb-6">Profile</h3>
+      <h3 className="text-lg font-semibold text-white mb-6">My Profile</h3>
 
       {/* Profile photo */}
       <div className="flex items-center space-x-6 mb-8">
@@ -124,30 +140,30 @@ const ProfileSettings = ({ user }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Full Name
+            Full Name {star}
           </label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            required
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Email Address
+            Email Address {star}
           </label>
           <input
             type="email"
             name="email"
             value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            readOnly // email is now not editable
+            required
+            className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-gray-400 bg-gray-800 placeholder-gray-500 cursor-not-allowed"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Job Title
@@ -161,7 +177,6 @@ const ProfileSettings = ({ user }) => {
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Company
@@ -175,7 +190,6 @@ const ProfileSettings = ({ user }) => {
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Location
@@ -189,7 +203,6 @@ const ProfileSettings = ({ user }) => {
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
             Phone Number
@@ -197,11 +210,16 @@ const ProfileSettings = ({ user }) => {
           <input
             type="tel"
             name="phone"
-            placeholder="+1 (555) 123-4567"
+            placeholder="1234567890"
             value={formData.phone}
             onChange={handleChange}
+            maxLength={10}
+            pattern="\d{10}"
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-white placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
+          {phoneError && (
+            <span className="text-red-500 text-xs mt-1 block">{phoneError}</span>
+          )}
         </div>
       </div>
 
@@ -218,7 +236,7 @@ const ProfileSettings = ({ user }) => {
         />
       </div>
 
-      {/* Save button with border */}
+      {/* Save button */}
       <div className="flex justify-end mt-6">
         <button
           type="submit"
