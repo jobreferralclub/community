@@ -5,6 +5,7 @@ import { UploadCloud, Loader2, CheckCircle, Brain, Zap, Target } from "lucide-re
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import Navigation from "../../../components/landing/Navigation";
+import Footer from "../../../components/landing/Footer";
 
 const ResumeAnalyzer = () => {
   const navigate = useNavigate();
@@ -164,6 +165,7 @@ const ResumeAnalyzer = () => {
           </motion.form>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

@@ -77,7 +77,7 @@ const HowItWorksSection = () => {
         {/* Desktop Timeline View */}
         <div className="hidden lg:block relative">
           {/* Timeline line */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-green/20 via-primary-green/60 to-primary-green/20 transform -translate-y-1/2"></div>
+          <div className="mx-24 absolute top-1/4 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-green/20 via-primary-green/60 to-primary-green/20 transform -translate-y-1/2"></div>
           
           <div className="grid grid-cols-5 gap-8">
             {steps.map((step, index) =>
@@ -89,12 +89,10 @@ const HowItWorksSection = () => {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               className="relative">
 
-                {/* Timeline dot */}
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary-green rounded-full border-4 border-black z-10"></div>
                 
                 <Card className="mt-16 bg-gray-900/50 border-gray-800 hover:border-primary-green/30 card-hover">
                   <CardContent className="p-6 text-center">
-                    <div className="w-16 h-16 bg-primary-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-[#142313] rounded-full flex items-center justify-center mx-auto mb-4">
                       <step.icon className={`w-8 h-8 ${step.color}`} />
                     </div>
                     

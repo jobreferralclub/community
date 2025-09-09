@@ -8,6 +8,7 @@ import { Button } from "../../components/ui/button";
 import { useAuthStore } from "../../store/authStore"; // Adjust to your auth store
 import { useAuth0 } from "@auth0/auth0-react";
 import { existingJobDescs } from "../../data/jobDescription";
+import Footer from "../../components/landing/Footer";
 
 const steps = [
     { id: "upload", label: "Upload / Select Resume" },
@@ -510,6 +511,7 @@ const MockInterviewer = () => {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };

@@ -12,6 +12,7 @@ import ApiSettings from "./settings/ApiSettings";
 import DataExportSettings from "./settings/DataExportSettings";
 import CompanySettings from "./settings/CompanySettings";
 import UserSettings from "./settings/UserSettings";
+import Footer from "../../components/landing/Footer";
 
 const Settings = () => {
   // ------------------------------------------
@@ -66,59 +67,62 @@ const Settings = () => {
   // MAIN RETURN (DARK MODE WRAPPER)
   // ------------------------------------------
   return (
-    <div className="space-y-6 bg-black min-h-screen p-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-gray-400 mt-1">
-          Manage your account preferences and configurations
-        </p>
-      </div>
+    <>
+      <div className="space-y-6 bg-black min-h-screen p-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
+          <p className="text-gray-400 mt-1">
+            Manage your account preferences and configurations
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-zinc-900 rounded-s rounded-e p-4 shadow-md border border-gray-700">
-            <nav className="space-y-2">
-              {tabs.map((tab) =>
-                adminOnly.includes(tab.name) && role !== "admin" ? null : (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-s rounded-e text-left transition-colors ${activeTab === tab.id
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-zinc-900 rounded-s rounded-e p-4 shadow-md border border-gray-700">
+              <nav className="space-y-2">
+                {tabs.map((tab) =>
+                  adminOnly.includes(tab.name) && role !== "admin" ? null : (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-s rounded-e text-left transition-colors ${activeTab === tab.id
                         ? "bg-primary-green !text-black"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                      }`}
-                  >
-                    <SafeIcon icon={tab.icon} className="w-5 h-5" />
-                    <span className={`font-medium ${activeTab == tab.id ? "!text-black":""}`}>{tab.name}</span>
-                  </button>
-                )
-              )}
-            </nav>
+                        }`}
+                    >
+                      <SafeIcon icon={tab.icon} className="w-5 h-5" />
+                      <span className={`font-medium ${activeTab == tab.id ? "!text-black" : ""}`}>{tab.name}</span>
+                    </button>
+                  )
+                )}
+              </nav>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="lg:col-span-3">
+            {activeTab === "profile" && <ProfileSettings user={user} />}
+            {activeTab === "notifications" && <NotificationSettings />}
+            {activeTab === "privacy" && <PrivacySettings />}
+            {activeTab === "integrations" && <IntegrationSettings />}
+            {activeTab === "api" && <ApiSettings />}
+            {activeTab === "data" && <DataExportSettings />}
+            {activeTab === "companies" && <CompanySettings />}
+            {activeTab === "users" && <UserSettings />}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="lg:col-span-3">
-          {activeTab === "profile" && <ProfileSettings user={user} />}
-          {activeTab === "notifications" && <NotificationSettings />}
-          {activeTab === "privacy" && <PrivacySettings />}
-          {activeTab === "integrations" && <IntegrationSettings />}
-          {activeTab === "api" && <ApiSettings />}
-          {activeTab === "data" && <DataExportSettings />}
-          {activeTab === "companies" && <CompanySettings />}
-          {activeTab === "users" && <UserSettings />}
+        {/* PADDING / Spacer to meet ≈910 lines */}
+        <div className="hidden">
+          {[...Array(40)].map((_, i) => (
+            <p key={i}>&nbsp;</p>
+          ))}
         </div>
       </div>
-
-      {/* PADDING / Spacer to meet ≈910 lines */}
-      <div className="hidden">
-        {[...Array(40)].map((_, i) => (
-          <p key={i}>&nbsp;</p>
-        ))}
-      </div>
-    </div>
+      <Footer/>
+    </>
   );
 };
 

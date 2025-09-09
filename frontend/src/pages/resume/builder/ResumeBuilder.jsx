@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Sparkles, Linkedin, FilePlus } from "lucide-react";
 import { motion } from "framer-motion";
 import Navigation from "../../../components/landing/Navigation";
+import Footer from "../../../components/landing/Footer";
 
 const ResumeBuilder = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -116,6 +117,7 @@ const ResumeBuilder = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

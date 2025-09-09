@@ -3,24 +3,35 @@ import { motion } from "framer-motion";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import { searchData } from "../../data/searchList";
 
-const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut } = FiIcons;
+const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut, FiUser } = FiIcons;
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuthStore();
-  const { user: auth0user, logout: auth0logout, loginWithPopup} = useAuth0();
+  const { logout: auth0logout } = useAuth0();
   const navigate = useNavigate();
 
   const apiBaseUrl = import.meta.env.VITE_API_PORT || "http://localhost:5000";
 
   const [points, setPoints] = useState(user?.points || 0);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
   const [notifications, setNotifications] = useState([
     { id: 1, message: "Add your resume", read: false, action: () => navigate("/profile") },
     { id: 2, message: "Update your profile", read: false, action: () => navigate("/community/settings") },
   ]);
+
+
+  const filteredResults = searchData.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     if (!user?._id) return;
@@ -36,7 +47,6 @@ const Header = ({ onMenuClick }) => {
   }, [user?._id]);
 
   const handleNotificationClick = (id, action) => {
-    // mark as read
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
@@ -62,6 +72,7 @@ const Header = ({ onMenuClick }) => {
             <SafeIcon icon={FiMenu} className="w-5 h-5 text-gray-300" />
           </button>
 
+          {/* Search bar with dropdown */}
           <div className="relative hidden md:block flex-1">
             <SafeIcon
               icon={FiSearch}
@@ -69,9 +80,48 @@ const Header = ({ onMenuClick }) => {
             />
             <input
               type="text"
-              placeholder="Search community, jobs, members..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowSearchResults(true);
+              }}
+              placeholder="Search community, tools..."
               className="pl-10 pr-4 py-2 w-full rounded-s rounded-e border border-zinc-800 bg-zinc-900 text-gray-300 placeholder-gray-500 focus:ring-2 focus:ring-[#79e708] focus:border-transparent transition-all"
             />
+
+            {/* Dropdown results */}
+            {showSearchResults && searchTerm && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 bg-black/50 z-10"
+                  onClick={() => setShowSearchResults(false)}
+                />
+
+                {/* Dropdown results */}
+                <div className="absolute mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+                  {filteredResults.length > 0 ? (
+                    filteredResults.slice(0, 10).map((item, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => {
+                          navigate(item.url);
+                          setSearchTerm("");
+                          setShowSearchResults(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+                      >
+                        {item.name}{" "}
+                        <span className="text-green-500">in {item.type}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="px-4 py-2 text-sm text-gray-500">No results found</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -83,7 +133,7 @@ const Header = ({ onMenuClick }) => {
             <span className="text-sm font-medium text-gray-300">{points} pts</span>
           </div>
 
-          {/* Notifications with dropdown */}
+          {/* Notifications */}
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
@@ -104,8 +154,8 @@ const Header = ({ onMenuClick }) => {
                         key={n.id}
                         onClick={() => handleNotificationClick(n.id, n.action)}
                         className={`w-full text-left px-4 py-2 text-sm rounded-md ${n.read
-                            ? "text-gray-500 hover:bg-gray-800"
-                            : "text-gray-300 hover:bg-gray-700 font-medium"
+                          ? "text-gray-500 hover:bg-gray-800"
+                          : "text-gray-300 hover:bg-gray-700 font-medium"
                           }`}
                       >
                         {n.message}
@@ -121,7 +171,7 @@ const Header = ({ onMenuClick }) => {
             )}
           </div>
 
-          {/* Profile with dropdown */}
+          {/* Profile */}
           <div className="relative group">
             <div className="flex items-center space-x-3 cursor-pointer">
               <img
@@ -141,13 +191,13 @@ const Header = ({ onMenuClick }) => {
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
               >
-                <SafeIcon icon={FiLogOut} className="w-4 h-4 text-gray-400" />
-                User Profile
+                <SafeIcon icon={FiUser} className="w-4 h-4 text-gray-400" />
+                Your Profile
               </button>
               <button
                 onClick={() => {
                   logout();
-                  auth0logout({ returnTo: '/' });
+                  auth0logout({ returnTo: "/" });
                   navigate("/");
                 }}
                 className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"

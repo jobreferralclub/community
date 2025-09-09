@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "../../../components/landing/Navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, BarChart3, Sparkles, CheckCircle2, XCircle } from "lucide-react";
+import Footer from "../../../components/landing/Footer";
 
 interface AnalysisResult {
   candidate_name: string;
@@ -161,6 +162,7 @@ const AnalyzerResult: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

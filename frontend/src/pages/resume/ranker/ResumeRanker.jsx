@@ -1,3 +1,4 @@
+import Footer from "../../../components/landing/Footer";
 import Navigation from "../../../components/landing/Navigation";
 import React, { useState } from "react";
 
@@ -480,6 +481,7 @@ const ResumeRanker = () => {
                     )}
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };

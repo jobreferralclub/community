@@ -59,8 +59,8 @@ const ProfileHeader = ({ profile }) => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-gray-900 to-black border-b border-gray-800 relative">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="bg-gradient-to-r from-gray-900 to-black border-b border-gray-800 relative pt-10">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center gap-6">
           {/* Avatar */}
           <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-lime-500">
@@ -79,14 +79,20 @@ const ProfileHeader = ({ profile }) => {
                 <Mail size={16} />
                 <span>{editData.email}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone size={16} />
-                <span>{editData.phone}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin size={16} />
-                <span>{editData.location}</span>
-              </div>
+
+              {editData.phone && (
+                <div className="flex items-center gap-2">
+                  <Phone size={16} />
+                  <span>{editData.phone}</span>
+                </div>
+              )}
+
+              {editData.location && (
+                <div className="flex items-center gap-2">
+                  <MapPin size={16} />
+                  <span>{editData.location}</span>
+                </div>
+              )}
             </div>
           </div>
 

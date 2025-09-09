@@ -12,7 +12,7 @@ const Navigation = () => {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const { user, logout } = useAuthStore();
-  const { user: auth0user, logout: auth0logout, loginWithPopup} = useAuth0();
+  const { user: auth0user, logout: auth0logout, loginWithPopup } = useAuth0();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -29,14 +29,13 @@ const Navigation = () => {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.8 }}
-      className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${
-        isScrolled
+      initial={{ y: 0, opacity: 1 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0 }}
+      className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
           ? "bg-black/95 backdrop-blur-md border-b border-gray-800/50 shadow-lg"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="w-full max-w-[1440px] mx-auto px-4">
         <div className="flex justify-between items-center h-16">
@@ -85,7 +84,7 @@ const Navigation = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute left-0 top-full mt-2 bg-black rounded-lg border border-gray-800 w-56 shadow-lg z-50 overflow-hidden"
+                    className="absolute left-0 top-full mt-2 bg-black rounded-s rounded-e border border-gray-800 w-56 shadow-lg z-50 overflow-hidden"
                   >
                     {[
                       { label: "Resume Builder", href: "./resume-builder" },
@@ -129,7 +128,7 @@ const Navigation = () => {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 top-0 mt-12 bg-black rounded-lg border border-gray-800 w-48 shadow-lg z-50 overflow-hidden"
+                        className="absolute right-0 top-0 mt-12 bg-black rounded-s rounded-e border border-gray-800 w-48 shadow-lg z-50 overflow-hidden"
                       >
                         <a
                           href="/community"
@@ -141,7 +140,7 @@ const Navigation = () => {
                           href="/profile"
                           className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
                         >
-                          User Profile
+                          Your Profile
                         </a>
                         <button
                           onClick={() => {
@@ -218,7 +217,7 @@ const Navigation = () => {
                       className="text-gray-300 hover:text-primary-green transition-colors duration-300 font-medium"
                       onClick={() => setMenuOpen(false)}
                     >
-                      User Profile
+                      Your Profile
                     </a>
                     <button
                       onClick={() => {

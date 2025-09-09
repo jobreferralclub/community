@@ -8,6 +8,8 @@ import CertificatesSection from "../components/profile/sections/CertificatesSect
 import Modal from "../components/profile/Modal";
 import { useAuthStore } from "../store/authStore";
 import axios from "axios";
+import Navigation from "../components/landing/Navigation";
+import Footer from "../components/landing/Footer";
 
 const ProfilePage = () => {
     const { user, setUser } = useAuthStore();
@@ -528,71 +530,73 @@ const ProfilePage = () => {
         }
     };
 
-    return (
-        <div className="min-h-screen bg-black text-white">
-            <ProfileHeader profile={profile} />
+return (
+        <>
+            <Navigation />
+            <div className="min-h-screen bg-black text-white">
+                <ProfileHeader profile={profile} />
 
-            <div className="max-w-6xl mx-auto px-6 py-8">
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-8">
-                        <EducationSection
-                            education={education}
-                            onAdd={() => openModal("education")}
-                            onEdit={(item) => openModal("education", item)}
-                            onDelete={async (id) => {
-                                const updated = education.filter((e) => e.id !== id);
-                                setEducation(updated);
-                                try {
-                                    await axios.put(
-                                        `${apiUrl}/api/users/${user._id}`,
-                                        { education: updated }
-                                    );
-                                    setUser({ ...user, education: updated });
-                                } catch (err) {
-                                    console.error("Error deleting education:", err);
-                                }
-                            }}
-                        />
-                        <WorkExperienceSection
-                            workExperience={workExperience}
-                            onAdd={() => openModal("work")}
-                            onEdit={(item) => openModal("work", item)}
-                            onDelete={(id) => setWorkExperience(workExperience.filter((w) => w.id !== id))}
-                        />
-                        <ProjectsSection
-                            projects={projects}
-                            onAdd={() => openModal("project")}
-                            onEdit={(item) => openModal("project", item)}
-                            onDelete={(id) => setProjects(projects.filter((p) => p.id !== id))}
-                        />
-                    </div>
+                <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+                    <EducationSection
+                        education={education}
+                        onAdd={() => openModal("education")}
+                        onEdit={(item) => openModal("education", item)}
+                        onDelete={async (id) => {
+                            const updated = education.filter((e) => e.id !== id);
+                            setEducation(updated);
+                            try {
+                                await axios.put(
+                                    `${apiUrl}/api/users/${user._id}`,
+                                    { education: updated }
+                                );
+                                setUser({ ...user, education: updated });
+                            } catch (err) {
+                                console.error("Error deleting education:", err);
+                            }
+                        }}
+                    />
 
-                    <div className="space-y-8">
-                        <SkillsSection
-                            skills={skills}
-                            onAdd={() => openModal("skill")}
-                            onEdit={(item) => openModal("skill", item)}
-                            onDelete={(id) => setSkills(skills.filter((s) => s.id !== id))}
-                        />
-                        <CertificatesSection
-                            certificates={certificates}
-                            onAdd={() => openModal("certificate")}
-                            onEdit={(item) => openModal("certificate", item)}
-                            onDelete={(id) => setCertificates(certificates.filter((c) => c.id !== id))}
-                        />
-                    </div>
+                    <WorkExperienceSection
+                        workExperience={workExperience}
+                        onAdd={() => openModal("work")}
+                        onEdit={(item) => openModal("work", item)}
+                        onDelete={(id) => setWorkExperience(workExperience.filter((w) => w.id !== id))}
+                    />
+
+                    <ProjectsSection
+                        projects={projects}
+                        onAdd={() => openModal("project")}
+                        onEdit={(item) => openModal("project", item)}
+                        onDelete={(id) => setProjects(projects.filter((p) => p.id !== id))}
+                    />
+
+                    <SkillsSection
+                        skills={skills}
+                        onAdd={() => openModal("skill")}
+                        onEdit={(item) => openModal("skill", item)}
+                        onDelete={(id) => setSkills(skills.filter((s) => s.id !== id))}
+                    />
+
+                    <CertificatesSection
+                        certificates={certificates}
+                        onAdd={() => openModal("certificate")}
+                        onEdit={(item) => openModal("certificate", item)}
+                        onDelete={(id) => setCertificates(certificates.filter((c) => c.id !== id))}
+                    />
                 </div>
+
+                <Modal
+                    show={showModal}
+                    title={loading ? "Saving..." : "Add / Edit Item"}
+                    onSave={handleSave}
+                    onClose={closeModal}
+                >
+                    {renderForm()}
+                </Modal>
             </div>
 
-            <Modal
-                show={showModal}
-                title={loading ? "Saving..." : "Add / Edit Item"}
-                onSave={handleSave}
-                onClose={closeModal}
-            >
-                {renderForm()}
-            </Modal>
-        </div>
+            <Footer />
+        </>
     );
 };
 

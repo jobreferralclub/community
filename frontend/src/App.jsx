@@ -233,29 +233,29 @@ function AppWrapper() {
                       <Route path="dashboard" element={<Dashboard />} />
 
                       {/* India sub-communities */}
-                      <Route path="in/operations" element={<Community />} />
-                      <Route path="in/program" element={<Community />} />
-                      <Route path="in/product" element={<Community />} />
-                      <Route path="in/marketing" element={<Community />} />
-                      <Route path="in/account" element={<Community />} />
-                      <Route path="in/category" element={<Community />} />
-                      <Route path="in/finance" element={<Community />} />
-                      <Route path="in/hr" element={<Community />} />
-                      <Route path="in/analyst" element={<Community />} />
-                      <Route path="in/strategy" element={<Community />} />
-                      <Route path="in/freshers" element={<Community />} />
+                      <Route path="/in/operations" element={<Community />} />
+                      <Route path="/in/program" element={<Community />} />
+                      <Route path="/in/product" element={<Community />} />
+                      <Route path="/in/marketing" element={<Community />} />
+                      <Route path="/in/account" element={<Community />} />
+                      <Route path="/in/category" element={<Community />} />
+                      <Route path="/in/finance" element={<Community />} />
+                      <Route path="/in/hr" element={<Community />} />
+                      <Route path="/in/analyst" element={<Community />} />
+                      <Route path="/in/strategy" element={<Community />} />
+                      <Route path="/in/freshers" element={<Community />} />
 
                       {/* US sub-communities */}
-                      <Route path="us/operations" element={<Community />} />
-                      <Route path="us/program" element={<Community />} />
-                      <Route path="us/product" element={<Community />} />
-                      <Route path="us/marketing" element={<Community />} />
-                      <Route path="us/account" element={<Community />} />
-                      <Route path="us/category" element={<Community />} />
-                      <Route path="us/finance" element={<Community />} />
-                      <Route path="us/hr" element={<Community />} />
-                      <Route path="us/analyst" element={<Community />} />
-                      <Route path="us/strategy" element={<Community />} />
+                      <Route path="/us/operations" element={<Community />} />
+                      <Route path="/us/program" element={<Community />} />
+                      <Route path="/us/product" element={<Community />} />
+                      <Route path="/us/marketing" element={<Community />} />
+                      <Route path="/us/account" element={<Community />} />
+                      <Route path="/us/category" element={<Community />} />
+                      <Route path="/us/finance" element={<Community />} />
+                      <Route path="/us/hr" element={<Community />} />
+                      <Route path="/us/analyst" element={<Community />} />
+                      <Route path="/us/strategy" element={<Community />} />
 
                       {/* Global sub-communities */}
                       <Route path="ask-the-community" element={<Community />} />
