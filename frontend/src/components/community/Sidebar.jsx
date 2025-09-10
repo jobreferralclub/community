@@ -97,7 +97,7 @@ const Sidebar = ({ open, setOpen }) => {
                   {item.name}
                 </motion.span>
                 <span
-                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                     isSubMenuActive(item) ? "w-full" : "w-0 hover:w-full"
                   }`}
                 />
@@ -138,7 +138,7 @@ const Sidebar = ({ open, setOpen }) => {
                   {item.name}
                 </motion.span>
                 <span
-                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 w-0 group-hover:w-full ${
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
                     location.pathname.startsWith(item.path) ? "w-full" : ""
                   }`}
                 />
@@ -156,7 +156,7 @@ const Sidebar = ({ open, setOpen }) => {
       animate={{ x: 0 }}
       className={`${
         open ? "w-82" : "w-20"
-      } bg-black border-e border-gray-600 transition-all duration-300 ease-in-out flex flex-col`}
+      } bg-black border-e border-gray-600 transition-all duration-500 ease-in-out flex flex-col`}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -215,7 +215,7 @@ const Sidebar = ({ open, setOpen }) => {
                         } ${isRegionActive(region) ? "text-[#79e708]" : "text-white"}`}
                       />
                       <span
-                        className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                        className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                           isRegionActive(region) ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       />
@@ -240,7 +240,7 @@ const Sidebar = ({ open, setOpen }) => {
                           >
                             {sub.name}
                             <span
-                              className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 w-0 group-hover:w-full ${
+                              className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
                                 location.pathname.startsWith(sub.path) ? "w-full" : ""
                               }`}
                             />
@@ -278,7 +278,7 @@ const Sidebar = ({ open, setOpen }) => {
                 Settings
               </motion.span>
               <span
-                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-300 ${
+                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                   location.pathname === "/community/settings" ? "w-full" : "w-0 group-hover:w-full"
                 }`}
               />
