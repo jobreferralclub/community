@@ -6,12 +6,14 @@ import * as FiIcons from "react-icons/fi";
 
 const { FiTrendingUp, FiUsers, FiActivity, FiCalendar } = FiIcons;
 
+// Format large numbers for display
 const formatNumber = (num) => {
   if (num === null || num === undefined) return "...";
   if (num > 9999) return (num / 1000).toFixed(1) + "k";
   return num.toString();
 };
 
+// Format "DD/MM" labels
 const formatDayMonthFromId = (dateObj) => {
   if (!dateObj) return "No date";
   const day = String(dateObj.day).padStart(2, "0");
@@ -19,12 +21,45 @@ const formatDayMonthFromId = (dateObj) => {
   return `${day}/${month}`;
 };
 
-const formatSeries = (data) => {
+// Fill missing days and always use integer values for counts
+const fillMissingDays = (data, range = "30d") => {
+  // Parse start date from today based on range
+  const now = new Date();
+  let days = 30;
+  if (range === "7d") days = 7;
+  else if (range === "90d") days = 90;
+  else if (range === "1y") days = 365;
+
+  // Create a lookup for existing dates
+  const lookup = new Map(
+    data.map(
+      (d) => [
+        formatDayMonthFromId(d._id),
+        Number.isInteger(d.count) ? d.count : Math.round(d.count),
+      ]
+    )
+  );
+
+  // Generate list of last N days
+  const labels = [];
+  const values = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const dt = new Date(now);
+    dt.setDate(now.getDate() - i);
+    const key = formatDayMonthFromId({
+      day: dt.getDate(),
+      month: dt.getMonth() + 1,
+    });
+    labels.push(key);
+    values.push(lookup.get(key) || 0);
+  }
+  return { labels, values };
+};
+
+const formatSeries = (data, range) => {
   if (!data) return { labels: [], values: [] };
-  return {
-    labels: data.map((d) => formatDayMonthFromId(d._id)),
-    values: data.map((d) => d.count),
-  };
+  // Use fillMissingDays to output a complete timeline
+  return fillMissingDays(data, range);
 };
 
 const Analytics = () => {
@@ -110,12 +145,13 @@ const Analytics = () => {
     fetchAnalytics();
   }, [timeRange]);
 
+  // Use new formatSeries that fills gaps and rounds counts
   const { labels: userGrowthLabels, values: userGrowthValues } =
-    formatSeries(userGrowthData);
+    formatSeries(userGrowthData, timeRange);
   const { labels: postsLabels, values: postsValues } =
-    formatSeries(postsActivityData);
+    formatSeries(postsActivityData, timeRange);
   const { labels: commentsLabels, values: commentsValues } =
-    formatSeries(commentsActivityData);
+    formatSeries(commentsActivityData, timeRange);
 
   const metrics = [
     {
@@ -144,34 +180,37 @@ const Analytics = () => {
     },
   ];
 
-  const userGrowthOptions = {
-    title: {
-      text: "Daily New Users",
-      left: "center",
-      textStyle: { color: "#d1d5db" },
-      top: 10,
+ const userGrowthOptions = {
+  title: {
+    text: "Daily New Users",
+    left: "center",
+    textStyle: { color: "#d1d5db" },
+    top: 10,
+  },
+  xAxis: {
+    type: "category",
+    data: userGrowthLabels,
+    axisLabel: { color: "#d1d5db" },
+    axisLine: { lineStyle: { color: "#6b7280" } },
+  },
+  yAxis: {
+    type: "value",
+    min: 0,
+    max: Math.max(3, Math.ceil(Math.max(...userGrowthValues))),  // Make sure top tick is >= your largest count
+    interval: 1,
+    axisLabel: { color: "#d1d5db" },
+    axisLine: { lineStyle: { color: "#6b7280" } },
+  },
+  tooltip: { trigger: "axis" },
+  series: [
+    {
+      type: "line",
+      smooth: true,
+      data: userGrowthValues,
+      color: "#3b82f6",
     },
-    xAxis: {
-      type: "category",
-      data: userGrowthLabels,
-      axisLabel: { color: "#d1d5db" },
-      axisLine: { lineStyle: { color: "#6b7280" } },
-    },
-    yAxis: {
-      type: "value",
-      axisLabel: { color: "#d1d5db" },
-      axisLine: { lineStyle: { color: "#6b7280" } },
-    },
-    tooltip: { trigger: "axis" },
-    series: [
-      {
-        type: "line",
-        smooth: true,
-        data: userGrowthValues,
-        color: "#3b82f6",
-      },
-    ],
-  };
+  ],
+};
 
   const activityOptions = {
     title: {
@@ -194,6 +233,7 @@ const Analytics = () => {
     },
     yAxis: {
       type: "value",
+      min: 0,
       axisLabel: { color: "#9ca3af" },
       axisLine: { lineStyle: { color: "#6b7280" } },
       splitLine: { lineStyle: { color: "#374151" } },
@@ -270,6 +310,8 @@ const Analytics = () => {
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+            <option value="1y">Last 1 year</option>
           </select>
         </div>
       </div>
@@ -331,66 +373,70 @@ const Analytics = () => {
         >
           <ReactECharts option={activityOptions} style={{ height: 360 }} />
         </article>
-
         {/* Top Active Users - Padded, Clean Structure */}
         <aside
-  aria-label="Top Active Users List"
-  className="p-0 max-h-[350px] w-full"
->
-  <h2 className="text-xl font-bold mb-3 text-gray-100">Top Active Users</h2>
-  {/* Column Headings */}
-  <div className="flex items-center justify-between px-3 py-1 bg-zinc-900 mb-2 text-xs rounded">
-    <span className="font-semibold text-gray-300 w-6 text-center">#</span>
-    <span className="font-semibold text-gray-300 flex-1 mx-2">User</span>
-    <span className="font-semibold text-gray-300 min-w-[40px] flex items-center justify-center">
-      Posts
-    </span>
-    <span className="font-semibold text-gray-300 min-w-[60px] flex items-center justify-center">
-      Comment
-    </span>
-    <span className="font-semibold text-gray-300 min-w-[46px] flex items-center justify-center">
-      Total
-    </span>
-  </div>
-  <ul className="flex flex-col gap-2">
-    {topActiveUsersData.slice(0, 5).map((u, idx) => (
-      <li
-        key={u.userId || idx}
-        className="flex items-center justify-between py-2 px-3 bg-transparent text-sm"
-        tabIndex={0}
-        aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
-      >
-        {/* Rank */}
-        <span className="text-base font-bold text-blue-400 w-6 text-center flex-shrink-0">{idx + 1}</span>
-        {/* Avatar + Name */}
-        <div className="flex items-center flex-1 gap-2 min-w-0 mx-2 truncate">
-          <img
-            src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
-            alt={`${u.name} avatar`}
-            className="w-7 h-7 rounded-full object-cover flex-shrink-0"
-          />
-          <span className="truncate font-medium text-gray-100">{u.name}</span>
-        </div>
-        {/* Posts */}
-        <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
-          <span role="img" aria-label="posts" className="text-base">🗒</span>
-          <span className="font-bold">{u.posts}</span>
-        </span>
-        {/* Comments */}
-        <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
-          <span role="img" aria-label="comments" className="text-base">💬</span>
-          <span className="font-bold">{u.comments}</span>
-        </span>
-        {/* Total */}
-        <span className="flex items-center gap-1 min-w-[46px] justify-center text-green-400 font-bold">
-          <span role="img" aria-label="total" className="text-base">🚀</span>
-          <span>{u.total}</span>
-        </span>
-      </li>
-    ))}
-  </ul>
-</aside>
-
+          aria-label="Top Active Users List"
+          className="p-0 max-h-[350px] w-full"
+        >
+          <h2 className="text-xl font-bold mb-3 text-gray-100">
+            Top Active Users
+          </h2>
+          {/* Column Headings */}
+          <div className="flex items-center justify-between px-3 py-1 bg-zinc-900 mb-2 text-xs rounded">
+            <span className="font-semibold text-gray-300 w-6 text-center">#</span>
+            <span className="font-semibold text-gray-300 flex-1 mx-2">User</span>
+            <span className="font-semibold text-gray-300 min-w-[40px] flex items-center justify-center">
+              Posts
+            </span>
+            <span className="font-semibold text-gray-300 min-w-[60px] flex items-center justify-center">
+              Comment
+            </span>
+            <span className="font-semibold text-gray-300 min-w-[46px] flex items-center justify-center">
+              Total
+            </span>
+          </div>
+          <ul className="flex flex-col gap-2">
+            {topActiveUsersData.slice(0, 5).map((u, idx) => (
+              <li
+                key={u.userId || idx}
+                className="flex items-center justify-between py-2 px-3 bg-transparent text-sm"
+                tabIndex={0}
+                aria-label={`User ${u.name} with ${u.posts} posts and ${u.comments} comments, total activity ${u.total}`}
+              >
+                {/* Rank */}
+                <span className="text-base font-bold text-blue-400 w-6 text-center flex-shrink-0">
+                  {idx + 1}
+                </span>
+                {/* Avatar + Name */}
+                <div className="flex items-center flex-1 gap-2 min-w-0 mx-2 truncate">
+                  <img
+                    src={u.avatar || "https://randomuser.me/api/portraits/lego/1.jpg"}
+                    alt={`${u.name} avatar`}
+                    className="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                  />
+                  <span className="truncate font-medium text-gray-100">
+                    {u.name}
+                  </span>
+                </div>
+                {/* Posts */}
+                <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
+                  <span role="img" aria-label="posts" className="text-base">🗒</span>
+                  <span className="font-bold">{u.posts}</span>
+                </span>
+                {/* Comments */}
+                <span className="flex items-center gap-1 min-w-[40px] justify-center text-gray-200">
+                  <span role="img" aria-label="comments" className="text-base">💬</span>
+                  <span className="font-bold">{u.comments}</span>
+                </span>
+                {/* Total */}
+                <span className="flex items-center gap-1 min-w-[46px] justify-center text-green-400 font-bold">
+                  <span role="img" aria-label="total" className="text-base">🚀</span>
+                  <span>{u.total}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </aside>
       </section>
     </div>
   );
