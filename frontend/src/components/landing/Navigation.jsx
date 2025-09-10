@@ -33,8 +33,8 @@ const Navigation = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0 }}
       className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
-          ? "bg-black/95 backdrop-blur-md border-b border-gray-800/50 shadow-lg"
-          : "bg-transparent"
+        ? "bg-black/95 backdrop-blur-md border-b border-gray-800/50 shadow-lg"
+        : "bg-transparent"
         }`}
     >
       <div className="w-full max-w-[1440px] mx-auto px-4">
@@ -160,7 +160,7 @@ const Navigation = () => {
                   onClick={loginWithPopup}
                   className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20 whitespace-nowrap"
                 >
-                  Sign In / Sign Up
+                  Community Sign In / Up
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               )}
@@ -222,7 +222,7 @@ const Navigation = () => {
                     <button
                       onClick={() => {
                         logout();
-                        setMenuOpen(false);
+                        auth0logout({ returnTo: '/' });
                       }}
                       className="text-red-400 hover:text-red-500 transition-colors duration-300 text-left"
                     >
@@ -232,12 +232,11 @@ const Navigation = () => {
                 ) : (
                   <Button
                     onClick={() => {
-                      window.location.href = "/login";
+                      loginWithPopup();
                       setMenuOpen(false);
                     }}
-                    className="btn-primary group transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-green/20"
                   >
-                    Sign In / Sign Up
+                    Community Sign In / Up
                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                   </Button>
                 )}

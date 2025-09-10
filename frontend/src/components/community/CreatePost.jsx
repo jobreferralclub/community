@@ -9,7 +9,7 @@ import { subCommunities } from '../../data/communityList';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const { FiX, FiImage, FiLink, FiHash } = FiIcons;
+const { FiX, FiImage, FiHash } = FiIcons;
 
 const CreatePost = ({ onClose }) => {
   const location = useLocation();
@@ -26,54 +26,24 @@ const CreatePost = ({ onClose }) => {
   });
 
   const [tagInput, setTagInput] = useState('');
-  const [linkInput, setLinkInput] = useState('');
   const { addPost } = useCommunityStore();
   const { user } = useAuthStore();
 
   const apiUrl = import.meta.env.VITE_API_PORT;
 
-  // ===== Tag Handling =====
+  // Tag Handling
   const addTag = () => {
     const newTag = tagInput.trim();
     if (newTag && !formData.tags.includes(newTag)) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag]
-      }));
+      setFormData(prev => ({ ...prev, tags: [...prev.tags, newTag] }));
       setTagInput('');
     }
   };
   const removeTag = (tag) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(t => t !== tag)
-    }));
+    setFormData(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }));
   };
 
-  // ===== Link Handling =====
-  const addLink = () => {
-    const url = linkInput.trim();
-    try {
-      new URL(url); // validate URL format
-      if (url && !formData.links.includes(url)) {
-        setFormData(prev => ({
-          ...prev,
-          links: [...prev.links, url]
-        }));
-        setLinkInput('');
-      }
-    } catch {
-      alert('Invalid URL. Please include full format like https://example.com');
-    }
-  };
-  const removeLink = (link) => {
-    setFormData(prev => ({
-      ...prev,
-      links: prev.links.filter(l => l !== link)
-    }));
-  };
-
-  // ===== Image Handling =====
+  // Image Handling
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -87,30 +57,22 @@ const CreatePost = ({ onClose }) => {
         body: formDataObj,
       });
       const data = await response.json();
-
       if (data.success && data.imageUrl) {
-        setFormData(prev => ({
-          ...prev,
-          imageUrl: data.imageUrl,
-        }));
-      } else {
-        alert('Image upload failed.');
+        setFormData(prev => ({ ...prev, imageUrl: data.imageUrl }));
       }
-    } catch (error) {
-      console.error('Image upload error:', error);
-      alert('Could not upload image. Try again.');
+    } catch (err) {
+      console.error(err);
     }
   };
-  const removeImage = () => {
-    setFormData(prev => ({ ...prev, imageUrl: '' }));
-  };
 
-  // ===== Submission =====
+  const removeImage = () => setFormData(prev => ({ ...prev, imageUrl: '' }));
+
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     await addPost({
       ...formData,
-      communityId: currentCommunity?.id,   // ✅ add community ID
+      communityId: currentCommunity?.id,
       author: user?.name,
       avatar: user?.avatar,
       userId: user?._id
@@ -119,25 +81,35 @@ const CreatePost = ({ onClose }) => {
   };
 
   return (
-    <motion.div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <motion.div className="bg-zinc-900 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-
+    <motion.div
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="bg-gradient-to-br from-zinc-900 to-zinc-800 shadow-2xl rounded-2xl p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-zinc-700/50"
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Create New Post</h2>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-800 rounded-s rounded-e transition-colors">
+          <h2 className="text-2xl font-semibold text-white">✨ Create New Post</h2>
+          <button onClick={onClose} className="p-2 hover:bg-zinc-800 rounded-full">
             <SafeIcon icon={FiX} className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Post Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Post Type</label>
+            <label className="block text-sm text-gray-400 mb-1">Post Type</label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 bg-zinc-900 border border-zinc-700 rounded-xl text-gray-100 focus:ring-2 focus:ring-primary-500"
             >
               <option value="discussion">Discussion</option>
               <option value="job-posting">Job Posting</option>
@@ -145,165 +117,109 @@ const CreatePost = ({ onClose }) => {
             </select>
           </div>
 
-          {/* Community */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Community</label>
-            <input
-              type="text"
-              value={formData.community}
-              readOnly
-              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100"
-            />
-          </div>
-
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Title</label>
+            <label className="block text-sm text-gray-400 mb-1">Title</label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Enter a compelling title..."
+              className="w-full p-3 bg-zinc-900 border border-zinc-700 rounded-xl text-gray-100 focus:ring-2 focus:ring-primary-500"
+              placeholder="Enter a catchy title..."
               required
             />
           </div>
 
-          {/* Content - Rich Text Editor */}
+          {/* Content */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Content</label>
+            <label className="block text-sm text-gray-400 mb-1">Content</label>
             <ReactQuill
               theme="snow"
               value={formData.content}
               onChange={(content) => setFormData({ ...formData, content })}
-              className="mb-4 bg-zinc-800 text-gray-100"
-              style={{ borderRadius: '0.5rem' }}
+              className="bg-zinc-900 text-gray-100 rounded-xl overflow-hidden"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Tags</label>
-            <div className="flex items-center space-x-2 mb-3">
+            <label className="block text-sm text-gray-400 mb-1">Tags</label>
+            <div className="flex items-center gap-2">
               <div className="relative flex-1">
-                <SafeIcon icon={FiHash} className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <SafeIcon icon={FiHash} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addTag();
-                    }
-                  }}
-                  className="w-full pl-9 pr-4 py-2 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Add tags..."
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                  className="w-full pl-9 pr-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-gray-100 focus:ring-2 focus:ring-primary-500"
+                  placeholder="Add a tag..."
                 />
               </div>
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 bg-zinc-800 text-gray-200 rounded-s rounded-e hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl"
               >
                 Add
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag) => (
-                <span key={tag} className="flex items-center space-x-1 px-3 py-1 bg-primary-800 text-primary-300 rounded-full text-sm">
-                  <span>#{tag}</span>
-                  <button type="button" onClick={() => removeTag(tag)} className="hover:bg-primary-700 rounded-full p-1">
+            <div className="flex flex-wrap gap-2 mt-3">
+              {formData.tags.map(tag => (
+                <motion.span
+                  key={tag}
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-primary-700/30 text-primary-300 rounded-full text-sm border border-primary-600/50"
+                >
+                  #{tag}
+                  <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-400">
                     <SafeIcon icon={FiX} className="w-3 h-3" />
                   </button>
-                </span>
+                </motion.span>
               ))}
             </div>
           </div>
 
-          {/* Links */}
+          {/* Image */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Links</label>
-            <div className="flex items-center space-x-2 mb-3">
-              <input
-                type="text"
-                value={linkInput}
-                onChange={(e) => setLinkInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addLink();
-                  }
-                }}
-                placeholder="Add link (https://...)"
-                className="w-full p-3 border border-gray-700 rounded-s rounded-e bg-zinc-800 text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-              <button
-                type="button"
-                onClick={addLink}
-                className="px-4 py-2 bg-zinc-800 text-gray-200 rounded-s rounded-e hover:bg-gray-700 transition-colors"
-              >
-                Add
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.links.map((link) => (
-                <span key={link} className="flex items-center space-x-1 px-3 py-1 bg-primary-800 text-primary-300 rounded-full text-sm">
-                  <a href={link} target="_blank" rel="noopener noreferrer" className="underline">{link}</a>
-                  <button type="button" onClick={() => removeLink(link)} className="hover:bg-primary-700 rounded-full p-1">
-                    <SafeIcon icon={FiX} className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              id="image-upload"
-              style={{ display: 'none' }}
-              onChange={handleImageChange}
-            />
+            <label className="block text-sm text-gray-400 mb-1">Image</label>
+            <input type="file" accept="image/*" id="image-upload" hidden onChange={handleImageChange} />
             <button
               type="button"
               onClick={() => document.getElementById('image-upload').click()}
-              className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-gray-300 hover:bg-zinc-800"
             >
               <SafeIcon icon={FiImage} className="w-5 h-5" />
-              <span className="text-sm">Add Image</span>
+              Add Image
             </button>
             {formData.imageUrl && (
-              <div className="mt-3 relative">
-                <img src={formData.imageUrl} alt="Preview" className="w-full rounded-s rounded-e border border-gray-700" />
+              <div className="mt-4 relative">
+                <img src={formData.imageUrl} alt="Preview" className="rounded-xl border border-zinc-700 shadow-lg" />
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 bg-zinc-800 p-1 rounded-full shadow"
+                  className="absolute top-2 right-2 bg-black/70 rounded-full p-1"
                 >
-                  <SafeIcon icon={FiX} className="w-4 h-4 text-gray-400" />
+                  <SafeIcon icon={FiX} className="w-4 h-4 text-gray-300" />
                 </button>
               </div>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
+          <div className="flex justify-end gap-3 pt-6 border-t border-zinc-700/50">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-200 bg-zinc-900 rounded-s rounded-e hover:bg-gray-700 transition-colors"
+              className="px-5 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-gray-300 hover:bg-zinc-800"
             >
               Cancel
             </button>
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
               type="submit"
-              className="px-6 py-2 bg-zinc-800 text-white rounded-s rounded-e hover:bg-primary-700 transition-colors"
+              className="px-6 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white shadow-md"
             >
               Post
             </motion.button>

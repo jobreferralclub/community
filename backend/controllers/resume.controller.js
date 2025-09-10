@@ -4,6 +4,7 @@ import { getLLMResponse } from "../utils/llm.js";
 import { jsonrepair } from "jsonrepair";
 import path from "path";
 import mammoth from "mammoth";
+import puppeteer from "puppeteer";
 import { extractTextAndEmail } from "../utils/parser.js";
 import { scoreResumeWithLLM } from "../utils/scoring.js";
 import { analyzeResumeWithLLM } from "../utils/resumeAnalyzer.js";
@@ -249,6 +250,30 @@ export const resumeRanker = async (req, res) => {
         res.status(500).json({ error: err.message, trace: err.stack });
     }
 }
+
+export const generateResumePdf = async (req, res) => {
+    const { html } = req.body;
+
+    if (!html || typeof html !== "string") {
+        return res.status(400).json({ error: "Invalid or missing HTML content." });
+    }
+
+    try {
+        const browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox"] });
+        const page = await browser.newPage();
+        await page.setContent(html, { waitUntil: "networkidle0" });
+
+        const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
+        await browser.close();
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", 'attachment; filename="resume.pdf"');
+        res.end(pdfBuffer); // ✅ important
+    } catch (error) {
+        console.error("PDF generation error:", error.message);
+        res.status(500).json({ error: "Failed to generate PDF." });
+    }
+};
 
 const ALLOWED_EXTENSIONS = [".pdf", ".docx"];
 function allowedFile(filename) {

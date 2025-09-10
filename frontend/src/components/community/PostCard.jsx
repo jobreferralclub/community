@@ -39,6 +39,9 @@ const PostCard = ({ post, onDelete }) => {
   const [loadingJD, setLoadingJD] = useState(false);
   const [jobDescription, setJobDescription] = useState("");
   const [generatingKit, setGeneratingKit] = useState(false);
+  const [generatingStep, setGeneratingStep] = useState(null); // "coverLetter" | "jdResume" | null
+  const [coverLetterData, setCoverLetterData] = useState(null);
+  const [jdResumeData, setJdResumeData] = useState(null);
 
   useEffect(() => {
     setLocalPost(post); // keep sync if parent updates it
@@ -300,7 +303,7 @@ const PostCard = ({ post, onDelete }) => {
       {/* Post Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-700 hover:shadow-md transition-all text-gray-100"
+        className="bg-zinc-900 rounded-s rounded-e p-6 shadow-sm border border-gray-700 hover:shadow-md transition-all text-gray-100"
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-4 relative" ref={menuRef}>
@@ -326,13 +329,13 @@ const PostCard = ({ post, onDelete }) => {
               <div className="relative">
                 <button
                   onClick={() => setShowMenu(prev => !prev)}
-                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-800 rounded-s rounded-e transition-colors"
                 >
                   <SafeIcon icon={FiMoreHorizontal} className="w-4 h-4 text-gray-400" />
                 </button>
 
                 {showMenu && (
-                  <div className="absolute right-0 mt-2 w-36 bg-gray-800 border border-gray-700 rounded-lg shadow-md z-10">
+                  <div className="absolute right-0 mt-2 w-36 bg-gray-800 border border-gray-700 rounded-s rounded-e shadow-md z-10">
                     <button
                       onClick={handleEdit}
                       className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
@@ -364,7 +367,7 @@ const PostCard = ({ post, onDelete }) => {
             <img
               src={localPost.imageUrl}
               alt="Post attachment"
-              className="block w-full max-h-96 object-contain rounded-lg border border-gray-700"
+              className="block w-full max-h-96 object-contain rounded-s rounded-e border border-gray-700"
             />
           </div>
         )}
@@ -375,7 +378,7 @@ const PostCard = ({ post, onDelete }) => {
             {localPost.tags.map(tag => (
               <span
                 key={tag}
-                className="px-2 py-1 bg-gray-800 text-gray-400 rounded-md text-sm"
+                className="px-2 py-1 bg-gray-800 text-gray-400 rounded-s rounded-e text-sm"
               >
                 #{tag}
               </span>
@@ -434,7 +437,7 @@ const PostCard = ({ post, onDelete }) => {
             </motion.button>
 
             {/* NEW: Check Resume Compatibility Button */}
-            {/* {localPost.type === "job-posting" && (
+            {localPost.type === "job-posting" && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowResumeModal(true)}
@@ -442,7 +445,7 @@ const PostCard = ({ post, onDelete }) => {
               >
                 Generate Application Kit
               </motion.button>
-            )} */}
+            )}
 
           </div>
         </div>
@@ -452,11 +455,11 @@ const PostCard = ({ post, onDelete }) => {
       {showResumeModal && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto"
-          onClick={() => setShowResumeModal(false)} // close when clicking backdrop
+          onClick={() => setShowResumeModal(false)}
         >
           <div
-            className="bg-gray-900 p-6 rounded-lg w-full max-w-lg text-gray-100 my-10 relative"
-            onClick={(e) => e.stopPropagation()} // prevent backdrop close on inside click
+            className="bg-gray-900 p-6 rounded-s rounded-e w-full max-w-lg text-gray-100 my-10 relative"
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Cross button */}
             <button
@@ -467,7 +470,9 @@ const PostCard = ({ post, onDelete }) => {
             </button>
 
             {/* Header */}
-            <h3 className="text-lg font-semibold mb-4">Generate a new application kit</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Generate a new application kit
+            </h3>
             <p className="text-gray-300 mb-4">
               Checking your resume against this job description:
             </p>
@@ -503,6 +508,63 @@ const PostCard = ({ post, onDelete }) => {
                 );
               })()}
 
+            {/* Progress Steps */}
+            {(generatingStep !== null || coverLetterData || jdResumeData) && (
+              <div className="space-y-4 mb-6">
+                {/* Step 1: Cover Letter */}
+                <div className="flex justify-between items-center bg-gray-800 p-3 rounded">
+                  <span>
+                    {generatingStep === "coverLetter"
+                      ? "📄 Generating Cover Letter..."
+                      : coverLetterData
+                        ? "📄 Cover Letter Generated"
+                        : "📄 Waiting..."}
+                  </span>
+
+                  {generatingStep === "coverLetter" && (
+                    <span className="animate-spin border-2 border-t-transparent border-[#79e708] rounded-full w-5 h-5"></span>
+                  )}
+
+                  {coverLetterData && (
+                    <button
+                      onClick={() => {
+                        localStorage.setItem(
+                          "coverLetterData",
+                          JSON.stringify({
+                            coverLetter: coverLetterData.coverLetter,
+                            jobTitle: coverLetterData.jobTitle,
+                            companyName: coverLetterData.companyName,
+                          })
+                        );
+                        window.open("/profile/cover-letter", "_blank");
+                      }}
+                      className="px-2 py-1 text-xs bg-[#79e708] text-black rounded hover:bg-[#66c206]"
+                    >
+                      View
+                    </button>
+                  )}
+                </div>
+
+                {/* Step 2: JD Resume */}
+                <div className="flex justify-between items-center bg-gray-800 p-3 rounded">
+                  <span>
+                    {generatingStep === "jdResume"
+                      ? "📑 Generating JD-Specific Resume..."
+                      : jdResumeData
+                        ? "📑 JD-Specific Resume Generated"
+                        : "📑 Waiting..."}
+                  </span>
+
+                  {generatingStep === "jdResume" && (
+                    <span className="animate-spin border-2 border-t-transparent border-[#79e708] rounded-full w-5 h-5"></span>
+                  )}
+
+                  {jdResumeData && <span className="text-green-400">✅ Done</span>}
+                </div>
+              </div>
+            )}
+
+
             {/* Footer Actions */}
             <div className="flex justify-end gap-2">
               <button
@@ -518,14 +580,64 @@ const PostCard = ({ post, onDelete }) => {
                 Close
               </button>
               <button
-                onClick={handleGenerateApplicationKit}
-                disabled={generatingKit}
-                className={`px-4 py-2 rounded ${generatingKit
+                onClick={async () => {
+                  try {
+                    setGeneratingStep("coverLetter");
+
+                    // Extract job details
+                    const { companyName, jobTitle } = extractJobDetails(
+                      localPost.content,
+                      jobDescription
+                    );
+
+                    // 1️⃣ Generate Cover Letter
+                    const coverLetterRes = await fetch(
+                      `${apiUrl}/api/resume/generate-cover-letter`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          jobDescription,
+                          resume: user,
+                          jobTitle,
+                          companyName,
+                        }),
+                      }
+                    );
+                    const coverLetter = await coverLetterRes.json();
+                    setCoverLetterData(coverLetter);
+
+                    // 2️⃣ Generate JD Resume
+                    setGeneratingStep("jdResume");
+                    const jdResumeRes = await fetch(
+                      `${apiUrl}/api/resume/generate-jd-resume`,
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          masterResume: user,
+                          jobDescription,
+                          jobTitle,
+                          companyName,
+                        }),
+                      }
+                    );
+                    const jdResume = await jdResumeRes.json();
+                    setJdResumeData(jdResume);
+
+                    setGeneratingStep(null);
+                  } catch (err) {
+                    console.error("❌ Error generating application kit:", err);
+                    setGeneratingStep(null);
+                  }
+                }}
+                disabled={generatingStep !== null}
+                className={`px-4 py-2 rounded ${generatingStep !== null
                   ? "bg-gray-600 text-gray-300 cursor-not-allowed"
                   : "bg-[#79e708] text-black hover:bg-[#66c206]"
                   }`}
               >
-                {generatingKit ? "⏳ Generating..." : "Generate Application Kit"}
+                {generatingStep !== null ? "⏳ Generating..." : "Generate Application Kit"}
               </button>
             </div>
           </div>
@@ -538,7 +650,7 @@ const PostCard = ({ post, onDelete }) => {
       {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-md text-gray-100">
+          <div className="bg-gray-900 p-6 rounded-s rounded-e w-full max-w-md text-gray-100">
             <h3 className="text-lg font-semibold mb-4">Edit Post</h3>
 
             {/* Title input */}
@@ -582,7 +694,7 @@ const PostCard = ({ post, onDelete }) => {
       {/* Delete Confirm Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-gray-900 p-6 rounded-lg w-full max-w-sm text-center text-gray-100">
+          <div className="bg-gray-900 p-6 rounded-s rounded-e w-full max-w-sm text-center text-gray-100">
             <h3 className="text-lg font-semibold mb-4">Delete Post?</h3>
             <p className="text-gray-400 mb-6">This action cannot be undone.</p>
             <div className="flex justify-center gap-3">

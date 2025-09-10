@@ -1,7 +1,7 @@
 // routes/resume.js
 import express from "express";
 import multer from "multer";
-import { jdAnalyze, extractText, enhanceResume, formatPdf, resumeRanker, resumeAnalyzer, mockInterview, analyzeInterview, generateCoverLetter, generateJDResume } from "../controllers/resume.controller.js";
+import { jdAnalyze, extractText, enhanceResume, formatPdf, resumeRanker, resumeAnalyzer, mockInterview, analyzeInterview, generateCoverLetter, generateJDResume, generateResumePdf } from "../controllers/resume.controller.js";
 
 const router = express.Router();
 
@@ -17,5 +17,6 @@ router.post("/mock-interview", mockInterview);
 router.post("/analyze-interview", analyzeInterview);
 router.post("/generate-cover-letter", generateCoverLetter);
 router.post("/generate-jd-resume", generateJDResume);
+router.post("/generate-resume-pdf", generateResumePdf);
 
 export default router;

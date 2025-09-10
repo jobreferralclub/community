@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactQuill from "react-quill";
@@ -6,11 +5,45 @@ import "react-quill/dist/quill.snow.css";
 import Navigation from "../../components/landing/Navigation";
 import toast from 'react-hot-toast';
 
-export default function CoverLetterPage() {
-    const location = useLocation();
-    const { coverLetter, companyName, jobTitle } = location.state || {};
+import { useState, useEffect } from "react";
+import Footer from "../../components/landing/Footer";
 
-    const [letter, setLetter] = useState(coverLetter || "");
+export default function CoverLetterPage() {
+    const [letterData, setLetterData] = useState({
+        coverLetter: "",
+        companyName: "Unknown Company",
+        jobTitle: "Job Title",
+    });
+
+    useEffect(() => {
+        const storedData = localStorage.getItem("coverLetterData");
+        if (storedData) {
+            let data = JSON.parse(storedData);
+            let cleanText = data.coverLetter;
+
+            // Remove ``` backticks
+            cleanText = cleanText.replace(/```/g, "");
+
+            // Remove any literal 'html' at the start (case-insensitive)
+            cleanText = cleanText.replace(/^html\s*/i, "");
+
+            // Trim extra whitespace
+            cleanText = cleanText.trim();
+
+            setLetterData({
+                ...data,
+                coverLetter: cleanText,
+            });
+        }
+    }, []);
+
+    const { coverLetter, companyName, jobTitle } = letterData;
+    const [letter, setLetter] = useState("");
+
+    // Sync letter state with loaded coverLetter
+    useEffect(() => {
+        setLetter(coverLetter);
+    }, [coverLetter]);
 
     const handleCopy = () => {
         const tempElement = document.createElement("div");
@@ -107,6 +140,7 @@ export default function CoverLetterPage() {
                     </CardContent>
                 </Card>
             </div>
+            <Footer />
         </div>
     );
 }

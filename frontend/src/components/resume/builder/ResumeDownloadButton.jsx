@@ -1,9 +1,9 @@
 import React from "react";
 import { Download } from "lucide-react";
 
-const ResumeDownloadButton: React.FC = () => {
+const ResumeDownloadButton = () => {
+  const apiUrl = import.meta.env.VITE_API_PORT;
 
-  const apiUrl = import.meta.env.VITE_API_URL;
   const downloadPDF = async () => {
     const element = document.getElementById("resume-preview");
 
@@ -11,7 +11,6 @@ const ResumeDownloadButton: React.FC = () => {
       console.error("Resume preview element not found.");
       return;
     }
-
 
     const content = element.innerHTML;
 
@@ -40,10 +39,8 @@ const ResumeDownloadButton: React.FC = () => {
     console.log(content);
     console.log(html);
 
-
-
     try {
-      const response = await fetch(`${apiUrl}/generate-pdf`, {
+      const response = await fetch(`${apiUrl}/api/resume/generate-resume-pdf`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ html }),
