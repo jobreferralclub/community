@@ -107,17 +107,19 @@ const Community = () => {
               {/* <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" /> */}
               <div className="flex flex-wrap gap-2">
                 {filters.map((filterOption) => (
-                  <button
-                    key={filterOption.id}
-                    onClick={() => setFilter(filterOption.id)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-                      ? "bg-[#79e708] !text-black"
-                      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
-                      }`}
-                  >
-                    {filterOption.name} ({filterOption.count})
-                  </button>
-                ))}
+  <button
+    key={filterOption.id}
+    onClick={() => setFilter(filterOption.id)}
+    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
+      ? "bg-[#79e708] !text-black"
+      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+      }`}
+  >
+    {filterOption.name}
+    {filterOption.count > 0 && ` (${filterOption.count})`}
+  </button>
+))}
+
               </div>
             </div>
           </div>
