@@ -77,7 +77,7 @@ const HeroSection = () => {
             variants={item}
             className="flex flex-wrap justify-center gap-8 mb-12"
           >
-            <Stat icon={<Users />} label="Active Members" value="1,000+" />
+            <Stat icon={<Users />} label="Active Members" value="2,000+" />
             <Stat icon={<TrendingUp />} label="Success Rate" value="85%" />
             <Stat icon={<Zap />} label="Partner Companies" value="100+" />
           </motion.div>

@@ -73,7 +73,7 @@ const StorySection = () => {
           </div>
           <div className="text-center p-6 rounded-xl bg-black/30 border border-gray-800">
             <Users className="w-8 h-8 text-primary-green mx-auto mb-3" />
-            <div className="text-3xl font-bold gradient-text mb-2">1,000+</div>
+            <div className="text-3xl font-bold gradient-text mb-2">2,000+</div>
             <div className="text-gray-400">Successful Career Transitions</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-black/30 border border-gray-800">

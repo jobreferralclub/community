@@ -6,7 +6,7 @@ import { LinkedinIcon, MessageCircle, Users, Star } from 'lucide-react';
 
 const CommunitySection = () => {
   const communityStats = [
-    { label: "Active Members", value: "1,000+", icon: <Users className="h-6 w-6" /> },
+    { label: "Active Members", value: "2,000+", icon: <Users className="h-6 w-6" /> },
     { label: "Successful Referrals", value: "50+", icon: <Star className="h-6 w-6" /> },
     { label: "LinkedIn Followers", value: "Growing Daily", icon: <LinkedinIcon className="h-6 w-6" /> }
   ];
