@@ -14,7 +14,7 @@ const FinalCTASection = () => {
   const features = [
     {
       icon: Users,
-      text: "1,000+ verified professionals",
+      text: "2,000+ verified professionals",
     },
     {
       icon: TrendingUp,

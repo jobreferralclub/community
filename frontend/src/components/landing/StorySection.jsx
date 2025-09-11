@@ -167,7 +167,7 @@ const StorySection = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-400">
-                +1,000 members already inside
+                +2,000 members already inside
               </span>
             </div>
           </div>

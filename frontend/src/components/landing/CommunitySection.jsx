@@ -29,7 +29,7 @@ const CommunitySection = () => {
             Community Highlight
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Join our thriving LinkedIn community of 1,000+ professionals. Get peer support, mentorship, and exclusive job alerts.
+            Join our thriving LinkedIn community of 2,000+ professionals. Get peer support, mentorship, and exclusive job alerts.
           </p>
         </motion.div>
 

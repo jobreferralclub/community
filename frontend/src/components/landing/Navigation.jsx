@@ -28,10 +28,7 @@ const Navigation = () => {
   ];
 
   return (
-    <motion.nav
-      initial={{ y: 0, opacity: 1 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0 }}
+    <nav
       className={`fixed top-0 left-0 right-0 z-[1000] transition-all duration-300 ${isScrolled
         ? "bg-black/95 backdrop-blur-md border-b border-gray-800/50 shadow-lg"
         : "bg-transparent"
@@ -40,9 +37,8 @@ const Navigation = () => {
       <div className="w-full max-w-[1440px] mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <motion.a
+          <a
             href="/"
-            whileHover={{ scale: 1.05 }}
             className="flex items-center gap-3 transition-all duration-300"
           >
             <img
@@ -53,19 +49,19 @@ const Navigation = () => {
             <div className="font-bold text-xl text-white whitespace-nowrap">
               JobReferral<span className="text-primary-green">.Club</span>
             </div>
-          </motion.a>
+          </a>
 
           {/* Desktop Nav */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <motion.a
+              <a
                 key={index}
                 href={item.href}
                 className="text-gray-300 hover:text-primary-green transition-all duration-300 font-medium relative group whitespace-nowrap"
               >
                 {item.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-green transition-all duration-300 group-hover:w-full"></span>
-              </motion.a>
+              </a>
             ))}
 
             {/* Services Dropdown */}
@@ -245,7 +241,7 @@ const Navigation = () => {
           )}
         </AnimatePresence>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 
