@@ -437,7 +437,7 @@ const PostCard = ({ post, onDelete }) => {
             </motion.button>
 
             {/* NEW: Check Resume Compatibility Button */}
-            {localPost.type === "job-posting" && (
+            {/* {localPost.type === "job-posting" && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowResumeModal(true)}
@@ -445,7 +445,7 @@ const PostCard = ({ post, onDelete }) => {
               >
                 Generate Application Kit
               </motion.button>
-            )}
+            )} */}
 
           </div>
         </div>
