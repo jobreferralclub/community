@@ -13,6 +13,7 @@ const {
   HUMAN_RESOURCES_INDIA_SHEET_ID,
   ANALYTICS_INDIA_SHEET_ID,
   STRATEGY_INDIA_SHEET_ID,
+  FRESHERS_INDIA_SHEET_ID,
 
   OPERATIONS_US_SHEET_ID,
   PROGRAM_AND_PROJECT_US_SHEET_ID,
@@ -35,29 +36,25 @@ const auth = new google.auth.GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
 });
 
-// Load the last posted Job ID log from file or initialize empty object
 async function loadLastJobIdLog() {
   try {
     const data = await fs.readFile(LOG_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    if (error.code === 'ENOENT') return {}; // no file yet, return empty
+    if (error.code === 'ENOENT') return {};
     throw error;
   }
 }
 
-// Save updated last posted Job ID log to file
 async function saveLastJobIdLog(log) {
   await fs.writeFile(LOG_FILE_PATH, JSON.stringify(log, null, 2), 'utf-8');
 }
 
-// Check if current jobId is lexically greater (newer) than last posted
 function isJobIdNewer(current, last) {
-  if (!last) return true; // no previous job, so current is new
+  if (!last) return true;
   return current.localeCompare(last) > 0;
 }
 
-// Fetch data from Google Sheets
 async function fetchData(spreadsheetId, range) {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
@@ -67,6 +64,7 @@ async function fetchData(spreadsheetId, range) {
   });
 
   const [headers, ...rows] = result.data.values;
+  console.log(`DEBUG: [${spreadsheetId}] headers: [${headers.join(', ')}]`);
   return rows.map(row => {
     let obj = {};
     headers.forEach((header, i) => (obj[header.trim()] = row[i] || ""));
@@ -74,50 +72,44 @@ async function fetchData(spreadsheetId, range) {
   });
 }
 
-// Create post by calling backend API with retries and detailed logging
 async function createPost(title, content, job_description, community, maxRetries = 3) {
   let attempt = 0;
   const delay = ms => new Promise(res => setTimeout(res, ms));
-
   while (attempt < maxRetries) {
     try {
       const response = await axios.post('http://localhost:5000/api/posts/', {
         title,
         content,
-        userId: '68983120b0b01c3a69f54851', // Adjust if needed
+        userId: '68983120b0b01c3a69f54851',
         community,
         job_description,
         type: "job-posting",
       }, {
-        timeout: 10000 // 10 seconds
+        timeout: 10000
       });
-
-      console.log(`Post created: ${response.data._id}`);
+      console.log(`[POST SUCCESS] ${community}: JobID ${response.data._id}`);
       return true;
-
     } catch (error) {
       attempt++;
       if (error.response) {
-        console.error(`Attempt ${attempt} - API error (${error.response.status}):`, error.response.data);
+        console.error(`[POST ERROR] Attempt ${attempt} - API error (${error.response.status}):`, error.response.data);
       } else if (error.request) {
-        console.error(`Attempt ${attempt} - No response received:`, error.message);
+        console.error(`[POST ERROR] Attempt ${attempt} - No response received:`, error.message);
       } else {
-        console.error(`Attempt ${attempt} - Request setup error:`, error.message);
+        console.error(`[POST ERROR] Attempt ${attempt} - Request setup error:`, error.message);
       }
-
       if (attempt < maxRetries) {
-        const backoff = 500 * Math.pow(2, attempt); // exponential backoff: 1s, 2s, 4s
-        console.log(`Retrying after ${backoff}ms...`);
+        const backoff = 500 * Math.pow(2, attempt);
+        console.log(`[POST RETRY] Retrying after ${backoff}ms...`);
         await delay(backoff);
       } else {
-        console.error('Max retries reached, skipping this job post.');
+        console.error('[POST ABORT] Max retries reached, skipping this job post.');
         return false;
       }
     }
   }
 }
 
-// List of sheets with spreadsheet IDs and community names
 const sheetsToProcess = [
   { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
   { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
@@ -129,7 +121,7 @@ const sheetsToProcess = [
   { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
   { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
   { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
-
+  { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" },
   { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
   { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
   { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
@@ -142,51 +134,69 @@ const sheetsToProcess = [
   { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
-// Main function to generate posts ensuring no duplicates and starting from the next job ID
 async function generatePostsAll() {
   const lastJobIdLog = await loadLastJobIdLog();
+  console.log("\n=== Debug: lastJobIdLog loaded ===");
+  Object.entries(lastJobIdLog).forEach(([k, v]) => {
+    console.log(`  "${k}" => ${v}`);
+  });
 
   for (const sheet of sheetsToProcess) {
-    console.log(`Fetching data for spreadsheet ID: ${sheet.id}`);
+    console.log(`\n--- Fetching data for spreadsheet ID: ${sheet.id} (${sheet.community}) ---`);
     const data = await fetchData(sheet.id, SHEET_RANGE);
     console.log(`Fetched rows: ${data.length}`);
+    if (data.length > 0) {
+      console.log(`Row keys in first row: ${Object.keys(data[0]).join(', ')}`);
+    }
 
     if (!lastJobIdLog[sheet.community]) lastJobIdLog[sheet.community] = null;
 
-    // Process posts sequentially for concurrency control and stability
     for (const row of data) {
-      const jobId = (row['Job ID'] || row['Job ID '] || '').trim();
-      if (!jobId) continue;
-
-      if (!isJobIdNewer(jobId, lastJobIdLog[sheet.community])) {
-        console.log(`Skipping Job ID ${jobId} <= last posted Job ID ${lastJobIdLog[sheet.community]}`);
+      // Robust jobId extraction, handling all whitespace and formatting issues
+      const jobIdKey = Object.keys(row).find(
+        k => k.replace(/\s/g, '').toLowerCase() === 'jobid'
+      );
+      const jobId = jobIdKey ? (row[jobIdKey] || '').trim() : '';
+      if (!jobId) {
+        console.log(`[DEBUG] Empty jobId in ${sheet.community}: Row keys=[${Object.keys(row).join(', ')}], Raw row=`, row);
         continue;
       }
 
+      if (!isJobIdNewer(jobId, lastJobIdLog[sheet.community])) {
+        console.log(`[SKIP] Job ID ${jobId} <= last posted Job ID ${lastJobIdLog[sheet.community]} (${sheet.community})`);
+        continue;
+      }
+
+      if (sheet.community === "Freshers - India") {
+        console.log(`[DEBUG] Freshers - Checking JobID: "${jobId}" vs Last: "${lastJobIdLog[sheet.community]}"`);
+        console.log(`[DEBUG] Freshers - isJobIdNewer result: ${isJobIdNewer(jobId, lastJobIdLog[sheet.community])}`);
+      }
+
       const title = 'Job Referral Opportunity';
-      const job_description = row['About the Job'];
+      const job_description = row['About the Job'] || row['Job Description'] || '';
       const message = `
 <p><strong>Job ID:</strong> ${jobId}</p>
 <p><strong>Company Name:</strong> ${row['Company Name']}</p>
-<p><strong>Job Role:</strong> ${row['Job Title']}</p>
+<p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
 <p><strong>Location:</strong> ${row['Location']}</p>
-<p>${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title']}</strong> at <strong>${row['Company Name']}</strong>.</p>
+<p>${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
 <p>Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to
 <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
 <p><em>T&amp;C applied.</em></p>
 `;
 
-      console.log(`Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
-
+      console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
       const success = await createPost(title, message, job_description, sheet.community);
+
+      console.log(`[RESULT] Post for JobID ${jobId} (${sheet.community}) => ${success}`);
 
       if (success) {
         lastJobIdLog[sheet.community] = jobId;
         await saveLastJobIdLog(lastJobIdLog);
+        console.log(`[SAVED] Updated lastJobId for "${sheet.community}" => ${jobId}`);
       }
     }
   }
 }
 
-// Start the process
 generatePostsAll();
