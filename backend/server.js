@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
+import { generatePostsAll } from './controllers/google-sheet-referral-bot/fetchPosts.js';
 
 // === Load Environment Variables ===
 dotenv.config();
@@ -58,6 +59,15 @@ app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // Check if llm works or not
 app.get('/api/give-joke', giveJoke);
+
+//Fetching Job Posts from Google sheet
+
+setInterval(() => {
+  generatePostsAll()
+    .then(() => console.log('Job posts generation completed'))
+    .catch(err => console.error('Error generating job posts:', err));
+}, 10 * 60 * 1000); // 10 minutes interval
+
 
 // ===================================================================
 // 🚀 Start Server

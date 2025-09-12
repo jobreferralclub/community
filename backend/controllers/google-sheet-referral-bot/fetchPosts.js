@@ -1,8 +1,8 @@
-const axios = require('axios');
-const { google } = require('googleapis');
-const path = require('path');
-const fs = require('fs').promises;
-const {
+import axios from 'axios';
+import { google } from 'googleapis';
+import path from 'path';
+import fs from 'fs/promises';
+import {
   OPERATIONS_INDIA_SHEET_ID,
   PROGRAM_AND_PROJECT_INDIA_SHEET_ID,
   PRODUCT_INDIA_SHEET_ID,
@@ -26,7 +26,14 @@ const {
   ANALYTICS_US_SHEET_ID,
   STRATEGY_US_SHEET_ID,
   SHEET_RANGE,
-} = require('./config.cjs');
+} from './config.mjs';
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// for __dirname replacement in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const keyPath = path.join(__dirname, 'credentials.json');
 const LOG_FILE_PATH = path.join(__dirname, 'lastJobIdLog.json');
@@ -59,8 +66,8 @@ async function fetchData(spreadsheetId, range) {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
   const result = await sheets.spreadsheets.values.get({
-    spreadsheetId: spreadsheetId,
-    range: range,
+    spreadsheetId,
+    range,
   });
 
   const [headers, ...rows] = result.data.values;
@@ -134,7 +141,8 @@ const sheetsToProcess = [
   { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
-async function generatePostsAll() {
+
+export async function generatePostsAll() {
   const lastJobIdLog = await loadLastJobIdLog();
   console.log("\n=== Debug: lastJobIdLog loaded ===");
   Object.entries(lastJobIdLog).forEach(([k, v]) => {
@@ -152,7 +160,6 @@ async function generatePostsAll() {
     if (!lastJobIdLog[sheet.community]) lastJobIdLog[sheet.community] = null;
 
     for (const row of data) {
-      // Robust jobId extraction, handling all whitespace and formatting issues
       const jobIdKey = Object.keys(row).find(
         k => k.replace(/\s/g, '').toLowerCase() === 'jobid'
       );
@@ -198,5 +205,3 @@ async function generatePostsAll() {
     }
   }
 }
-
-generatePostsAll();
