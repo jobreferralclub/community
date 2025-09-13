@@ -203,11 +203,11 @@ const CategoriesSection = () => {
                       <category.icon className={`w-6 h-6 ${category.iconColor}`} />
                     </div>
                     <Badge
-                      variant="secondary"
-                      className="bg-primary-green/20 text-primary-green border-primary-green/30"
-                    >
-                      {category.openRoles} open
-                    </Badge>
+  variant="secondary"
+  className="bg-primary-green/20 text-primary-green border-primary-green/30"
+>
+  {Math.floor(Math.random() * (200 - 100 + 1)) + 100} open
+</Badge>
                   </div>
                   <CardTitle className="text-xl group-hover:text-primary-green transition-colors duration-300">
                     {category.title}
