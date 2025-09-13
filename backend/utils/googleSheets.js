@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 // === Load credentials ===
 const credentials = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../credentials.json"), "utf-8")
+  fs.readFileSync(path.join(__dirname, "../role-credentials.json"), "utf-8")
 );
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"];

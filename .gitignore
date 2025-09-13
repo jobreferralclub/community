@@ -3,3 +3,9 @@
 /backend/uploads
 /frontend/dist
 /.vscode
+# Ignore credentials files
+
+job-details-google-credentials.json
+# Ignore environment files with secrets
+.env
+.env.*

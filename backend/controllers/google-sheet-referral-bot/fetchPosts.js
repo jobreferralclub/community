@@ -35,7 +35,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const keyPath = path.join(__dirname, 'credentials.json');
+const keyPath = path.join(__dirname, 'job-details-google-credentials.json');
 const LOG_FILE_PATH = path.join(__dirname, 'lastJobIdLog.json');
 
 const auth = new google.auth.GoogleAuth({
