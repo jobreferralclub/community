@@ -205,4 +205,5 @@ export async function generatePostsAll() {
     }
   }
 }
-// generatePostsAll();
+generatePostsAll();
+
