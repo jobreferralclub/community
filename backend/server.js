@@ -30,7 +30,7 @@ import companyRoutes from "./routes/companies.js";
 import otpRoutes from "./routes/otp.js";
 import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
-import rolesStatsRoutes from "./routes/rolesStats.js";
+// import rolesStatsRoutes from "./routes/rolesStats.js";
 import resumeRoutes from "./routes/resume.js";
 import communityRoutes from  "./routes/community.js";
 import { giveJoke } from "./controllers/give-joke.controller.js";
@@ -52,7 +52,7 @@ app.use("/api/auth", otpRoutes);
 app.use("/api/resume", resumeRoutes);
 
 // Landing page
-app.use("/api/roleStats", rolesStatsRoutes);
+// app.use("/api/roleStats", rolesStatsRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
