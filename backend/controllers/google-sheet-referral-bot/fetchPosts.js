@@ -181,15 +181,18 @@ export async function generatePostsAll() {
 
       const title = 'Job Referral Opportunity';
       const job_description = row['About the Job'] || row['Job Description'] || '';
-      const message = `
+     const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
+
+const message = `
 <p><strong>Job ID:</strong> ${jobId}</p>
 <p><strong>Company Name:</strong> ${row['Company Name']}</p>
 <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
 <p><strong>Location:</strong> ${row['Location']}</p>
+${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
 <p>${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
 <p>Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to
 <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
-<p><em>T&amp;C applied.</em></p>
+<p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
 `;
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
