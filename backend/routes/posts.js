@@ -11,6 +11,7 @@ import {
   deleteComment,
   getCommentCountByUser,
   getJobDescriptionByPostId,
+  getPostByID,
 } from "../controllers/posts.controller.js";
 import Comment from "../models/Comment.js";
 
@@ -21,6 +22,7 @@ router.get("/", getAllPosts);
 router.post("/", createPost);
 router.patch("/:id", updatePost);
 router.delete("/:id", deletePost);
+router.get("/:id", getPostByID);
 router.patch("/:id/like", toggleLike);
 router.get("/:postId/job-description", getJobDescriptionByPostId);
 

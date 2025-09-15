@@ -84,7 +84,7 @@ export const deleteCommunity = async (req, res) => {
 
 export const getPostsByCommunityId = async (req, res) => {
     try {
-        const { page = 1 } = req.body; // default page = 1
+        const { page = 1 } = req.query; // ✅ read from query, not body
         const limit = 10;
         const skip = (page - 1) * limit;
 
@@ -116,7 +116,7 @@ export const getPostsByCommunityId = async (req, res) => {
                 postCount: totalPosts,
             },
             totalPages,
-            currentPage: page,
+            currentPage: Number(page), // ✅ convert string to number
             totalPosts,
             posts,
         });

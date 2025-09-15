@@ -17,8 +17,11 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [highlightedPost, setHighlightedPost] = useState(null);
 
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const postId = queryParams.get("postid");
 
   // Identify current community
   const currentCommunity =
@@ -56,6 +59,27 @@ const Community = () => {
 
     fetchPosts();
   }, [currentCommunity?.id, page]);
+
+  useEffect(() => {
+    if (!postId) return;
+
+    const fetchPostById = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/posts/${postId}`);
+        const data = await res.json();
+        if (res.ok) {
+          setHighlightedPost(data);
+        } else {
+          setHighlightedPost(null);
+        }
+      } catch (err) {
+        console.error("Error fetching post by ID:", err);
+        setHighlightedPost(null);
+      }
+    };
+
+    fetchPostById();
+  }, [postId]);
 
   const filters = [
     { id: "all", name: "All Posts", count: posts.length },
@@ -107,18 +131,18 @@ const Community = () => {
               {/* <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" /> */}
               <div className="flex flex-wrap gap-2">
                 {filters.map((filterOption) => (
-  <button
-    key={filterOption.id}
-    onClick={() => setFilter(filterOption.id)}
-    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-      ? "bg-[#79e708] !text-black"
-      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
-      }`}
-  >
-    {filterOption.name}
-    {filterOption.count > 0 && ` (${filterOption.count})`}
-  </button>
-))}
+                  <button
+                    key={filterOption.id}
+                    onClick={() => setFilter(filterOption.id)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
+                      ? "bg-[#79e708] !text-black"
+                      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
+                      }`}
+                  >
+                    {filterOption.name}
+                    {filterOption.count > 0 && ` (${filterOption.count})`}
+                  </button>
+                ))}
 
               </div>
             </div>
@@ -149,6 +173,16 @@ const Community = () => {
 
         {/* Posts */}
         <div className="space-y-6">
+          {highlightedPost && postId && (
+            <motion.div
+              key={highlightedPost._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <PostCard post={highlightedPost} />
+              <div className="border-b border-zinc-800 my-4"></div>
+            </motion.div>
+          )}
           {loading ? (
             <div className="text-center text-gray-500 py-10">Loading posts...</div>
           ) : filteredPosts.length > 0 ? (
@@ -211,7 +245,7 @@ const Community = () => {
           }}
         />}
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };

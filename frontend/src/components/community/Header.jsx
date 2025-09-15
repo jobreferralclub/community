@@ -20,30 +20,33 @@ const Header = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchSubmitted, setSearchSubmitted] = useState(false);
+  const [postResults, setPostResults] = useState([]);
 
   const [notifications, setNotifications] = useState([
     { id: 1, message: "Add your resume", read: false, action: () => navigate("/profile") },
     { id: 2, message: "Update your profile", read: false, action: () => navigate("/community/settings") },
   ]);
 
-  const [users, setUsers] = useState([]);
-
-  // Fetch users for search bar
   useEffect(() => {
-    async function fetchUsers() {
+    if (!searchSubmitted || !searchTerm.trim()) return;
+
+    async function fetchPosts() {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/users`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
-        }
+        const res = await fetch(`${apiBaseUrl}/api/search?q=${encodeURIComponent(searchTerm)}`);
+        if (!res.ok) throw new Error("Failed to fetch posts");
+
         const data = await res.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
+        setPostResults(data.results || []);
+      } catch (err) {
+        console.error("Failed to search posts:", err);
+        setPostResults([]);
       }
     }
-    fetchUsers();
-  }, [apiBaseUrl]);
+
+    fetchPosts();
+  }, [searchSubmitted, searchTerm, apiBaseUrl]);
+
 
   // Fetch user's gamification points
   useEffect(() => {
@@ -83,13 +86,13 @@ const Header = ({ onMenuClick }) => {
     }),
   ];
 
-  const userSearchData = users.map((u) => ({
-    name: u.name,
-    type: "User",
-    url: `/profile/${u._id}`,
-  }));
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchSubmitted(true);
+    }
+  };
 
-  const searchData = [...baseSearchData, ...userSearchData];
+  const searchData = [...baseSearchData];
 
   // Filter search results by searchTerm
   const filteredResults = searchData.filter(
@@ -137,7 +140,9 @@ const Header = ({ onMenuClick }) => {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setShowSearchResults(true);
+                setSearchSubmitted(false); // reset if typing again
               }}
+              onKeyDown={handleKeyDown}
               placeholder="Search community, tools, users..."
               className="pl-10 pr-4 py-2 w-full rounded-s rounded-e border border-zinc-800 bg-zinc-900 text-gray-300 placeholder-gray-500 focus:ring-2 focus:ring-[#79e708] focus:border-transparent transition-all"
             />
@@ -148,35 +153,100 @@ const Header = ({ onMenuClick }) => {
                 {/* Backdrop */}
                 <div
                   className="fixed inset-0 bg-black/50 z-10"
-                  onClick={() => setShowSearchResults(false)}
+                  onClick={() => {
+                    setShowSearchResults(false);
+                    setSearchSubmitted(false);
+                  }}
                 />
 
-                {/* Dropdown results */}
+                {/* Dropdown box */}
                 <div className="absolute mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
-                  {filteredResults.length > 0 ? (
-                    filteredResults.slice(0, 10).map((item, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => {
-                          navigate(item.url);
-                          setSearchTerm("");
-                          setShowSearchResults(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
-                      >
-                        {item.name}{" "}
-                        <span className="text-green-500">in {item.type}</span>
-                      </button>
-                    ))
+                  {!searchSubmitted ? (
+                    // Before pressing Enter
+                    <button
+                      type="button"
+                      onClick={() => setSearchSubmitted(true)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+                    >
+                      Search for: <span className="font-medium">{searchTerm}</span>{" "}
+                      <span className="text-gray-500">(Press Enter)</span>
+                    </button>
+                  ) : (filteredResults.length > 0 || postResults.length > 0) ? (
+                    <>
+                      {filteredResults.slice(0, 5).map((item, index) => (
+                        <button
+                          key={`local-${index}`}
+                          type="button"
+                          onClick={() => {
+                            navigate(item.url);
+                            setSearchTerm("");
+                            setShowSearchResults(false);
+                            setSearchSubmitted(false);
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+                        >
+                          {item.name}{" "}
+                          <span className="text-green-500">in {item.type}</span>
+                        </button>
+                      ))}
+
+                      {postResults.slice(0, 5).map((post) => {
+                        // Find community path from local list
+                        const matchedCommunity = subCommunities.find(
+                          (c) => c.title.toLowerCase().includes(post.community.toLowerCase())
+                        );
+                        const communityPath = matchedCommunity ? matchedCommunity.path : "/general";
+
+                        // Build custom redirect URL
+                        const customUrl = `${communityPath}?postid=${post.id}`;
+
+                        return (
+                          <button
+                            key={post.id}
+                            type="button"
+                            onClick={() => {
+                              navigate(customUrl);
+                              console.log("Navigating to:", customUrl);
+                              setSearchTerm("");
+                              setShowSearchResults(false);
+                              setSearchSubmitted(false);
+                            }}
+                            className="w-full text-left p-3 flex items-start gap-3 hover:bg-gray-800 transition-colors border-b border-zinc-800"
+                          >
+                            {/* Avatar */}
+                            <img
+                              src={post.author?.avatar || "/default-avatar.png"}
+                              alt={post.author?.name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+
+                            {/* Text Section */}
+                            <div className="flex-1">
+                              {/* Title */}
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-200">
+                                  {post.author?.name}
+                                </span>
+                                <span className="text-xs text-gray-500">· {post.community}</span>
+                              </div>
+
+                              {/* Snippet */}
+                              <p className="text-sm text-gray-400 line-clamp-1">{post.snippet}</p>
+                            </div>
+
+                            {/* Post Type / Tag */}
+                            <span className="text-xs text-blue-400 font-medium">Post</span>
+                          </button>
+                        );
+                      })}
+                    </>
                   ) : (
-                    <p className="px-4 py-2 text-sm text-gray-500">
-                      No results found
-                    </p>
+                    <p className="px-4 py-2 text-sm text-gray-500">No results found</p>
                   )}
                 </div>
               </>
             )}
+
           </div>
         </div>
 
@@ -208,11 +278,10 @@ const Header = ({ onMenuClick }) => {
                       <button
                         key={n.id}
                         onClick={() => handleNotificationClick(n.id, n.action)}
-                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${
-                          n.read
-                            ? "text-gray-500 hover:bg-gray-800"
-                            : "text-gray-300 hover:bg-gray-700 font-medium"
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${n.read
+                          ? "text-gray-500 hover:bg-gray-800"
+                          : "text-gray-300 hover:bg-gray-700 font-medium"
+                          }`}
                       >
                         {n.message}
                       </button>

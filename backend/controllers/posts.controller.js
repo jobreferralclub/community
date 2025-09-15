@@ -65,8 +65,8 @@ export const createPost = async (req, res) => {
 
     const savedPost = await post.save();
     if (userId) {
-  await User.findByIdAndUpdate(userId, { $inc: { postsCount: 1 } });
-}
+      await User.findByIdAndUpdate(userId, { $inc: { postsCount: 1 } });
+    }
 
     // ✅ Attach post to community & increment postCount
     if (communityId) {
@@ -126,6 +126,25 @@ export const updatePost = async (req, res) => {
     res.status(500).json({ error: "Failed to update post" });
   }
 };
+
+export const getPostByID = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const post = await Post.findById(id)
+      .populate("createdBy", "name avatar") // include author details
+      .lean();
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(post);
+  } catch (error) {
+    console.error("Error fetching post by ID:", error);
+    res.status(500).json({ error: "Failed to fetch post" });
+  }
+}
 
 // Delete a post
 export const deletePost = async (req, res) => {
@@ -234,8 +253,8 @@ export const addComment = async (req, res) => {
 
     const savedComment = await comment.save();
     if (userId) {
-  await User.findByIdAndUpdate(userId, { $inc: { commentsCount: 1 } });
-}
+      await User.findByIdAndUpdate(userId, { $inc: { commentsCount: 1 } });
+    }
 
     // Increment comment count
     await Post.findByIdAndUpdate(postId, { $inc: { comments: 1 } });

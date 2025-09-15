@@ -33,6 +33,7 @@ import analyticsRoutes from "./routes/analytics.js";
 // import rolesStatsRoutes from "./routes/rolesStats.js";
 import resumeRoutes from "./routes/resume.js";
 import communityRoutes from  "./routes/community.js";
+import searchRoutes from "./routes/search.js";
 import { giveJoke } from "./controllers/give-joke.controller.js";
 
 
@@ -59,6 +60,9 @@ app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 
 // Check if llm works or not
 app.get('/api/give-joke', giveJoke);
+
+// Search
+app.use("/api/search", searchRoutes);
 
 //Fetching Job Posts from Google sheet
 
