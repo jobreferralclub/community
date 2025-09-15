@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { searchData } from "../../data/searchList";
+import { subCommunities } from "../../data/communityList";
 
 const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut, FiUser } = FiIcons;
 
@@ -26,13 +26,26 @@ const Header = ({ onMenuClick }) => {
     { id: 2, message: "Update your profile", read: false, action: () => navigate("/community/settings") },
   ]);
 
+  const [users, setUsers] = useState([]);
 
-  const filteredResults = searchData.filter(
-    (item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Fetch users for search bar
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/users`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data = await res.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    }
+    fetchUsers();
+  }, [apiBaseUrl]);
 
+  // Fetch user's gamification points
   useEffect(() => {
     if (!user?._id) return;
 
@@ -44,8 +57,48 @@ const Header = ({ onMenuClick }) => {
       .catch((err) => {
         console.error("Failed to fetch gamification points:", err);
       });
-  }, [user?._id]);
+  }, [user?._id, apiBaseUrl]);
 
+  // Combine static, community and user search data
+  const baseSearchData = [
+    { name: "Mock Interviewer", type: "Free Tools", url: "/mock-interviewer" },
+    { name: "Resume Builder", type: "Free Tools", url: "/resume-builder" },
+    { name: "Resume Ranker", type: "Free Tools", url: "/resume-ranker" },
+    { name: "Resume Analyzer", type: "Free Tools", url: "/resume-analyzer" },
+    { name: "Profile", type: "User Profile", url: "/profile" },
+    { name: "Settings", type: "Community", url: "/community/settings" },
+
+    ...subCommunities.map((c) => {
+      const regionMatch = c.title.match(/- (.*)$/);
+      const region = regionMatch ? regionMatch[1] : "";
+
+      const nameMatch = c.title.match(/^(.*?)\s*-/);
+      const name = nameMatch ? nameMatch[1].trim() : c.title;
+
+      return {
+        name,
+        type: region ? `Community (${region})` : "Community",
+        url: c.path,
+      };
+    }),
+  ];
+
+  const userSearchData = users.map((u) => ({
+    name: u.name,
+    type: "User",
+    url: `/profile/${u._id}`,
+  }));
+
+  const searchData = [...baseSearchData, ...userSearchData];
+
+  // Filter search results by searchTerm
+  const filteredResults = searchData.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle notification clicks
   const handleNotificationClick = (id, action) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
@@ -85,7 +138,7 @@ const Header = ({ onMenuClick }) => {
                 setSearchTerm(e.target.value);
                 setShowSearchResults(true);
               }}
-              placeholder="Search community, tools..."
+              placeholder="Search community, tools, users..."
               className="pl-10 pr-4 py-2 w-full rounded-s rounded-e border border-zinc-800 bg-zinc-900 text-gray-300 placeholder-gray-500 focus:ring-2 focus:ring-[#79e708] focus:border-transparent transition-all"
             />
 
@@ -117,7 +170,9 @@ const Header = ({ onMenuClick }) => {
                       </button>
                     ))
                   ) : (
-                    <p className="px-4 py-2 text-sm text-gray-500">No results found</p>
+                    <p className="px-4 py-2 text-sm text-gray-500">
+                      No results found
+                    </p>
                   )}
                 </div>
               </>
@@ -153,18 +208,17 @@ const Header = ({ onMenuClick }) => {
                       <button
                         key={n.id}
                         onClick={() => handleNotificationClick(n.id, n.action)}
-                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${n.read
-                          ? "text-gray-500 hover:bg-gray-800"
-                          : "text-gray-300 hover:bg-gray-700 font-medium"
-                          }`}
+                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${
+                          n.read
+                            ? "text-gray-500 hover:bg-gray-800"
+                            : "text-gray-300 hover:bg-gray-700 font-medium"
+                        }`}
                       >
                         {n.message}
                       </button>
                     ))
                   ) : (
-                    <p className="px-4 py-2 text-sm text-gray-500">
-                      No new notifications
-                    </p>
+                    <p className="px-4 py-2 text-sm text-gray-500">No new notifications</p>
                   )}
                 </div>
               </div>

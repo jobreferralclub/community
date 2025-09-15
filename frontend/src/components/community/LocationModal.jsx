@@ -14,7 +14,7 @@ const LocationModal = ({ isOpen, onSelect }) => {
           // boxShadow: "0 0 10px 2px #79b708"
         }}
       >
-        <h2 className="text-2xl font-bold text-center mb-6">Select Job Location</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Select Work Location</h2>
         <div className="grid grid-cols-2 gap-4">
           <motion.button
             whileHover={{ scale: 1.02 }}
