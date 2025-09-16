@@ -111,10 +111,9 @@ const Community = () => {
         </div>
 
         {/* Search + Filters */}
-        <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800">
+        {/* <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            {/* Search */}
-            {/* <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-md">
             <SafeIcon
               icon={FiSearch}
               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -124,11 +123,8 @@ const Community = () => {
               placeholder="Search posts, tags, or users..."
               className="w-full pl-10 pr-4 py-2 rounded-s rounded-e bg-zinc-800 text-gray-200 border border-zinc-700 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
             />
-          </div> */}
-
-            {/* Filters */}
+          </div>
             <div className="flex items-center space-x-2">
-              {/* <SafeIcon icon={FiFilter} className="w-5 h-5 text-gray-400" /> */}
               <div className="flex flex-wrap gap-2">
                 {filters.map((filterOption) => (
                   <button
@@ -147,7 +143,7 @@ const Community = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Trending Topics
       <motion.div
@@ -179,10 +175,16 @@ const Community = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <PostCard post={highlightedPost} />
+              <div className=" shadow-lg p-4">
+                <div className="mb-2 text-sm font-semibold text-yellow-500 uppercase tracking-wide">
+                  Highlighted Post
+                </div>
+                <PostCard post={highlightedPost} />
+              </div>
               <div className="border-b border-zinc-800 my-4"></div>
             </motion.div>
           )}
+
           {loading ? (
             <div className="text-center text-gray-500 py-10">Loading posts...</div>
           ) : filteredPosts.length > 0 ? (
@@ -212,6 +214,7 @@ const Community = () => {
             </div>
           )}
         </div>
+
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (

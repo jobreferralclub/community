@@ -187,20 +187,22 @@ function AppWrapper() {
       <Routes>
         {/* ✅ Landing page (always public) */}
         <Route path="/" element={<Landing />} />
-        <Route path="/resume-builder">
-          <Route index element={<ResumeBuilder />} />
-          <Route path="questionnaire" element={<ResumeBuilderQuestionnaire />} />
-          <Route path="preview" element={<ResumeBuilderPreview />} />
-          <Route path="resume-from-linkedin" element={<ResumeFromLinkedin />} />
-          <Route path="enhancer" element={<ResumeEnhancer />} />
-        </Route>
+
+        {/* Resume Builder */}
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/resume-builder/questionnaire" element={<ResumeBuilderQuestionnaire />} />
+        <Route path="/resume-builder/preview" element={<ResumeBuilderPreview />} />
+        <Route path="/resume-builder/resume-from-linkedin" element={<ResumeFromLinkedin />} />
+        <Route path="/resume-builder/enhancer" element={<ResumeEnhancer />} />
+
         <Route path="/resume-ranker" element={<ResumeRanker />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
         <Route path="/analyzer-result" element={<AnalyzerResult />} />
+
+        {/* Mock Interviewer */}
         <Route path="/mock-interviewer" element={<MockInterviewer />} />
         <Route path="/mock-interviewer/interview" element={<Interview />} />
         <Route path="/mock-interviewer/summary" element={<SummaryPage />} />
-        <Route path="*" element={<NotFound />} />
 
         {/* ✅ Public login route */}
         <Route
@@ -208,86 +210,76 @@ function AppWrapper() {
           element={isAuthenticated ? <Navigate to="/community/introductions" replace /> : <Login />}
         />
 
+        {/* Profile */}
         {isAuthenticated ? (
           <>
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/profile/cover-letter" element={<CoverLetterPage/>} />
+            <Route path="/profile/cover-letter" element={<CoverLetterPage />} />
           </>
         ) : (
           <Route path="/profile" element={<Navigate to="/login" replace />} />
         )}
-        {/* ✅ Protected routes under /community */}
+
+        {/* ✅ Community routes (flat, with Layout wrapper) */}
         {isAuthenticated ? (
-          <Route
-            path="/community/*"
-            element={
-              <div className="min-h-screen bg-gray-50">
-                <Layout>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Routes>
-                      <Route path="introductions" element={<Community />} />
-                      <Route path="dashboard" element={<Dashboard />} />
+          <>
+            <Route path="/community/introductions" element={<Layout><Community /></Layout>} />
+            <Route path="/community/dashboard" element={<Layout><Dashboard /></Layout>} />
 
-                      {/* India sub-communities */}
-                      <Route path="/in/operations" element={<Community />} />
-                      <Route path="/in/program" element={<Community />} />
-                      <Route path="/in/product" element={<Community />} />
-                      <Route path="/in/marketing" element={<Community />} />
-                      <Route path="/in/account" element={<Community />} />
-                      <Route path="/in/category" element={<Community />} />
-                      <Route path="/in/finance" element={<Community />} />
-                      <Route path="/in/hr" element={<Community />} />
-                      <Route path="/in/analyst" element={<Community />} />
-                      <Route path="/in/strategy" element={<Community />} />
-                      <Route path="/in/freshers" element={<Community />} />
+            {/* India */}
+            <Route path="/community/in/operations" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/program" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/product" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/marketing" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/account" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/category" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/finance" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/hr" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/analyst" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/strategy" element={<Layout><Community /></Layout>} />
+            <Route path="/community/in/freshers" element={<Layout><Community /></Layout>} />
 
-                      {/* US sub-communities */}
-                      <Route path="/us/operations" element={<Community />} />
-                      <Route path="/us/program" element={<Community />} />
-                      <Route path="/us/product" element={<Community />} />
-                      <Route path="/us/marketing" element={<Community />} />
-                      <Route path="/us/account" element={<Community />} />
-                      <Route path="/us/category" element={<Community />} />
-                      <Route path="/us/finance" element={<Community />} />
-                      <Route path="/us/hr" element={<Community />} />
-                      <Route path="/us/analyst" element={<Community />} />
-                      <Route path="/us/strategy" element={<Community />} />
+            {/* US */}
+            <Route path="/community/us/operations" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/program" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/product" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/marketing" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/account" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/category" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/finance" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/hr" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/analyst" element={<Layout><Community /></Layout>} />
+            <Route path="/community/us/strategy" element={<Layout><Community /></Layout>} />
 
-                      {/* Global sub-communities */}
-                      <Route path="ask-the-community" element={<Community />} />
-                      <Route path="announcements" element={<Community />} />
-                      <Route path="club-guidelines" element={<Community />} />
+            {/* Global */}
+            <Route path="/community/ask-the-community" element={<Layout><Community /></Layout>} />
+            <Route path="/community/announcements" element={<Layout><Community /></Layout>} />
+            <Route path="/community/club-guidelines" element={<Layout><Community /></Layout>} />
 
-                      {/* Other authenticated routes */}
-                      <Route path="/analytics" element={<Analytics />} />
-                      <Route path="/email" element={<EmailBroadcast />} />
-                      <Route path="/videos" element={<VideoHub />} />
-                      <Route path="/gamification" element={<Gamification />} />
-                      <Route path="/monetization" element={<Monetization />} />
-                      <Route path="/coaching" element={<Coaching />} />
-                      <Route path="/courses" element={<CourseBuilder />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/auth/callback" element={<AuthCallback />} />
+            {/* Other features */}
+            <Route path="/community/analytics" element={<Layout><Analytics /></Layout>} />
+            <Route path="/community/email" element={<Layout><EmailBroadcast /></Layout>} />
+            <Route path="/community/videos" element={<Layout><VideoHub /></Layout>} />
+            <Route path="/community/gamification" element={<Layout><Gamification /></Layout>} />
+            <Route path="/community/monetization" element={<Layout><Monetization /></Layout>} />
+            <Route path="/community/coaching" element={<Layout><Coaching /></Layout>} />
+            <Route path="/community/courses" element={<Layout><CourseBuilder /></Layout>} />
+            <Route path="/community/settings" element={<Layout><Settings /></Layout>} />
+            <Route path="/community/auth/callback" element={<AuthCallback />} />
 
-                      {/* Catch all for authenticated users */}
-                      <Route path="*" element={<Navigate to="/community/introductions" replace />} />
-                    </Routes>
-                  </motion.div>
-                </Layout>
-              </div>
-            }
-          />
+            {/* Fallback for unknown /community routes */}
+            <Route path="/community/*" element={<Navigate to="/community/introductions" replace />} />
+          </>
         ) : (
-          // Redirect all unknown routes to login if not authenticated
           <Route path="/community/*" element={<Navigate to="/login" replace />} />
         )}
+
+        {/* Catch all */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
+
 }
 
 export default function App() {
