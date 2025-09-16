@@ -209,5 +209,5 @@ ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
     }
   }
 }
-generatePostsAll();
+// generatePostsAll();
 
