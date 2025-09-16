@@ -190,10 +190,11 @@ const message = `
 <p><strong>Location:</strong> ${row['Location']}</p>
 ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
 <p>${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
-<p>Refer Job Description for more details. If you find this role relevant and are interested to be referred, please send your CV to
+<p>Refer the <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer">Job Description</a> for more details. If you find this role relevant and are interested to be referred, please send your CV to
 <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
 <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
 `;
+
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
       const success = await createPost(title, message, job_description, sheet.community);
@@ -208,5 +209,5 @@ ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
     }
   }
 }
-// generatePostsAll();
+generatePostsAll();
 
