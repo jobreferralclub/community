@@ -13,7 +13,7 @@ const ProfileSettings = ({ user }) => {
     avatar: user.avatar || "",
   });
 
-  const [phoneError, setPhoneError] = useState(""); // New: error for phone validation
+  const [phoneError, setPhoneError] = useState(""); // Phone validation error
 
   const apiUrl = import.meta.env.VITE_API_PORT;
 
@@ -25,7 +25,6 @@ const ProfileSettings = ({ user }) => {
     // Phone: Only allow digits, max 10 characters
     if (name === "phone") {
       if (!/^\d{0,10}$/.test(value)) return;
-      // Validation live error
       if (value && value.length !== 10) {
         setPhoneError("Phone number must be 10 digits");
       } else {
@@ -98,12 +97,13 @@ const ProfileSettings = ({ user }) => {
       onSubmit={handleSubmit}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-zinc-900 rounded-s rounded-e p-6 shadow-md border border-gray-700"
+      // Responsive wrapper
+      className="w-full max-w-3xl mx-auto bg-zinc-900 rounded-s rounded-e p-4 sm:p-6 md:p-8 shadow-md border border-gray-700"
     >
       <h3 className="text-lg font-semibold text-white mb-6">My Profile</h3>
 
-      {/* Profile photo */}
-      <div className="flex items-center space-x-6 mb-8">
+      {/* Responsive Avatar and Upload */}
+      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 mb-8">
         <img
           src={formData.avatar}
           alt={formData.name}
@@ -136,7 +136,7 @@ const ProfileSettings = ({ user }) => {
         </div>
       </div>
 
-      {/* Basic Inputs */}
+      {/* Responsive grid for inputs */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -159,7 +159,7 @@ const ProfileSettings = ({ user }) => {
             type="email"
             name="email"
             value={formData.email}
-            readOnly // email is now not editable
+            readOnly
             required
             className="w-full p-3 bg-black border border-gray-700 rounded-s rounded-e text-gray-400 bg-gray-800 placeholder-gray-500 cursor-not-allowed"
           />
