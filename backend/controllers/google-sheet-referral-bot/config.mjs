@@ -22,4 +22,4 @@ export const HUMAN_RESOURCES_US_SHEET_ID = '1wspialayhascMNhf0NBFAOddsDTroygU34r
 export const ANALYTICS_US_SHEET_ID = '1QrtUikquNmHM4it8R18vDYMptvDiDiLHOng5xD-z19k';
 export const STRATEGY_US_SHEET_ID = '1z3o-eh8fRap7wZr21-X6im9izuRhP-IdGhM75i48JQQ';
 
-export const SHEET_RANGE = 'Sheet1!A1:L100';
+export const SHEET_RANGE = 'Sheet1!A1:M100';
