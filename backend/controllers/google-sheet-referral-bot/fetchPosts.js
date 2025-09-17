@@ -182,21 +182,38 @@ export async function generatePostsAll() {
     const title = 'Job Referral Opportunity';
     const job_description = row['About the Job'] || row['Job Description'] || '';
     const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
-    const yearsOfExp = row['Years of experience'];
-    const yearsExpText = yearsOfExp ? `<p><strong>Years of experience:</strong> ${yearsOfExp} years</p>` : '';
+    const yearsOfExpRaw = row['Years of experience'];
+    const yearsOfExp = (
+      yearsOfExpRaw !== undefined &&
+      yearsOfExpRaw !== null &&
+      yearsOfExpRaw !== '' &&
+      yearsOfExpRaw.toString().toLowerCase() !== 'null'
+    ) ? yearsOfExpRaw : null;
 
-      const message = `
-      <p><strong>Job ID:</strong> ${jobId}</p>
-      <p><strong>Company Name:</strong> ${row['Company Name']}</p>
-      <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
-      <p><strong>Location:</strong> ${row['Location']}</p>
-      ${yearsExpText}
-      ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
-      <p>${row["Hiring Manager's Name"]} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
-      <p>Refer the <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer">Job Description</a> for more details. If you find this role relevant and are interested to be referred, please send your CV to
-      <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
-      <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
-      `;
+const yearsExpText = yearsOfExp
+  ? `<p><strong>Years of experience:</strong> ${yearsOfExp} years</p>`
+  : '';
+
+
+    const hiringManagerName = row["Hiring Manager's Name"];
+    const hiringManagerText =
+   hiringManagerName && hiringManagerName !== "0"
+    ? `<p>${hiringManagerName} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>`
+    : "";
+
+const message = `
+  <p><strong>Job ID:</strong> ${jobId}</p>
+  <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+  <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
+  <p><strong>Location:</strong> ${row['Location']}</p>
+  ${yearsExpText}
+  ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
+  ${hiringManagerText}
+  <p>Refer the <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer">Job Description</a> for more details. If you find this role relevant and are interested to be referred, please send your CV to
+  <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
+  <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
+`;
+
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
       const success = await createPost(title, message, job_description, sheet.community);
