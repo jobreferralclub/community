@@ -209,10 +209,16 @@ const message = `
   ${yearsExpText}
   ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
   ${hiringManagerText}
-  <p>Refer the <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer">Job Description</a> for more details. If you find this role relevant and are interested to be referred, please send your CV to
-  <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.</p>
+  <p>Refer the 
+    <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
+      Job Description
+    </a> 
+    for more details. If you find this role relevant and are interested to be referred, please send your CV to 
+    <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.
+  </p>
   <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
 `;
+
 
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
