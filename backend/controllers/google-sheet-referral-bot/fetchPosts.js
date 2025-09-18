@@ -141,7 +141,6 @@ const sheetsToProcess = [
   { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
-
 export async function generatePostsAll() {
   const lastJobIdLog = await loadLastJobIdLog();
   console.log("\n=== Debug: lastJobIdLog loaded ===");
@@ -179,47 +178,53 @@ export async function generatePostsAll() {
         console.log(`[DEBUG] Freshers - isJobIdNewer result: ${isJobIdNewer(jobId, lastJobIdLog[sheet.community])}`);
       }
 
-    const title = 'Job Referral Opportunity';
-    const job_description = row['About the Job'] || row['Job Description'] || '';
-    const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
-    const yearsOfExpRaw = row['Years of experience'];
-    const yearsOfExp = (
-      yearsOfExpRaw !== undefined &&
-      yearsOfExpRaw !== null &&
-      yearsOfExpRaw !== '' &&
-      yearsOfExpRaw.toString().toLowerCase() !== 'null'
-    ) ? yearsOfExpRaw : null;
+      const title = 'Job Referral Opportunity';
+      const job_description = row['About the Job'] || row['Job Description'] || '';
+      const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
+      const yearsOfExpRaw = row['Years of experience'];
+      const yearsOfExp = (
+        yearsOfExpRaw !== undefined &&
+        yearsOfExpRaw !== null &&
+        yearsOfExpRaw !== '' &&
+        yearsOfExpRaw.toString().toLowerCase() !== 'null'
+      ) ? yearsOfExpRaw : null;
 
-const yearsExpText = yearsOfExp
-  ? `<p><strong>Years of experience:</strong> ${yearsOfExp} years</p>`
-  : '';
+      const yearsExpText = yearsOfExp
+        ? `<p><strong>Years of experience:</strong> ${yearsOfExp} years</p>`
+        : '';
 
+      const hiringManagerName = row["Hiring Manager's Name"];
+      const isHiringManagerMissing =
+        hiringManagerName === undefined ||
+        hiringManagerName === null ||
+        hiringManagerName === "" ||
+        hiringManagerName.toString().toLowerCase() === "null";
 
-    const hiringManagerName = row["Hiring Manager's Name"];
-    const hiringManagerText =
-   hiringManagerName && hiringManagerName !== "0"
-    ? `<p>${hiringManagerName} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>`
-    : "";
+      const jobLink = row['Job Link'];
 
-const message = `
-  <p><strong>Job ID:</strong> ${jobId}</p>
-  <p><strong>Company Name:</strong> ${row['Company Name']}</p>
-  <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
-  <p><strong>Location:</strong> ${row['Location']}</p>
-  ${yearsExpText}
-  ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
-  ${hiringManagerText}
-  <p>Refer the 
-    <a href="${row['Job Link']}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
-      Job Description
-    </a> 
-    for more details. If you find this role relevant and are interested to be referred, please send your CV to 
-    <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.
-  </p>
-  <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
-`;
-
-
+      const message = isHiringManagerMissing
+        ? `<p>Refer the 
+            <a href="${jobLink}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
+              Job Description
+            </a> 
+            for more details and apply.</p>`
+        : `
+          <p><strong>Job ID:</strong> ${jobId}</p>
+          <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+          <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
+          <p><strong>Location:</strong> ${row['Location']}</p>
+          ${yearsExpText}
+          ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
+          <p>${hiringManagerName} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
+          <p>Refer the 
+            <a href="${jobLink}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
+              Job Description
+            </a> 
+            for more details. If you find this role relevant and are interested to be referred, please send your CV to 
+            <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.
+          </p>
+          <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
+        `;
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
       const success = await createPost(title, message, job_description, sheet.community);
@@ -235,4 +240,3 @@ const message = `
   }
 }
 // generatePostsAll();
-
