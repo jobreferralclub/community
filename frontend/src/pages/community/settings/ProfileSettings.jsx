@@ -238,12 +238,24 @@ const ProfileSettings = ({ user }) => {
 
       {/* Save button */}
       <div className="flex justify-end mt-6">
-        <button
-          type="submit"
-          className="border border-[#79e708] text-[#79e708] px-6 py-2 rounded-s rounded-e hover:bg-[#79e708] hover:text-black transition-colors duration-300"
-        >
-          Save Changes
-        </button>
+          <button
+  type="submit"
+  className="
+    text-white text-base px-6 py-3
+    bg-black
+    rounded-md
+    transition-all duration-300
+    hover:scale-105
+    hover:shadow-lg hover:shadow-[#79e708]/20
+    font-bold
+    flex items-center justify-center
+    relative
+    overflow-hidden
+  "
+>
+  Save Changes
+</button>
+
       </div>
     </motion.form>
   );
