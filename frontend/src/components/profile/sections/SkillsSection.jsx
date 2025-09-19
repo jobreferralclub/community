@@ -3,14 +3,14 @@ import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 
 const SkillsSection = ({ skills, onAdd, onDelete }) => (
-  <section className="bg-gray-900 rounded-xl p-6">
+  <section className="bg-zinc-900 rounded-xl">
     <SectionHeader title="Skills" onAdd={onAdd} />
 
     <div className="flex flex-wrap gap-3 mt-4">
       {skills.map((skill) => (
         <div
           key={skill.id}
-          className="group relative bg-gray-800 rounded-lg px-4 py-2 flex items-center hover:bg-gray-700 transition-colors"
+          className="group relative bg-zinc-800 rounded-s rounded-e px-4 py-2 flex items-center hover:bg-gray-700 transition-colors"
         >
           {/* Skill name */}
           <span className="text-white font-medium">{skill.name}</span>

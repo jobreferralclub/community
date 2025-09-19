@@ -4,13 +4,13 @@ import SectionHeader from "../SectionHeader";
 import ActionButtons from "../ActionButtons";
 
 const EducationSection = ({ education, onAdd, onEdit, onDelete }) => (
-  <section className="bg-gray-900 rounded-xl p-6">
+  <section className="bg-zinc-900 rounded-s rounded-e">
     <SectionHeader title="Education" onAdd={onAdd} />
     <div className="space-y-4">
       {education.map((edu) => (
         <div
           key={edu._id}
-          className="group bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors relative"
+          className="group bg-zinc-800 rounded-s rounded-e p-4 hover:bg-gray-750 transition-colors relative"
         >
           {/* Edit/Delete buttons */}
           <div className="absolute top-4 right-4">

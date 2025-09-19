@@ -4,13 +4,13 @@ import ActionButtons from "../ActionButtons";
 import { ExternalLink } from "lucide-react";
 
 const CertificatesSection = ({ certificates, onAdd, onEdit, onDelete }) => (
-  <section className="bg-gray-900 rounded-xl p-6">
+  <section className="bg-zinc-900 rounded-xl">
     <SectionHeader title="Certificates" onAdd={onAdd} />
     <div className="space-y-4">
       {certificates.map((cert) => (
         <div
           key={cert.id}
-          className="group bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors relative"
+          className="group bg-zinc-800 rounded-s rounded-e p-4 hover:bg-gray-750 transition-colors relative"
         >
           {/* Delete/Edit buttons */}
           <div className="absolute top-4 right-4">
@@ -36,7 +36,7 @@ const CertificatesSection = ({ certificates, onAdd, onEdit, onDelete }) => (
                 href={cert.credentialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-blue-400 hover:underline mt-1"
+                className="inline-flex items-center text-sm text-lime-500 hover:underline mt-1"
               >
                 <ExternalLink size={14} className="mr-1" />
                 View Credential

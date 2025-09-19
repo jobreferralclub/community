@@ -10,13 +10,13 @@ const formatMonthYear = (dateStr) => {
 };
 
 const ProjectsSection = ({ projects, onAdd, onEdit, onDelete }) => (
-  <section className="bg-gray-900 rounded-xl p-6">
+  <section className="bg-zinc-900 rounded-xl">
     <SectionHeader title="Projects" onAdd={onAdd} />
     <div className="space-y-4">
       {projects.map((project) => (
         <div
           key={project.id}
-          className="group bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-colors relative"
+          className="group bg-zinc-800 rounded-s rounded-e p-4 hover:bg-gray-750 transition-colors relative"
         >
           {/* Action Buttons */}
           <div className="absolute top-4 right-4">
@@ -62,7 +62,7 @@ const ProjectsSection = ({ projects, onAdd, onEdit, onDelete }) => (
                       href={url.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-sm text-blue-400 hover:underline"
+                      className="inline-flex items-center text-sm text-lime-500 hover:underline"
                     >
                       <ExternalLink size={14} className="mr-1" />
                       View Project

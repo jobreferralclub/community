@@ -260,7 +260,7 @@ const Header = ({ onMenuClick }) => {
 
           {/* Notifications */}
           <div className="relative">
-            <button
+            {/* <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-2 rounded-lg hover:bg-gray-900 transition-colors"
             >
@@ -268,7 +268,7 @@ const Header = ({ onMenuClick }) => {
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               )}
-            </button>
+            </button> */}
 
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20">
@@ -308,7 +308,7 @@ const Header = ({ onMenuClick }) => {
             </div>
 
             <div className="absolute right-0 top-6 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
-              <button
+              {/* <button
                 onClick={() => {
                   navigate("/profile");
                 }}
@@ -316,7 +316,7 @@ const Header = ({ onMenuClick }) => {
               >
                 <SafeIcon icon={FiUser} className="w-4 h-4 text-gray-400" />
                 My Profile
-              </button>
+              </button> */}
               <button
                 onClick={() => {
                   logout();

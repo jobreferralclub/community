@@ -9,6 +9,7 @@ const {
     FiDatabase,
     FiBriefcase,
     FiUsers,
+    FiFileText,
 } = FiIcons;
 
 export const tabs = [
@@ -20,6 +21,7 @@ export const tabs = [
     { id: "data", name: "Data & Export", icon: FiDatabase },
     { id: "companies", name: "Registered Companies", icon: FiBriefcase },
     { id: "users", name: "Users", icon: FiUsers },
+    { id: "resume", name: "Resume", icon: FiFileText },
 ];
 
 export const adminOnly = [

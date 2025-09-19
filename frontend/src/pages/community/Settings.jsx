@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useLocation, useNavigate } from "react-router-dom"; // 👈 add this
 import SafeIcon from "../../common/SafeIcon";
-import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
 import { tabs, adminOnly } from "../../data/settingList";
 import ProfileSettings from "./settings/ProfileSettings";
@@ -12,17 +11,38 @@ import ApiSettings from "./settings/ApiSettings";
 import DataExportSettings from "./settings/DataExportSettings";
 import CompanySettings from "./settings/CompanySettings";
 import UserSettings from "./settings/UserSettings";
+import ResumeSettings from "./settings/ResumeSettings";
 import Footer from "../../components/landing/Footer";
 
 const Settings = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const query = new URLSearchParams(location.search);
+  const pageParam = query.get("page");
+
   // ------------------------------------------
   // State and Store
   // ------------------------------------------
-  const [activeTab, setActiveTab] = useState("profile");
-  const { user, updateUser } = useAuthStore();
+  const [activeTab, setActiveTab] = useState(pageParam || "profile"); // 👈 default to query
+  const { user } = useAuthStore();
   const [companies, setCompanies] = useState([]);
   const [users, setUsers] = useState([]);
   const role = useAuthStore((state) => state.role);
+
+  // ------------------------------------------
+  // Sync activeTab with URL
+  // ------------------------------------------
+  useEffect(() => {
+    if (pageParam && pageParam !== activeTab) {
+      setActiveTab(pageParam);
+    }
+  }, [pageParam]);
+
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+    navigate(`?page=${id}`); // 👈 updates URL without reload
+  };
 
   // ------------------------------------------
   // Fetch Effects
@@ -32,14 +52,9 @@ const Settings = () => {
     fetchUsers();
   }, []);
 
-  // ------------------------------------------
-  // Fetch Users
-  // ------------------------------------------
   const fetchUsers = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_PORT}/api/users`
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/users`);
       const data = await res.json();
       setUsers(data);
     } catch (error) {
@@ -47,21 +62,15 @@ const Settings = () => {
     }
   };
 
-  // ------------------------------------------
-  // Fetch Companies
-  // ------------------------------------------
   const fetchCompanies = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_PORT}/api/companies`
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/companies`);
       const data = await res.json();
       setCompanies(data);
     } catch (error) {
       console.error("Failed to fetch companies:", error);
     }
   };
-
 
   // ------------------------------------------
   // MAIN RETURN (DARK MODE WRAPPER)
@@ -86,14 +95,21 @@ const Settings = () => {
                   adminOnly.includes(tab.name) && role !== "admin" ? null : (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-s rounded-e text-left transition-colors ${activeTab === tab.id
-                        ? "bg-primary-green !text-black"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                        }`}
+                      onClick={() => handleTabClick(tab.id)} // 👈 use handler
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-s rounded-e text-left transition-colors ${
+                        activeTab === tab.id
+                          ? "bg-primary-green !text-black"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      }`}
                     >
                       <SafeIcon icon={tab.icon} className="w-5 h-5" />
-                      <span className={`font-medium ${activeTab == tab.id ? "!text-black" : ""}`}>{tab.name}</span>
+                      <span
+                        className={`font-medium ${
+                          activeTab === tab.id ? "!text-black" : ""
+                        }`}
+                      >
+                        {tab.name}
+                      </span>
                     </button>
                   )
                 )}
@@ -111,17 +127,11 @@ const Settings = () => {
             {activeTab === "data" && <DataExportSettings />}
             {activeTab === "companies" && <CompanySettings />}
             {activeTab === "users" && <UserSettings />}
+            {activeTab === "resume" && <ResumeSettings />}
           </div>
         </div>
-
-        {/* PADDING / Spacer to meet ≈910 lines */}
-        <div className="hidden">
-          {[...Array(40)].map((_, i) => (
-            <p key={i}>&nbsp;</p>
-          ))}
-        </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };
