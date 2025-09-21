@@ -203,7 +203,13 @@ export async function generatePostsAll() {
       const jobLink = row['Job Link'];
 
       const message = isHiringManagerMissing
-        ? `<p>Refer the 
+        ? `<p><strong>Job ID:</strong> ${jobId}</p>
+          <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+          <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
+          <p><strong>Location:</strong> ${row['Location']}</p>
+          ${yearsExpText}
+          ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
+          <p>Refer the 
             <a href="${jobLink}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
               Job Description
             </a> 
