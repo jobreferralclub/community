@@ -8,22 +8,23 @@ import { useLocation } from "react-router-dom";
 import { subCommunities } from "../../data/communityList";
 import Footer from "../../components/landing/Footer";
 
-const { FiPlus, FiFilter, FiSearch, FiTrendingUp } = FiIcons;
+import FilterBar from "./FilterBar"; // Adjust path as needed
+
+const { FiPlus } = FiIcons;
 
 const Community = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
-  const [filter, setFilter] = useState("all");
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [highlightedPost, setHighlightedPost] = useState(null);
+  const [selectedFilters, setSelectedFilters] = useState({});
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("postid");
 
-  // Identify current community
   const currentCommunity =
     subCommunities.find((c) => location.pathname.startsWith(c.path)) || {
       id: null,
@@ -35,7 +36,6 @@ const Community = () => {
     setPage(1);
   }, [currentCommunity?.id]);
 
-  // Fetch posts
   useEffect(() => {
     if (!currentCommunity?.id) return;
 
@@ -81,14 +81,25 @@ const Community = () => {
     fetchPostById();
   }, [postId]);
 
-  const filters = [
-    { id: "all", name: "All Posts", count: posts.length },
-    { id: "job-posting", name: "Job Postings", count: posts.filter((p) => p.type === "job-posting").length },
-    { id: "success-story", name: "Success Stories", count: posts.filter((p) => p.type === "success-story").length },
-    { id: "discussion", name: "Discussions", count: posts.filter((p) => p.type === "discussion").length },
-  ];
+  // Filter posts based on selected filters
+  const applyFilters = (post) => {
+    if (selectedFilters.jobs && selectedFilters.jobs !== "All Jobs") {
+      if (!post.category || !post.category.includes(selectedFilters.jobs)) return false;
+    }
+    if (selectedFilters.company && selectedFilters.company !== "Any") {
+      if (post.company !== selectedFilters.company) return false;
+    }
+    if (selectedFilters.easyApply) {
+      if (!post.easyApply) return false;
+    }
+    if (selectedFilters.under10) {
+      if (!post.applicants || post.applicants >= 10) return false;
+    }
+    // Implement datePosted filtering as needed based on your post data
+    return true;
+  };
 
-  const filteredPosts = posts.filter((post) => filter === "all" || post.type === filter);
+  const filteredPosts = posts.filter(applyFilters);
 
   return (
     <>
@@ -110,75 +121,15 @@ const Community = () => {
           </motion.button>
         </div>
 
-        {/* Search + Filters */}
-        {/* <div className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div className="relative flex-1 max-w-md">
-            <SafeIcon
-              icon={FiSearch}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-            />
-            <input
-              type="text"
-              placeholder="Search posts, tags, or users..."
-              className="w-full pl-10 pr-4 py-2 rounded-s rounded-e bg-zinc-800 text-gray-200 border border-zinc-700 focus:ring-2 focus:ring-[#79e708] focus:border-transparent"
-            />
-          </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex flex-wrap gap-2">
-                {filters.map((filterOption) => (
-                  <button
-                    key={filterOption.id}
-                    onClick={() => setFilter(filterOption.id)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${filter === filterOption.id
-                      ? "bg-[#79e708] !text-black"
-                      : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
-                      }`}
-                  >
-                    {filterOption.name}
-                    {filterOption.count > 0 && ` (${filterOption.count})`}
-                  </button>
-                ))}
-
-              </div>
-            </div>
-          </div>
-        </div> */}
-
-        {/* Trending Topics
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-zinc-900 rounded-xl p-6 shadow-md border border-zinc-800"
-      >
-        <div className="flex items-center space-x-2 mb-4">
-          <SafeIcon icon={FiTrendingUp} className="w-5 h-5" style={{ color: "#79e708" }} />
-          <h3 className="text-lg font-semibold text-white">Trending Topics</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {["React", "Remote Work", "Google", "Meta", "Interview Tips", "Salary Negotiation"].map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 bg-[#79e708] !text-black rounded-full text-sm font-medium cursor-pointer hover:brightness-105"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
-      </motion.div> */}
+        {/* Filter Bar */}
+        <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
 
         {/* Posts */}
         <div className="space-y-6">
           {highlightedPost && postId && (
-            <motion.div
-              key={highlightedPost._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className=" shadow-lg p-4">
-                <div className="mb-2 text-sm font-semibold text-yellow-500 uppercase tracking-wide">
-                  Highlighted Post
-                </div>
+            <motion.div key={highlightedPost._id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="shadow-lg p-4">
+                <div className="mb-2 text-sm font-semibold text-yellow-500 uppercase tracking-wide">Highlighted Post</div>
                 <PostCard post={highlightedPost} />
               </div>
               <div className="border-b border-zinc-800 my-4"></div>
@@ -198,23 +149,16 @@ const Community = () => {
                 <PostCard
                   post={post}
                   onUpdate={(updatedPost) =>
-                    setPosts((prev) =>
-                      prev.map((p) => (p._id === updatedPost._id ? updatedPost : p))
-                    )
+                    setPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)))
                   }
-                  onDelete={(id) =>
-                    setPosts((prev) => prev.filter((p) => p._id !== id))
-                  }
+                  onDelete={(id) => setPosts((prev) => prev.filter((p) => p._id !== id))}
                 />
               </motion.div>
             ))
           ) : (
-            <div className="text-center text-gray-500 py-10">
-              No posts to display in this community.
-            </div>
+            <div className="text-center text-gray-500 py-10">No posts to display in this community.</div>
           )}
         </div>
-
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
@@ -241,12 +185,14 @@ const Community = () => {
           </div>
         )}
 
-        {showCreatePost && <CreatePost
-          onClose={() => {
-            setShowCreatePost(false);
-            setPage(1); // reset to first page
-          }}
-        />}
+        {showCreatePost && (
+          <CreatePost
+            onClose={() => {
+              setShowCreatePost(false);
+              setPage(1);
+            }}
+          />
+        )}
       </div>
       <Footer />
     </>
