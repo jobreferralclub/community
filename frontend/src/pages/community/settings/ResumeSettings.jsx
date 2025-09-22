@@ -521,7 +521,10 @@ const ResumeSettings = () => {
             className="space-y-6"
         >
             <div className="bg-zinc-900 p-6 rounded-xl border border-gray-700 shadow-md">
-                <h2 className="text-xl font-semibold text-white mb-6">Resume</h2>
+                <h2 className="text-3xl font-semibold text-white mb-6 text-center">
+  Resume Inputs
+</h2>
+
 
                 <div className="space-y-8">
                     <EducationSection
