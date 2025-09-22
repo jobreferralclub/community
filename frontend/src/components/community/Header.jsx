@@ -24,8 +24,8 @@ const Header = ({ onMenuClick }) => {
   const [postResults, setPostResults] = useState([]);
 
   const [notifications, setNotifications] = useState([
-    { id: 1, message: "Add your resume", read: false, action: () => navigate("/profile") },
-    { id: 2, message: "Update your profile", read: false, action: () => navigate("/community/settings") },
+    { id: 1, message: "Announcements", read: false, action: () => navigate("/community/announcements") },
+    { id: 2, message: "Ask the community", read: false, action: () => navigate("/community/ask-the-community") },
   ]);
 
   useEffect(() => {
@@ -260,7 +260,7 @@ const Header = ({ onMenuClick }) => {
 
           {/* Notifications */}
           <div className="relative">
-            {/* <button
+            { <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-2 rounded-lg hover:bg-gray-900 transition-colors"
             >
@@ -268,7 +268,7 @@ const Header = ({ onMenuClick }) => {
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               )}
-            </button> */}
+            </button> }
 
             {showNotifications && (
               <div className="absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20">
