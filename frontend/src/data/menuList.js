@@ -22,8 +22,8 @@ export const menuItems = [
                 name: "Community Hub",
                 children: [
                     { name: "Introductions", path: "/community/introductions" },
-                    { name: "Ask the Community", path: "/community/ask-the-community" },
-                    { name: "Announcements", path: "/community/announcements" },
+                    // { name: "Ask the Community", path: "/community/ask-the-community" },
+                    // { name: "Announcements", path: "/community/announcements" },
                     { name: "Club Guidelines", path: "/community/club-guidelines" },
                 ],
             },
