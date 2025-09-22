@@ -11,6 +11,7 @@ import ApiSettings from "./settings/ApiSettings";
 import DataExportSettings from "./settings/DataExportSettings";
 import CompanySettings from "./settings/CompanySettings";
 import UserSettings from "./settings/UserSettings";
+import ResumeFromLinkedin from "./settings/ResumeFromLinkedIn";
 import ResumeSettings from "./settings/ResumeSettings";
 import Footer from "../../components/landing/Footer";
 
@@ -127,6 +128,7 @@ const Settings = () => {
             {activeTab === "data" && <DataExportSettings />}
             {activeTab === "companies" && <CompanySettings />}
             {activeTab === "users" && <UserSettings />}
+            {activeTab === "resume-from-linkedin" && <ResumeFromLinkedin />}
             {activeTab === "resume" && <ResumeSettings />}
           </div>
         </div>

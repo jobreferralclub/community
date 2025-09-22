@@ -265,6 +265,7 @@ function AppWrapper() {
             <Route path="/community/coaching" element={<Layout><Coaching /></Layout>} />
             <Route path="/community/courses" element={<Layout><CourseBuilder /></Layout>} />
             <Route path="/community/settings" element={<Layout><Settings /></Layout>} />
+            <Route path="resume-from-linkedin" element={<ResumeFromLinkedin />} />
             <Route path="/community/auth/callback" element={<AuthCallback />} />
 
             {/* Fallback for unknown /community routes */}

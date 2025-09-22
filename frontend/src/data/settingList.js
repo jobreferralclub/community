@@ -1,4 +1,6 @@
 import * as FiIcons from "react-icons/fi";
+import { FaLinkedin } from "react-icons/fa";
+
 
 const {
     FiUser,
@@ -21,8 +23,10 @@ export const tabs = [
     { id: "data", name: "Data & Export", icon: FiDatabase },
     { id: "companies", name: "Registered Companies", icon: FiBriefcase },
     { id: "users", name: "Users", icon: FiUsers },
-    { id: "resume", name: "Resume", icon: FiFileText },
+    { id: "resume-from-linkedin", name: "Import Resume from LinkedIn", icon: FaLinkedin },
+    { id: "resume", name: "Resume Inputs", icon: FiFileText },
 ];
+
 
 export const adminOnly = [
     "Integrations",

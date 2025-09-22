@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+// Removed framer-motion import
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { useAuthStore } from "../../store/authStore";
@@ -90,15 +90,13 @@ const Sidebar = ({ open, setOpen }) => {
             />
             {open && (
               <>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                <span
                   className={`font-medium ${
                     isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
                   }`}
                 >
                   {item.name}
-                </motion.span>
+                </span>
                 <span
                   className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                     isSubMenuActive(item) ? "w-full" : "w-0 hover:w-full"
@@ -138,15 +136,13 @@ const Sidebar = ({ open, setOpen }) => {
             />
             {open && (
               <>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                <span
                   className={`font-medium ${
                     isActive ? "text-[#79e708]" : "text-white"
                   }`}
                 >
                   {item.name}
-                </motion.span>
+                </span>
                 <span
                   className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
                     location.pathname.startsWith(item.path) ? "w-full" : ""
@@ -171,23 +167,17 @@ const Sidebar = ({ open, setOpen }) => {
       />
 
       {/* Sidebar itself */}
-      <motion.div
-        initial={{ x: -300 }}
-        animate={{ x: open ? 0 : -300 }}
-        transition={{ type: "spring", stiffness: 80 }}
+      <div
         className={`fixed md:static top-0 left-0 h-full z-50 ${
           open ? "w-72" : "w-20 md:w-20"
         } bg-black border-e border-gray-600 transition-all duration-500 ease-in-out flex flex-col`}
+        style={{ transform: open ? "translateX(0)" : "translateX(-300px)" }}
       >
         {/* Header */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             {open && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center space-x-2"
-              >
+              <div className="flex items-center space-x-2" style={{opacity:1}}>
                 <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                   <img src="/logo.jpg" alt="logo" />
                 </div>
@@ -196,7 +186,7 @@ const Sidebar = ({ open, setOpen }) => {
                     JobReferral.Club
                   </span>
                 </a>
-              </motion.div>
+              </div>
             )}
             <button
               onClick={() => setOpen(!open)}
@@ -220,11 +210,7 @@ const Sidebar = ({ open, setOpen }) => {
               {item.children &&
                 openSubMenus.includes(item.name) &&
                 open && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    className="ml-6 mt-1 space-y-1"
-                  >
+                  <div className="ml-6 mt-1 space-y-1">
                     {item.children.map((region) => (
                       <div key={region.name}>
                         <button
@@ -258,11 +244,7 @@ const Sidebar = ({ open, setOpen }) => {
                         </button>
                         {region.children &&
                           openRegions.includes(region.name) && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              className="ml-6 mt-1 space-y-1"
-                            >
+                            <div className="ml-6 mt-1 space-y-1">
                               {region.children.map((sub) => (
                                 <NavLink
                                   key={sub.name}
@@ -285,11 +267,11 @@ const Sidebar = ({ open, setOpen }) => {
                                   />
                                 </NavLink>
                               ))}
-                            </motion.div>
+                            </div>
                           )}
                       </div>
                     ))}
-                  </motion.div>
+                  </div>
                 )}
             </div>
           ))}
@@ -313,13 +295,9 @@ const Sidebar = ({ open, setOpen }) => {
             />
             {open && (
               <>
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="ml-3 font-medium text-white"
-                >
+                <span className="ml-3 font-medium text-white">
                   Settings
-                </motion.span>
+                </span>
                 <span
                   className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                     location.pathname === "/community/settings"
@@ -331,7 +309,7 @@ const Sidebar = ({ open, setOpen }) => {
             )}
           </NavLink>
         </div>
-      </motion.div>
+      </div>
     </>
   );
 };
