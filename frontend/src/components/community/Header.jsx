@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { subCommunities } from "../../data/communityList";
 
-const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut, FiUser } = FiIcons;
+const { FiMenu, FiBell, FiSearch, FiAward, FiLogOut, FiUser, FiHelpCircle } = FiIcons;
 
 const Header = ({ onMenuClick }) => {
   const { user, logout } = useAuthStore();
@@ -16,17 +16,31 @@ const Header = ({ onMenuClick }) => {
 
   const apiBaseUrl = import.meta.env.VITE_API_PORT || "http://localhost:5000";
 
+   // =======================
+  // Gamification logic (commented out for now)
+
+  // const [points, setPoints] = useState(user?.points || 0);
+
+  // useEffect(() => {
+  //   if (!user?._id) return;
+
+  //   fetch(`${apiBaseUrl}/api/users/${user._id}/gamification`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setPoints(data.totalPoints);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to fetch gamification points:", err);
+  //     });
+  // }, [user?._id, apiBaseUrl]);
+
+  // =======================
+
   const [points, setPoints] = useState(user?.points || 0);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState(false);
   const [postResults, setPostResults] = useState([]);
-
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "Announcements", read: false, action: () => navigate("/community/announcements") },
-    { id: 2, message: "Ask the community", read: false, action: () => navigate("/community/ask-the-community") },
-  ]);
 
   useEffect(() => {
     if (!searchSubmitted || !searchTerm.trim()) return;
@@ -47,8 +61,6 @@ const Header = ({ onMenuClick }) => {
     fetchPosts();
   }, [searchSubmitted, searchTerm, apiBaseUrl]);
 
-
-  // Fetch user's gamification points
   useEffect(() => {
     if (!user?._id) return;
 
@@ -62,7 +74,6 @@ const Header = ({ onMenuClick }) => {
       });
   }, [user?._id, apiBaseUrl]);
 
-  // Combine static, community and user search data
   const baseSearchData = [
     { name: "Mock Interviewer", type: "Free Tools", url: "/mock-interviewer" },
     { name: "Resume Builder", type: "Free Tools", url: "/resume-builder" },
@@ -94,23 +105,13 @@ const Header = ({ onMenuClick }) => {
 
   const searchData = [...baseSearchData];
 
-  // Filter search results by searchTerm
   const filteredResults = searchData.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle notification clicks
-  const handleNotificationClick = (id, action) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-    action();
-    setShowNotifications(false);
-  };
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = 0; // Not used since bell redirects immediately
 
   return (
     <motion.header
@@ -128,7 +129,6 @@ const Header = ({ onMenuClick }) => {
             <SafeIcon icon={FiMenu} className="w-5 h-5 text-gray-300" />
           </button>
 
-          {/* Search bar with dropdown */}
           <div className="relative hidden md:block flex-1">
             <SafeIcon
               icon={FiSearch}
@@ -140,17 +140,15 @@ const Header = ({ onMenuClick }) => {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setShowSearchResults(true);
-                setSearchSubmitted(false); // reset if typing again
+                setSearchSubmitted(false);
               }}
               onKeyDown={handleKeyDown}
               placeholder="Search community, tools, users..."
               className="pl-10 pr-4 py-2 w-full rounded-s rounded-e border border-zinc-800 bg-zinc-900 text-gray-300 placeholder-gray-500 focus:ring-2 focus:ring-[#79e708] focus:border-transparent transition-all"
             />
 
-            {/* Dropdown results */}
             {showSearchResults && searchTerm && (
               <>
-                {/* Backdrop */}
                 <div
                   className="fixed inset-0 bg-black/50 z-10"
                   onClick={() => {
@@ -159,10 +157,8 @@ const Header = ({ onMenuClick }) => {
                   }}
                 />
 
-                {/* Dropdown box */}
                 <div className="absolute mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                   {!searchSubmitted ? (
-                    // Before pressing Enter
                     <button
                       type="button"
                       onClick={() => setSearchSubmitted(true)}
@@ -171,7 +167,7 @@ const Header = ({ onMenuClick }) => {
                       Search for: <span className="font-medium">{searchTerm}</span>{" "}
                       <span className="text-gray-500">(Press Enter)</span>
                     </button>
-                  ) : (filteredResults.length > 0 || postResults.length > 0) ? (
+                  ) : filteredResults.length > 0 || postResults.length > 0 ? (
                     <>
                       {filteredResults.slice(0, 5).map((item, index) => (
                         <button
@@ -185,19 +181,16 @@ const Header = ({ onMenuClick }) => {
                           }}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
                         >
-                          {item.name}{" "}
-                          <span className="text-green-500">in {item.type}</span>
+                          {item.name} <span className="text-green-500">in {item.type}</span>
                         </button>
                       ))}
 
                       {postResults.slice(0, 5).map((post) => {
-                        // Find community path from local list
                         const matchedCommunity = subCommunities.find(
                           (c) => c.title.toLowerCase().includes(post.community.toLowerCase())
                         );
                         const communityPath = matchedCommunity ? matchedCommunity.path : "/general";
 
-                        // Build custom redirect URL
                         const customUrl = `${communityPath}?postid=${post.id}`;
 
                         return (
@@ -206,23 +199,19 @@ const Header = ({ onMenuClick }) => {
                             type="button"
                             onClick={() => {
                               navigate(customUrl);
-                              console.log("Navigating to:", customUrl);
                               setSearchTerm("");
                               setShowSearchResults(false);
                               setSearchSubmitted(false);
                             }}
                             className="w-full text-left p-3 flex items-start gap-3 hover:bg-gray-800 transition-colors border-b border-zinc-800"
                           >
-                            {/* Avatar */}
                             <img
                               src={post.author?.avatar || "/default-avatar.png"}
                               alt={post.author?.name}
                               className="w-8 h-8 rounded-full object-cover"
                             />
 
-                            {/* Text Section */}
                             <div className="flex-1">
-                              {/* Title */}
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-semibold text-gray-200">
                                   {post.author?.name}
@@ -230,11 +219,9 @@ const Header = ({ onMenuClick }) => {
                                 <span className="text-xs text-gray-500">· {post.community}</span>
                               </div>
 
-                              {/* Snippet */}
                               <p className="text-sm text-gray-400 line-clamp-1">{post.snippet}</p>
                             </div>
 
-                            {/* Post Type / Tag */}
                             <span className="text-xs text-blue-400 font-medium">Post</span>
                           </button>
                         );
@@ -246,53 +233,35 @@ const Header = ({ onMenuClick }) => {
                 </div>
               </>
             )}
-
           </div>
         </div>
 
         {/* Right side */}
-        <div className="flex items-center space-x-4">
-          {/* Points */}
-          <div className="hidden sm:flex items-center space-x-2 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800">
-            <SafeIcon icon={FiAward} className="w-4 h-4 text-[#79e708]" />
-            <span className="text-sm font-medium text-gray-300">{points} pts</span>
-          </div>
+        <div className="flex items-center space-x-4 relative">
+          {/* Points display (commented out) */}
+  {/* 
+  <div className="hidden sm:flex items-center space-x-2 bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800">
+    <SafeIcon icon={FiAward} className="w-4 h-4 text-[#79e708]" />
+    <span className="text-sm font-medium text-gray-300">{points} pts</span>
+  </div>
+  */}
+          {/* Bell icon redirects directly to announcements */}
+          <button
+            onClick={() => navigate("/community/announcements")}
+            className="p-2 rounded-lg hover:bg-gray-900 transition-colors flex items-center"
+            aria-label="Announcements"
+          >
+            <SafeIcon icon={FiBell} className="w-6 h-6 text-white" />
+          </button>
 
-          {/* Notifications */}
-          <div className="relative">
-            { <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 rounded-lg hover:bg-gray-900 transition-colors"
-            >
-              <SafeIcon icon={FiBell} className="w-5 h-5 text-gray-300" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              )}
-            </button> }
-
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20">
-                <div className="p-2">
-                  {notifications.length > 0 ? (
-                    notifications.map((n) => (
-                      <button
-                        key={n.id}
-                        onClick={() => handleNotificationClick(n.id, n.action)}
-                        className={`w-full text-left px-4 py-2 text-sm rounded-md ${n.read
-                          ? "text-gray-500 hover:bg-gray-800"
-                          : "text-gray-300 hover:bg-gray-700 font-medium"
-                          }`}
-                      >
-                        {n.message}
-                      </button>
-                    ))
-                  ) : (
-                    <p className="px-4 py-2 text-sm text-gray-500">No new notifications</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Ask the community icon */}
+          <button
+            onClick={() => navigate("/community/ask-the-community")}
+            className="p-2 rounded-lg hover:bg-gray-900 transition-colors flex items-center"
+            aria-label="Ask the community"
+          >
+            <SafeIcon icon={FiHelpCircle} className="w-6 h-6 text-white" />
+          </button>
 
           {/* Profile */}
           <div className="relative group">
@@ -308,15 +277,6 @@ const Header = ({ onMenuClick }) => {
             </div>
 
             <div className="absolute right-0 top-6 w-40 bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-y-1 transform transition-all z-20 pointer-events-none group-hover:pointer-events-auto">
-              {/* <button
-                onClick={() => {
-                  navigate("/profile");
-                }}
-                className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
-              >
-                <SafeIcon icon={FiUser} className="w-4 h-4 text-gray-400" />
-                My Profile
-              </button> */}
               <button
                 onClick={() => {
                   logout();
