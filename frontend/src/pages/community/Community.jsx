@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 import { subCommunities } from "../../data/communityList";
 import Footer from "../../components/landing/Footer";
 
-import FilterBar from "./FilterBar"; // Adjust path as needed
+// import FilterBar from "./FilterBar"; // Adjust path as needed
 
 const { FiPlus } = FiIcons;
 
@@ -122,7 +122,7 @@ const Community = () => {
         </div>
 
         {/* Filter Bar */}
-        <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
+      {/* <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} /> */}
 
         {/* Posts */}
         <div className="space-y-6">
