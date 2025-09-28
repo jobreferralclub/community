@@ -178,6 +178,7 @@ const EmailBroadcast = () => {
             </div>
           </motion.div>
 
+
           {/* Preview Pane */}
           {previewMode && (
             <motion.div
@@ -199,6 +200,112 @@ const EmailBroadcast = () => {
               </div>
             </motion.div>
           )}
+          {/* Push Notification */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-zinc-800"
+          >
+            <div className="flex items-center space-x-2 mb-4">
+              <SafeIcon icon={FiMail} className="w-5 h-5 text-primary-600" />
+              <h3 className="text-lg font-semibold text-black dark:text-white">Push Notification</h3>
+            </div>
+
+            <div className="space-y-3">
+              {/* Notification Title */}
+              <input
+                type="text"
+                placeholder="Notification Title"
+                value={emailData.notificationTitle || ''}
+                onChange={(e) =>
+                  setEmailData((prev) => ({ ...prev, notificationTitle: e.target.value }))
+                }
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-gray-100 focus:ring-2 focus:ring-primary-500"
+              />
+
+              {/* Notification Content */}
+              <textarea
+                rows={3}
+                placeholder="Notification Content"
+                value={emailData.notificationContent || ''}
+                onChange={(e) =>
+                  setEmailData((prev) => ({ ...prev, notificationContent: e.target.value }))
+                }
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-gray-100 focus:ring-2 focus:ring-primary-500"
+              />
+
+              {/* Notification Link */}
+              <input
+                type="text"
+                placeholder="Optional Link (URL)"
+                value={emailData.notificationLink || ''}
+                onChange={(e) =>
+                  setEmailData((prev) => ({ ...prev, notificationLink: e.target.value }))
+                }
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-800 text-black dark:text-gray-100 focus:ring-2 focus:ring-primary-500"
+              />
+
+              <div className="flex gap-2">
+                {/* Send Notification */}
+                <button
+                  onClick={async () => {
+                    if (!emailData.notificationTitle || !emailData.notificationContent) {
+                      toast.error('Please enter title and content for the notification');
+                      return;
+                    }
+                    try {
+                      const res = await fetch(
+                        `${import.meta.env.VITE_API_PORT}/api/notifications/send-to-all`,
+                        {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            title: emailData.notificationTitle,
+                            description: emailData.notificationContent,
+                            link: emailData.notificationLink || null, // include link if provided
+                          }),
+                        }
+                      );
+                      if (!res.ok) throw new Error('Failed to send notification');
+                      toast.success('Push notification sent to all users!');
+                      setEmailData(prev => ({
+                        ...prev,                     // keep all existing fields
+                        notificationTitle: '',        // clear only notification title
+                        notificationContent: '',      // clear only notification content
+                        notificationLink: ''          // also clear link if you added it
+                      }));
+                    } catch (err) {
+                      toast.error(err.message || 'Something went wrong');
+                    }
+                  }}
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition"
+                >
+                  Send Notification
+                </button>
+
+                {/* Clear All Notifications */}
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(
+                        `${import.meta.env.VITE_API_PORT}/api/notifications/clear-all`,
+                        { method: 'DELETE' }
+                      );
+                      if (!res.ok) throw new Error('Failed to clear notifications');
+                      toast.success('All notifications cleared!');
+                    } catch (err) {
+                      toast.error(err.message || 'Something went wrong');
+                    }
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+                >
+                  Clear All
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
         </div>
 
         {/* Sidebar */}

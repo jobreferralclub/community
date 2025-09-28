@@ -16,7 +16,7 @@ const EducationSection = ({ education, onAdd, onEdit, onDelete }) => (
           <div className="absolute top-4 right-4">
             <ActionButtons
               onEdit={() => onEdit(edu)}
-              onDelete={() => onDelete(edu.id)}
+              onDelete={() => onDelete(edu._id)}
             />
           </div>
 

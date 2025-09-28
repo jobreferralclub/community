@@ -13,29 +13,17 @@ const Sidebar = ({ open, setOpen }) => {
   const role = useAuthStore((state) => state.role);
   const currentLocation = useAuthStore((state) => state.location);
 
-  const [openSubMenus, setOpenSubMenus] = React.useState(["Community"]);
-  const [openRegions, setOpenRegions] = React.useState([
-    "Community Hub",
-    "India Jobs",
-    "United States Jobs",
-  ]);
+  // ✅ Always open all submenus
+  const allSubMenus = menuItems.filter((item) => item.isSubmenu).map((i) => i.name);
+  const [openSubMenus] = React.useState(allSubMenus);
 
-  const handleToggleSubMenu = (menuName) => {
-    setOpenSubMenus((prev) =>
-      prev.includes(menuName)
-        ? prev.filter((m) => m !== menuName)
-        : [...prev, menuName]
-    );
-  };
+  // ✅ Always open all regions
+  const allRegions = menuItems
+    .filter((item) => item.children)
+    .flatMap((item) => item.children.map((c) => c.name));
+  const [openRegions] = React.useState(allRegions);
 
-  const handleToggleRegion = (regionName) => {
-    setOpenRegions((prev) =>
-      prev.includes(regionName)
-        ? prev.filter((r) => r !== regionName)
-        : [...prev, regionName]
-    );
-  };
-
+  // 🔹 Keep your filtering logic intact
   const filteredMenu =
     role === "admin"
       ? menuItems
@@ -74,7 +62,8 @@ const Sidebar = ({ open, setOpen }) => {
     if (item.isSubmenu) {
       return (
         <button
-          onClick={() => handleToggleSubMenu(item.name)}
+          // ⚡ handler still here for animation but state never changes
+          onClick={() => {}}
           className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 relative ${
             isSubMenuActive(item)
               ? "text-[#79e708]"
@@ -173,106 +162,72 @@ const Sidebar = ({ open, setOpen }) => {
         } bg-black border-e border-gray-600 transition-all duration-500 ease-in-out flex flex-col`}
         style={{ transform: open ? "translateX(0)" : "translateX(-300px)" }}
       >
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            {open && (
-              <div className="flex items-center space-x-2" style={{opacity:1}}>
-                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                  <img src="/logo.jpg" alt="logo" />
-                </div>
-                <a href="/">
-                  <span className="font-bold text-white">
-                    JobReferral.Club
-                  </span>
-                </a>
-              </div>
-            )}
-            <button
-              onClick={() => setOpen(!open)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <SafeIcon
-                icon={FiChevronLeft}
-                className={`w-5 h-5 text-gray-400 transition-transform ${
-                  !open ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {filteredCommunity.map((item) => (
             <div key={item.name}>
               {renderMenuItem(item)}
-              {item.children &&
-                openSubMenus.includes(item.name) &&
-                open && (
-                  <div className="ml-6 mt-1 space-y-1">
-                    {item.children.map((region) => (
-                      <div key={region.name}>
-                        <button
-                          onClick={() => handleToggleRegion(region.name)}
-                          className={`group flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 relative ${
+              {item.children && openSubMenus.includes(item.name) && open && (
+                <div className="ml-6 mt-1 space-y-1">
+                  {item.children.map((region) => (
+                    <div key={region.name}>
+                      <button
+                        onClick={() => {}}
+                        className={`group flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 relative ${
+                          isRegionActive(region)
+                            ? "text-[#79e708]"
+                            : "text-white hover:text-[#79e708]"
+                        }`}
+                      >
+                        {region.name}
+                        <SafeIcon
+                          icon={FiChevronLeft}
+                          className={`w-4 h-4 transition-transform ${
+                            openRegions.includes(region.name) ? "rotate-90" : ""
+                          } ${
                             isRegionActive(region)
                               ? "text-[#79e708]"
-                              : "text-white hover:text-[#79e708]"
+                              : "text-white"
                           }`}
-                        >
-                          {region.name}
-                          <SafeIcon
-                            icon={FiChevronLeft}
-                            className={`w-4 h-4 transition-transform ${
-                              openRegions.includes(region.name)
-                                ? "rotate-90"
-                                : ""
-                            } ${
-                              isRegionActive(region)
-                                ? "text-[#79e708]"
-                                : "text-white"
-                            }`}
-                          />
-                          <span
-                            className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
-                              isRegionActive(region)
-                                ? "w-full"
-                                : "w-0 group-hover:w-full"
-                            }`}
-                          />
-                        </button>
-                        {region.children &&
-                          openRegions.includes(region.name) && (
-                            <div className="ml-6 mt-1 space-y-1">
-                              {region.children.map((sub) => (
-                                <NavLink
-                                  key={sub.name}
-                                  to={sub.path}
-                                  className={({ isActive }) =>
-                                    `block px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${
-                                      isActive
-                                        ? activeClass
-                                        : "text-gray-400 hover:text-[#79e708]"
-                                    }`
-                                  }
-                                >
-                                  {sub.name}
-                                  <span
-                                    className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
-                                      location.pathname.startsWith(sub.path)
-                                        ? "w-full"
-                                        : ""
-                                    }`}
-                                  />
-                                </NavLink>
-                              ))}
-                            </div>
-                          )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        />
+                        <span
+                          className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
+                            isRegionActive(region)
+                              ? "w-full"
+                              : "w-0 group-hover:w-full"
+                          }`}
+                        />
+                      </button>
+                      {region.children && openRegions.includes(region.name) && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          {region.children.map((sub) => (
+                            <NavLink
+                              key={sub.name}
+                              to={sub.path}
+                              className={({ isActive }) =>
+                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${
+                                  isActive
+                                    ? activeClass
+                                    : "text-gray-400 hover:text-[#79e708]"
+                                }`
+                              }
+                            >
+                              {sub.name}
+                              <span
+                                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
+                                  location.pathname.startsWith(sub.path)
+                                    ? "w-full"
+                                    : ""
+                                }`}
+                              />
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </nav>
@@ -295,9 +250,7 @@ const Sidebar = ({ open, setOpen }) => {
             />
             {open && (
               <>
-                <span className="ml-3 font-medium text-white">
-                  Settings
-                </span>
+                <span className="ml-3 font-medium text-white">Settings</span>
                 <span
                   className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
                     location.pathname === "/community/settings"

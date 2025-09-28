@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,10 +22,10 @@ const Navigation = () => {
   }, []);
 
   const navItems = [
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Categories", href: "#categories" },
-    { label: "Success Stories", href: "#stories" },
-    { label: "Simulations", href: "#practice" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Categories", href: "/#categories" },
+    { label: "Success Stories", href: "/#stories" },
+    { label: "Simulations", href: "/#practice" },
   ];
 
   return (
@@ -57,6 +58,16 @@ const Navigation = () => {
               <a
                 key={index}
                 href={item.href}
+                onClick={(e) => {
+                  if (window.location.pathname === "/") {
+                    e.preventDefault();
+                    document.querySelector(item.href.replace("/", ""))?.scrollIntoView({
+                      behavior: "smooth",
+                    });
+                  } else {
+                    window.location.href = item.href;
+                  }
+                }}
                 className="text-gray-300 hover:text-primary-green transition-all duration-300 font-medium relative group whitespace-nowrap"
               >
                 {item.label}
@@ -83,18 +94,19 @@ const Navigation = () => {
                     className="absolute left-0 top-full mt-2 bg-black rounded-s rounded-e border border-gray-800 w-56 shadow-lg z-50 overflow-hidden"
                   >
                     {[
-                      { label: "Resume Builder", href: "./resume-builder" },
-                      { label: "Resume Ranker", href: "./resume-ranker" },
-                      { label: "Resume Analyzer", href: "./resume-analyzer" },
-                      { label: "Mock Interviewer", href: "./mock-interviewer" },
+                      { label: "Resume Builder", to: "/resume-builder" },
+                      { label: "Resume Ranker", to: "/resume-ranker" },
+                      { label: "Resume Analyzer", to: "/resume-analyzer" },
+                      { label: "Mock Interviewer", to: "/mock-interviewer" },
                     ].map((service, idx) => (
-                      <a
+                      <Link
                         key={idx}
-                        href={service.href}
+                        to={service.to}
+                        onClick={() => setMenuOpen(false)} // close mobile menu if open
                         className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
                       >
                         {service.label}
-                      </a>
+                      </Link>
                     ))}
                   </motion.div>
                 )}

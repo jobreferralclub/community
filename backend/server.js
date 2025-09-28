@@ -32,6 +32,7 @@ import otpRoutes from "./routes/otp.js";
 import uploadRoutes from "./routes/upload.js";
 import analyticsRoutes from "./routes/analytics.js";
 // import rolesStatsRoutes from "./routes/rolesStats.js";
+import notificationRoutes from "./routes/notification.js";
 import resumeRoutes from "./routes/resume.js";
 import communityRoutes from  "./routes/community.js";
 import searchRoutes from "./routes/search.js";
@@ -45,6 +46,7 @@ app.use("/api/companies", companyRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/communities", communityRoutes);
+app.use("/api/notifications", notificationRoutes)
 
 // Login/Signup
 app.use("/api/auth", authRoutes);

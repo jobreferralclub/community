@@ -4,6 +4,7 @@ import workSchema from "./Work.js";
 import projectSchema from "./Project.js";
 import skillSchema from "./Skill.js";
 import certificateSchema from "./Certificate.js";
+import notificationSchema from "./Notification.js";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -24,7 +25,7 @@ const userSchema = new mongoose.Schema({
   },
   accountRole: {
     type: String,
-    enum: ["member", "recruiter", "TPO", "admin"],
+    enum: ["member", "recruiter", "tpo", "admin"],
     default: "member",
     required: true,
   },
@@ -77,6 +78,7 @@ const userSchema = new mongoose.Schema({
   projects: [projectSchema],
   skills: [skillSchema],
   certificates: [certificateSchema],
+  notifications: [notificationSchema],
 });
 
 export default mongoose.model("User", userSchema);

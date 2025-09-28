@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navigation from "../components/landing/Navigation";
 import HeroSection from "../components/landing/HeroSection";
 import BenefitsSection from "../components/landing/BenefitsSection";
@@ -10,6 +12,23 @@ import FinalCTASection from "../components/landing/FinalCTASection";
 import Footer from "../components/landing/Footer";
 
 const LandingPage = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        // delay ensures the section is mounted
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    } else {
+      // optional: scroll to top if no hash
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [location]);
+
   return (
     <div className="min-h-screen">
       <Navigation />

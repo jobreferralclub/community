@@ -522,8 +522,8 @@ const ResumeSettings = () => {
         >
             <div className="bg-zinc-900 p-6 rounded-xl border border-gray-700 shadow-md">
                 <h2 className="text-3xl font-semibold text-white mb-6 text-center">
-  Resume Inputs
-</h2>
+                    Resume Inputs
+                </h2>
 
 
                 <div className="space-y-8">

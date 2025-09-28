@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
-import Header from "./Header";
+import Navigation from "../landing/Navigation"
 import { useAuthStore } from "../../store/authStore";
 import LocationModal from "./LocationModal";
 
@@ -11,10 +11,10 @@ const Layout = ({ children }) => {
 
   return (
     <>
-      <div className="flex h-screen bg-black text-gray-100">
+      <div className="flex h-screen bg-black text-gray-100 pt-16">
         {/* Sidebar (desktop only) */}
         <div className="hidden md:flex">
-          <Sidebar open={true} setOpen={() => { }} /> {/* always visible on desktop */}
+          <Sidebar open={true} setOpen={() => {}} /> {/* always visible on desktop */}
         </div>
 
         {/* Mobile Drawer */}
@@ -48,10 +48,10 @@ const Layout = ({ children }) => {
           )}
         </AnimatePresence>
 
-
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden bg-black">
-          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          {/* 🔹 Replace Header with Navigation */}
+          <Navigation setSidebarOpen={setSidebarOpen} />
 
           <motion.main
             className="flex-1 overflow-x-hidden overflow-y-auto bg-black p-2 sm:p-4"

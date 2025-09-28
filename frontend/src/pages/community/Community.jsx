@@ -7,6 +7,7 @@ import CreatePost from "../../components/community/CreatePost";
 import { useLocation } from "react-router-dom";
 import { subCommunities } from "../../data/communityList";
 import Footer from "../../components/landing/Footer";
+import CommunityHeader from "../../components/community/CommunityHeader";
 
 // import FilterBar from "./FilterBar"; // Adjust path as needed
 
@@ -123,6 +124,8 @@ const Community = () => {
 
         {/* Filter Bar */}
       {/* <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} /> */}
+
+      <CommunityHeader/>
 
         {/* Posts */}
         <div className="space-y-6">
