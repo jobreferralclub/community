@@ -63,33 +63,29 @@ const Sidebar = ({ open, setOpen }) => {
       return (
         <button
           // ⚡ handler still here for animation but state never changes
-          onClick={() => {}}
-          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 relative ${
-            isSubMenuActive(item)
-              ? "text-[#79e708]"
-              : "text-white hover:text-[#79e708]"
-          }`}
+          onClick={() => { }}
+          className={`w-full flex items-center justify-between px-3 py-3 transition-all duration-200 relative ${isSubMenuActive(item)
+            ? "text-[#79e708]"
+            : "text-white hover:text-[#79e708]"
+            }`}
         >
           <div className="flex items-center space-x-3">
             <SafeIcon
               icon={item.icon}
-              className={`w-5 h-5 flex-shrink-0 ${
-                isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
-              }`}
+              className={`w-5 h-5 flex-shrink-0 ${isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
+                }`}
             />
             {open && (
               <>
                 <span
-                  className={`font-medium ${
-                    isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
-                  }`}
+                  className={`font-medium ${isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
+                    }`}
                 >
                   {item.name}
                 </span>
                 <span
-                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
-                    isSubMenuActive(item) ? "w-full" : "w-0 hover:w-full"
-                  }`}
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${isSubMenuActive(item) ? "w-full" : "w-0 hover:w-full"
+                    }`}
                 />
               </>
             )}
@@ -97,11 +93,9 @@ const Sidebar = ({ open, setOpen }) => {
           {open && (
             <SafeIcon
               icon={FiChevronLeft}
-              className={`w-4 h-4 transition-transform ${
-                openSubMenus.includes(item.name) ? "rotate-90" : ""
-              } ${
-                isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
-              }`}
+              className={`w-4 h-4 transition-transform ${openSubMenus.includes(item.name) ? "rotate-90" : ""
+                } ${isSubMenuActive(item) ? "text-[#79e708]" : "text-white"
+                }`}
             />
           )}
         </button>
@@ -112,8 +106,7 @@ const Sidebar = ({ open, setOpen }) => {
       <NavLink
         to={item.path}
         className={({ isActive }) =>
-          `group flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 relative ${
-            isActive ? activeClass : "text-white hover:text-[#79e708]"
+          `group flex items-center justify-between px-3 py-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"
           }`
         }
       >
@@ -126,16 +119,14 @@ const Sidebar = ({ open, setOpen }) => {
             {open && (
               <>
                 <span
-                  className={`font-medium ${
-                    isActive ? "text-[#79e708]" : "text-white"
-                  }`}
+                  className={`font-medium ${isActive ? "text-[#79e708]" : "text-white"
+                    }`}
                 >
                   {item.name}
                 </span>
                 <span
-                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
-                    location.pathname.startsWith(item.path) ? "w-full" : ""
-                  }`}
+                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${location.pathname.startsWith(item.path) ? "w-full" : ""
+                    }`}
                 />
               </>
             )}
@@ -149,17 +140,15 @@ const Sidebar = ({ open, setOpen }) => {
     <>
       {/* Overlay for mobile */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden ${
-          open ? "block" : "hidden"
-        }`}
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden ${open ? "block" : "hidden"
+          }`}
         onClick={() => setOpen(false)}
       />
 
       {/* Sidebar itself */}
       <div
-        className={`fixed md:static top-0 left-0 h-full z-50 ${
-          open ? "w-72" : "w-20 md:w-20"
-        } bg-black border-e border-gray-600 transition-all duration-500 ease-in-out flex flex-col`}
+        className={`fixed md:static top-0 left-0 h-full z-50 ${open ? "w-72" : "w-20 md:w-20"
+          } bg-black border-e border-gray-600 transition-all duration-500 ease-in-out flex flex-col`}
         style={{ transform: open ? "translateX(0)" : "translateX(-300px)" }}
       >
         {/* Navigation */}
@@ -172,30 +161,26 @@ const Sidebar = ({ open, setOpen }) => {
                   {item.children.map((region) => (
                     <div key={region.name}>
                       <button
-                        onClick={() => {}}
-                        className={`group flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 relative ${
-                          isRegionActive(region)
-                            ? "text-[#79e708]"
-                            : "text-white hover:text-[#79e708]"
-                        }`}
+                        onClick={() => { }}
+                        className={`group flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg transition-all duration-200 relative ${isRegionActive(region)
+                          ? "text-[#79e708]"
+                          : "text-white hover:text-[#79e708]"
+                          }`}
                       >
                         {region.name}
                         <SafeIcon
                           icon={FiChevronLeft}
-                          className={`w-4 h-4 transition-transform ${
-                            openRegions.includes(region.name) ? "rotate-90" : ""
-                          } ${
-                            isRegionActive(region)
+                          className={`w-4 h-4 transition-transform ${openRegions.includes(region.name) ? "rotate-90" : ""
+                            } ${isRegionActive(region)
                               ? "text-[#79e708]"
                               : "text-white"
-                          }`}
+                            }`}
                         />
                         <span
-                          className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
-                            isRegionActive(region)
-                              ? "w-full"
-                              : "w-0 group-hover:w-full"
-                          }`}
+                          className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${isRegionActive(region)
+                            ? "w-full"
+                            : "w-0 group-hover:w-full"
+                            }`}
                         />
                       </button>
                       {region.children && openRegions.includes(region.name) && (
@@ -205,20 +190,18 @@ const Sidebar = ({ open, setOpen }) => {
                               key={sub.name}
                               to={sub.path}
                               className={({ isActive }) =>
-                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${
-                                  isActive
-                                    ? activeClass
-                                    : "text-gray-400 hover:text-[#79e708]"
+                                `block px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${isActive
+                                  ? activeClass
+                                  : "text-gray-400 hover:text-[#79e708]"
                                 }`
                               }
                             >
                               {sub.name}
                               <span
-                                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${
-                                  location.pathname.startsWith(sub.path)
-                                    ? "w-full"
-                                    : ""
-                                }`}
+                                className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 w-0 group-hover:w-full ${location.pathname.startsWith(sub.path)
+                                  ? "w-full"
+                                  : ""
+                                  }`}
                               />
                             </NavLink>
                           ))}
@@ -232,36 +215,29 @@ const Sidebar = ({ open, setOpen }) => {
           ))}
         </nav>
 
-        {/* Settings at Bottom */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        {/* Settings + Success Stories at Bottom */}
+        <div className="px-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-2">
+          <NavLink
+            to="/success-stories" // must match route path
+            className={({ isActive }) =>
+              `flex items-center px-3 pt-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
+            }
+          >
+            <SafeIcon icon={FiIcons.FiBookOpen} className="w-5 h-5 flex-shrink-0 text-white" />
+            {open && <span className="ml-3 font-medium text-white">Success Stories</span>}
+          </NavLink>
+
           <NavLink
             to="/community/settings"
             className={({ isActive }) =>
-              `flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative ${
-                isActive
-                  ? activeClass
-                  : "text-white hover:text-[#79e708] transition-colors duration-300"
-              }`
+              `flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
             }
           >
-            <SafeIcon
-              icon={FiSettings}
-              className="w-5 h-5 flex-shrink-0 text-white"
-            />
-            {open && (
-              <>
-                <span className="ml-3 font-medium text-white">Settings</span>
-                <span
-                  className={`absolute bottom-1 left-0 h-[2px] bg-[#79e708] transition-all duration-500 ${
-                    location.pathname === "/community/settings"
-                      ? "w-full"
-                      : "w-0 group-hover:w-full"
-                  }`}
-                />
-              </>
-            )}
+            <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0 text-white" />
+            {open && <span className="ml-3 font-medium text-white">Settings</span>}
           </NavLink>
         </div>
+
       </div>
     </>
   );

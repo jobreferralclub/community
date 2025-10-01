@@ -104,7 +104,7 @@ const Community = () => {
 
   return (
     <>
-      <div className="bg-black text-gray-300 min-h-screen p-6 space-y-6">
+      <div className="bg-black text-gray-300 min-h-screen space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -124,8 +124,6 @@ const Community = () => {
 
         {/* Filter Bar */}
       {/* <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} /> */}
-
-      <CommunityHeader/>
 
         {/* Posts */}
         <div className="space-y-6">

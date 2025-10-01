@@ -40,6 +40,7 @@ import MockInterviewer from "./pages/mock-interviewer/MockInterviewer";
 import Interview from "./pages/mock-interviewer/Interview";
 import SummaryPage from "./pages/mock-interviewer/SummaryPage";
 import CoverLetterPage from "./pages/application-kit/CoverLetterPage";
+import SuccessStories from "./pages/SuccessStories";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
@@ -187,6 +188,8 @@ function AppWrapper() {
       <Routes>
         {/* ✅ Landing page (always public) */}
         <Route path="/" element={<Landing />} />
+
+        <Route path="/success-stories" element={<SuccessStories/>} />
 
         {/* Resume Builder */}
         <Route path="/resume-builder" element={<ResumeBuilder />} />
