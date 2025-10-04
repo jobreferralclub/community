@@ -8,6 +8,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { subCommunities } from "../../data/communityList";
+import ProductsDropdown from "./ProductsDropdown";
 
 const { FiMenu, FiSearch, FiHelpCircle, FiBookOpen, FiBell } = FiIcons;
 
@@ -138,6 +139,7 @@ const Navigation = () => {
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-8">
+              {/* Left Nav Items */}
               {(!isCommunityPage ? defaultNavItems.slice(0, 2) : communityNavItems.slice(0, 1)).map(
                 (item, index) => (
                   <a
@@ -161,45 +163,10 @@ const Navigation = () => {
                 )
               )}
 
-              {/* Products Dropdown — visible in BOTH */}
-              <div
-                className="relative"
-                onMouseEnter={() => setProductsOpen(true)}
-                onMouseLeave={() => setProductsOpen(false)}
-              >
-                <div className="flex items-center text-gray-300 hover:text-primary-green transition-all duration-300 font-medium cursor-pointer">
-                  Products
-                  <ChevronDown className="w-4 h-4 ml-1" />
-                </div>
-                <AnimatePresence>
-                  {productsOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute left-0 top-full mt-2 bg-black border border-gray-800 w-56 shadow-lg z-50 rounded-lg overflow-hidden"
-                    >
-                      {[
-                        { label: "Resume Builder", to: "/resume-builder" },
-                        { label: "Resume Ranker", to: "/resume-ranker" },
-                        { label: "Resume Analyzer", to: "/resume-analyzer" },
-                        { label: "Mock Interviewer", to: "/mock-interviewer" },
-                      ].map((product, idx) => (
-                        <Link
-                          key={idx}
-                          to={product.to}
-                          onClick={() => setMenuOpen(false)}
-                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
-                        >
-                          {product.label}
-                        </Link>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              {/* Updated Products Dropdown */}
+              <ProductsDropdown menuOpenSetter={setMenuOpen} />
 
-              {/* Continue remaining nav items */}
+              {/* Right Nav Items */}
               {(!isCommunityPage ? defaultNavItems.slice(2) : communityNavItems.slice(1)).map(
                 (item, index) => (
                   <a
@@ -223,6 +190,7 @@ const Navigation = () => {
                 )
               )}
             </div>
+
           </div>
 
           {/* 🔹 Search Bar (Before Profile) */}
