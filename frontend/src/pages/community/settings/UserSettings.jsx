@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 const UserSettings = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const baseAPI = import.meta.env.VITE_API_PORT;
 
   // Fetch users from backend
   useEffect(() => {
@@ -41,7 +42,7 @@ const UserSettings = () => {
   // Handle role change
   const handleRoleChange = async (id, newRole) => {
     try {
-      const res = await fetch(`/api/users/${id}/role`, {
+      const res = await fetch(`${baseAPI}/api/users/${id}/role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),

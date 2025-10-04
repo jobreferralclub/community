@@ -76,9 +76,90 @@ const BlogDetail = () => {
                 </div>
 
                 {/* Blog Content */}
-                <div className="max-w-3xl mx-auto prose prose-invert prose-headings:text-[#79e708] prose-a:text-[#79e708] hover:prose-a:text-[#5bb406] prose-img:rounded-xl prose-img:border prose-img:border-[#79e708]/20 prose-img:shadow-md mb-10">
-                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                </div>
+                <div
+  className="max-w-3xl mx-auto prose prose-invert 
+             prose-headings:text-[#79e708] 
+             prose-a:text-[#79e708] hover:prose-a:text-[#5bb406]
+             prose-li:marker:text-[#79e708] 
+             prose-ul:list-disc prose-ol:list-decimal 
+             prose-img:rounded-xl prose-img:border prose-img:border-[#79e708]/20 prose-img:shadow-md 
+             mb-10"
+>
+  <style jsx>{`
+    .prose h1 {
+      font-size: 2.25rem; /* ~36px */
+      line-height: 1.2;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+    .prose h2 {
+      font-size: 1.875rem; /* ~30px */
+      line-height: 1.25;
+      margin-top: 1.25rem;
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .prose h3 {
+      font-size: 1.5rem; /* ~24px */
+      line-height: 1.3;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .prose h4 {
+      font-size: 1.25rem; /* ~20px */
+      margin-top: 0.75rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .prose h5 {
+      font-size: 1.125rem; /* ~18px */
+      font-weight: 500;
+      margin-top: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+    .prose h6 {
+      font-size: 1rem; /* ~16px */
+      font-weight: 500;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .prose a {
+      color: #79e708;
+      text-decoration: none;
+      transition: color 0.2s ease-in-out;
+    }
+    .prose a:hover {
+      color: #5bb406;
+      text-decoration: underline;
+    }
+    .prose ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .prose ol {
+      list-style-type: decimal;
+      padding-left: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .prose li {
+      margin-bottom: 0.25rem;
+      line-height: 1.6;
+    }
+    .prose img {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(121, 231, 8, 0.2);
+      box-shadow: 0 4px 15px rgba(121, 231, 8, 0.1);
+    }
+  `}</style>
+
+  <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+</div>
+
             </div>
             <Footer />
         </>

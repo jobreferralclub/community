@@ -29,7 +29,7 @@ router.post("/auth0", auth0Login);
 
 // Role management
 router.get("/:id/role", getUserRole);
-router.patch("/:id/role", updateUserRole);
+router.put("/:id/role", updateUserRole);
 
 // Auth
 router.post("/login", loginUser);
