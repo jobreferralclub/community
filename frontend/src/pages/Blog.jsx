@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Navigation from "../components/landing/Navigation";
 import Footer from "../components/landing/Footer";
 import { useAuthStore } from "../store/authStore";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -17,7 +17,7 @@ const Blog = () => {
         const fetchBlogs = async () => {
             try {
                 const res = await axios.get("http://localhost:5000/api/blogs");
-                setBlogs(res.data.sort((a, b) => new Date(b.date) - new Date(a.date))); // Sort by latest
+                setBlogs(res.data.sort((a, b) => new Date(b.date) - new Date(a.date)));
             } catch (err) {
                 console.error("Failed to fetch blogs:", err);
             } finally {
@@ -32,11 +32,25 @@ const Blog = () => {
 
     const formatDate = (dateStr) => {
         const options = { day: "numeric", month: "short", year: "numeric" };
-        return new Date(dateStr).toLocaleDateString("en-GB", options); // e.g., 4 Oct 2025
+        return new Date(dateStr).toLocaleDateString("en-GB", options);
     };
 
     const latestBlogs = blogs.slice(0, 3);
     const remainingBlogs = blogs.slice(3);
+
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this blog?");
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`http://localhost:5000/api/blogs/${id}`);
+            setBlogs((prev) => prev.filter((b) => b._id !== id));
+            alert("Blog deleted successfully!");
+        } catch (err) {
+            console.error("Failed to delete blog:", err);
+            alert("Failed to delete blog");
+        }
+    };
 
     return (
         <>
@@ -84,11 +98,13 @@ const Blog = () => {
                                     <motion.div
                                         key={blog._id}
                                         whileHover={{ scale: 1.05 }}
-                                        className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-xl border border-[#79e708]/20 rounded-3xl overflow-hidden hover:border-[#79e708]/40 hover:-translate-y-3 transition-all duration-500 cursor-pointer"
-                                        onClick={() => navigate(`/blogs/${blog._id}`)}
+                                        className="group relative bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-xl border border-[#79e708]/20 rounded-3xl overflow-hidden hover:border-[#79e708]/40 hover:-translate-y-3 transition-all duration-500"
                                     >
                                         {blog.coverImage && (
-                                            <div className="h-48 w-full overflow-hidden">
+                                            <div
+                                                className="h-48 w-full overflow-hidden cursor-pointer"
+                                                onClick={() => navigate(`/blogs/${blog._id}`)}
+                                            >
                                                 <img
                                                     src={blog.coverImage}
                                                     alt={blog.title}
@@ -99,7 +115,10 @@ const Blog = () => {
 
                                         <div className="p-6 text-left relative z-10 flex flex-col justify-between">
                                             <div>
-                                                <h3 className="text-white text-xl font-bold mb-3 group-hover:text-[#79e708] transition-colors">
+                                                <h3
+                                                    className="text-white text-xl font-bold mb-3 group-hover:text-[#79e708] transition-colors cursor-pointer"
+                                                    onClick={() => navigate(`/blogs/${blog._id}`)}
+                                                >
                                                     {blog.title}
                                                 </h3>
                                                 <p className="text-gray-400 text-sm leading-relaxed mb-4">
@@ -124,6 +143,20 @@ const Blog = () => {
                                                 </div>
                                                 <span>{formatDate(blog.date)}</span>
                                             </div>
+
+                                            {/* Admin Icons */}
+                                            {user?.accountRole === "admin" && (
+                                                <div className="absolute top-4 right-4 flex gap-2">
+                                                    <Edit
+                                                        className="w-5 h-5 text-[#79e708] cursor-pointer hover:text-[#5bb406]"
+                                                        onClick={() => navigate(`/blogs/editor/${blog._id}`)}
+                                                    />
+                                                    <Trash2
+                                                        className="w-5 h-5 text-red-500 cursor-pointer hover:text-red-400"
+                                                        onClick={() => handleDelete(blog._id)}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     </motion.div>
                                 ))}
@@ -138,7 +171,7 @@ const Blog = () => {
                                     {remainingBlogs.map((blog) => (
                                         <div
                                             key={blog._id}
-                                            className="flex items-center justify-between p-4 bg-gray-900/30 backdrop-blur-xl border border-[#79e708]/20 rounded-xl cursor-pointer hover:bg-gray-900/50 transition-all"
+                                            className="flex items-center justify-between p-4 bg-gray-900/30 backdrop-blur-xl border border-[#79e708]/20 rounded-xl cursor-pointer hover:bg-gray-900/50 transition-all relative"
                                             onClick={() => navigate(`/blogs/${blog._id}`)}
                                         >
                                             <div className="flex items-center gap-4">
@@ -171,6 +204,20 @@ const Blog = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* Admin Icons */}
+                                            {user?.accountRole === "admin" && (
+                                                <div className="absolute top-4 right-4 flex gap-2">
+                                                    <Edit
+                                                        className="w-5 h-5 text-[#79e708] cursor-pointer hover:text-[#5bb406]"
+                                                        onClick={() => navigate(`/blogs/editor/${blog._id}`)}
+                                                    />
+                                                    <Trash2
+                                                        className="w-5 h-5 text-red-500 cursor-pointer hover:text-red-400"
+                                                        onClick={() => handleDelete(blog._id)}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

@@ -196,6 +196,7 @@ function AppWrapper() {
         <Route path="/blogs" element={<Blog/>} />
         <Route path="/blogs/:id" element={<BlogDetail/>} />
         <Route path="/blogs/editor" element={<BlogEditor/>} />
+        <Route path="/blogs/editor/:id" element={<BlogEditor/>} />
 
         {/* Resume Builder */}
         <Route path="/resume-builder" element={<ResumeBuilder />} />
