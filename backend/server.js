@@ -36,6 +36,7 @@ import notificationRoutes from "./routes/notification.js";
 import resumeRoutes from "./routes/resume.js";
 import communityRoutes from  "./routes/community.js";
 import searchRoutes from "./routes/search.js";
+import blogRoutes from "./routes/blogs.js";
 import { giveJoke } from "./controllers/give-joke.controller.js";
 
 
@@ -66,6 +67,9 @@ app.get('/api/give-joke', giveJoke);
 
 // Search
 app.use("/api/search", searchRoutes);
+
+//Blogs
+app.use("/api/blogs", blogRoutes);
 
 //Fetching Job Posts from Google sheet
 
