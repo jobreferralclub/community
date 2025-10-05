@@ -222,7 +222,7 @@ const Navigation = () => {
                     setSearchSubmitted(false);
                   }}
                 />
-                <div className="absolute mt-1 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
+                <div className="absolute mt-12 w-full bg-zinc-900 border border-zinc-800 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                   {!searchSubmitted ? (
                     <button
                       type="button"
