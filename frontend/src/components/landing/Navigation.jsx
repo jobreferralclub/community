@@ -100,14 +100,14 @@ const Navigation = () => {
   const communityNavItems = [
     { label: "Jobs with Referrals", href: "/community/introductions" },
     { label: "Success Stories", href: "/#stories" },
-    { label: "Blogs", href: "/blogs" },
+    // { label: "Blogs", href: "/blogs" },
   ];
 
   const defaultNavItems = [
     { label: "How It Works", href: "/#how-it-works" },
     { label: "Categories", href: "/#categories" },
     { label: "Success Stories", href: "/#stories" },
-    { label: "Blogs", href: "/blogs" },
+    // { label: "Blogs", href: "/blogs" },
   ];
 
 

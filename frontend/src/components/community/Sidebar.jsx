@@ -217,7 +217,7 @@ const Sidebar = ({ open, setOpen }) => {
 
         {/* Settings + Success Stories at Bottom */}
         <div className="px-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-2">
-          <NavLink
+          {/* <NavLink
             to="/success-stories" // must match route path
             className={({ isActive }) =>
               `flex items-center px-3 pt-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
@@ -225,7 +225,7 @@ const Sidebar = ({ open, setOpen }) => {
           >
             <SafeIcon icon={FiIcons.FiBookOpen} className="w-5 h-5 flex-shrink-0 text-white" />
             {open && <span className="ml-3 font-medium text-white">Success Stories</span>}
-          </NavLink>
+          </NavLink> */}
 
           <NavLink
             to="/community/settings"
