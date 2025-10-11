@@ -216,29 +216,35 @@ const Sidebar = ({ open, setOpen }) => {
         </nav>
 
         {/* Settings + Success Stories at Bottom */}
+        
+        {/* change start here */}
         <div className="px-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-2">
-          {/* <NavLink
-            to="/success-stories" // must match route path
-            className={({ isActive }) =>
-              `flex items-center px-3 pt-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
-            }
-          >
-            <SafeIcon icon={FiIcons.FiBookOpen} className="w-5 h-5 flex-shrink-0 text-white" />
-            {open && <span className="ml-3 font-medium text-white">Success Stories</span>}
-          </NavLink> */}
+  {/* Download Job List for TPO */}
+  {role === "tpo" && (
+    <a
+      href="https://docs.google.com/spreadsheets/d/1c-olWTYEE0r80eoOuCr7dnU8bE4QGFOTWItEGmBP_fI/export?format=xlsx"
+      download
+      className="flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative text-white hover:text-[#79e708]"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <SafeIcon icon={FiIcons.FiDownload} className="w-5 h-5 flex-shrink-0 text-white" />
+      {open && <span className="ml-3 font-medium text-white">Download Job List</span>}
+    </a>
+  )}
 
-          <NavLink
-            to="/community/settings"
-            className={({ isActive }) =>
-              `flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
-            }
-          >
-            <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0 text-white" />
-            {open && <span className="ml-3 font-medium text-white">Settings</span>}
-          </NavLink>
-        </div>
+  <NavLink
+    to="/community/settings"
+    className={({ isActive }) =>
+      `flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative ${isActive ? activeClass : "text-white hover:text-[#79e708]"}`
+    }
+  >
+    <SafeIcon icon={FiSettings} className="w-5 h-5 flex-shrink-0 text-white" />
+    {open && <span className="ml-3 font-medium text-white">Settings</span>}
+  </NavLink>
+</div>
 
-      </div>
+      </div> {/* change made here */}
     </>
   );
 };
