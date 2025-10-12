@@ -1,36 +1,64 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import Navigation from "../landing/Navigation";
 import { useAuthStore } from "../../store/authStore";
 import LocationModal from "./LocationModal";
-import StatusModal from './StatusModal';
+import StatusModal from "./StatusModal";
+import RoleModal from "./RoleModal";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { location, setLocation } = useAuthStore();
 
-  // Add state for professional status
+  // Auth store context/state
+  const { location, setLocation, user } = useAuthStore();
+  const userId = user?._id;
+
+  // Modal flow state
   const [status, setStatus] = useState(null);
+  const [role, setRole] = useState(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
+  // Step 1: Location selected
   const handleLocationSelect = (loc) => {
     setLocation(loc);
-    setShowStatusModal(true);  // Show status modal after location is picked
+    setShowStatusModal(true); // Now prompt for status
   };
 
+  // Step 2: Status selected
   const handleStatusSelect = (statusVal) => {
     setStatus(statusVal);
     setShowStatusModal(false);
-    // Here, consider persisting the selected status to your user store/profile.
+    setShowRoleModal(true); // Now prompt for role
+  };
+
+  // Step 3: Role selected, update backend
+  const handleRoleSelect = async (roleVal) => {
+    setRole(roleVal);
+    setShowRoleModal(false);
+
+    if (!userId) return; // Prevent API call if not logged in
+
+    try {
+       await axios.put(`http://localhost:5000/api/users/${userId}/role`, { role: roleVal });
+      // Optionally show success toast or update UI here
+    } catch (err) {
+      console.error("Failed to update user role", err);
+      // Optionally show error toast
+    }
   };
 
   return (
     <>
+      {/* Main app layout */}
       <div className="flex h-screen bg-black text-gray-100 pt-16">
+        {/* Desktop sidebar */}
         <div className="hidden md:flex">
           <Sidebar open={true} setOpen={() => {}} />
         </div>
+        {/* Mobile sidebar overlay & drawer */}
         <AnimatePresence>
           {sidebarOpen && (
             <>
@@ -56,6 +84,7 @@ const Layout = ({ children }) => {
             </>
           )}
         </AnimatePresence>
+        {/* Content area */}
         <div className="flex-1 flex flex-col overflow-hidden bg-black">
           <Navigation setSidebarOpen={setSidebarOpen} />
           <motion.main
@@ -73,6 +102,8 @@ const Layout = ({ children }) => {
           </motion.main>
         </div>
       </div>
+
+      {/* Modals, controlled step-wise */}
       <LocationModal
         isOpen={location === null}
         onSelect={handleLocationSelect}
@@ -80,6 +111,10 @@ const Layout = ({ children }) => {
       <StatusModal
         isOpen={location !== null && status === null && showStatusModal}
         onSelect={handleStatusSelect}
+      />
+      <RoleModal
+        isOpen={location !== null && status !== null && role === null && showRoleModal}
+        onSelect={handleRoleSelect}
       />
     </>
   );
