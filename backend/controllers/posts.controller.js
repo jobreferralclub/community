@@ -5,21 +5,62 @@ import Community from "../models/Community.js";
 import User from "../models/User.js";
 // ========== POSTS ==========
 
-// Get all posts (newest first)
+// Get all posts (newest first) with filtering support
 export const getAllPosts = async (req, res) => {
   try {
-    const { community } = req.body;
+    // Use query params for filtering
+    const {
+      community,
+      keyword,
+      location,
+      experienceLevel,
+      jobType,
+      companyName,
+      salaryMin,
+      salaryMax,
+      page = 1,
+      limit = 20
+    } = req.query;
 
-    // Build query condition
-    const query = community ? { community } : {};
+    const filter = {};
+    if (community) filter.community = community;
 
-    // Fetch posts with optional filter
-    const posts = await Post.find(query)
+    if (keyword) {
+      filter.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { content: { $regex: keyword, $options: "i" } }
+      ];
+    }
+    if (location) filter.location = { $regex: location, $options: "i" };
+    if (experienceLevel) filter.experienceLevel = experienceLevel;
+    if (jobType) filter.jobType = jobType;
+    if (companyName) filter.companyName = { $regex: companyName, $options: "i" };
+    if (salaryMin || salaryMax) {
+      filter.salary = {};
+      if (salaryMin) filter.salary.$gte = Number(salaryMin);
+      if (salaryMax) filter.salary.$lte = Number(salaryMax);
+    }
+
+    // Pagination calculation
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const posts = await Post.find(filter)
       .sort({ createdAt: -1 })
-      .select('-job_description')   // exclude job_description
-      .populate('createdBy', 'name avatar');
+      .select("-job_description") // exclude job_description
+      .populate("createdBy", "name avatar")
+      .skip(skip)
+      .limit(Number(limit));
 
-    res.json(posts);
+    // You may want total count for frontend pagination
+    const totalCount = await Post.countDocuments(filter);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.json({
+      posts,
+      totalCount,
+      totalPages,
+      currentPage: Number(page),
+    });
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Failed to get posts" });
@@ -144,7 +185,7 @@ export const getPostByID = async (req, res) => {
     console.error("Error fetching post by ID:", error);
     res.status(500).json({ error: "Failed to fetch post" });
   }
-}
+};
 
 // Delete a post
 export const deletePost = async (req, res) => {
@@ -287,6 +328,7 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ error: "Failed to delete comment" });
   }
 };
+
 // Get comment count for a specific user
 export const getCommentCountByUser = async (req, res) => {
   try {

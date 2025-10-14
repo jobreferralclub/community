@@ -7,21 +7,25 @@ import CreatePost from "../../components/community/CreatePost";
 import { useLocation } from "react-router-dom";
 import { subCommunities } from "../../data/communityList";
 import Footer from "../../components/landing/Footer";
-import CommunityHeader from "../../components/community/CommunityHeader";
+import PostFilter from "../../components/community/PostFilter";
 
-// import FilterBar from "./FilterBar"; // Adjust path as needed
-
+const salaryRanges = [
+  { label: "₹0–₹5L", min: 0, max: 500000 },
+  { label: "₹5L–₹10L", min: 500000, max: 1000000 },
+  { label: "₹10L–₹20L", min: 1000000, max: 2000000 },
+  { label: "₹20L+", min: 2000000, max: null },
+];
 const { FiPlus } = FiIcons;
 
 const Community = () => {
   const [showCreatePost, setShowCreatePost] = useState(false);
-  const [posts, setPosts] = useState([]);
+  const [communityPosts, setCommunityPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [highlightedPost, setHighlightedPost] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
-
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("postid");
@@ -33,74 +37,95 @@ const Community = () => {
       subtitle: "Connect, share, and grow together",
     };
 
+  // Reset page on community change or filter change
   useEffect(() => {
     setPage(1);
-  }, [currentCommunity?.id]);
+  }, [currentCommunity?.id, selectedFilters]);
 
+  // Fetch community posts when community changes
   useEffect(() => {
     if (!currentCommunity?.id) return;
-
-    const fetchPosts = async () => {
+    const fetchCommunityPosts = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const res = await fetch(
           `${import.meta.env.VITE_API_PORT}/api/communities/${currentCommunity.id}/posts?page=${page}`,
           { method: "GET", headers: { "Content-Type": "application/json" } }
         );
         const data = await res.json();
-        setPosts(data.posts || []);
+        setCommunityPosts(data.posts || []);
         setTotalPages(data.totalPages || 1);
       } catch (err) {
-        console.error("Error fetching posts:", err);
-        setPosts([]);
+        setCommunityPosts([]);
       } finally {
         setLoading(false);
       }
     };
+    // Only fetch community posts when no filter applied
+    if (Object.keys(selectedFilters).length === 0) {
+      fetchCommunityPosts();
+      setFilteredPosts(null);
+    }
+  }, [currentCommunity?.id, page, selectedFilters]);
 
-    fetchPosts();
-  }, [currentCommunity?.id, page]);
+  // Fetch filtered posts independently of community
+  useEffect(() => {
+    if (Object.keys(selectedFilters).length === 0) return; // No filters, skip
+    const fetchFilteredPosts = async () => {
+      setLoading(true);
+      try {
+        let params = { page };
+        if (selectedFilters.keyword) params.keyword = selectedFilters.keyword;
+        if (selectedFilters.location) params.location = selectedFilters.location;
+        if (selectedFilters.experienceLevel) params.experienceLevel = selectedFilters.experienceLevel;
+        if (selectedFilters.jobType) params.jobType = selectedFilters.jobType;
+        if (selectedFilters.companyName) params.companyName = selectedFilters.companyName;
+        if (selectedFilters.salaryRange) {
+          const range = salaryRanges.find(r => r.label === selectedFilters.salaryRange);
+          if (range) {
+            params.salaryMin = range.min;
+            if (range.max !== null) params.salaryMax = range.max;
+          }
+        }
+        const query = new URLSearchParams(params).toString();
+        const res = await fetch(
+          `${import.meta.env.VITE_API_PORT}/api/posts?${query}`,
+          { method: "GET", headers: { "Content-Type": "application/json" } }
+        );
+        const data = await res.json();
+        setFilteredPosts(data.posts || []);
+        setTotalPages(data.totalPages || 1);
+      } catch (err) {
+        setFilteredPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFilteredPosts();
+  }, [page, selectedFilters]);
 
+  // Highlighted post fetch logic
   useEffect(() => {
     if (!postId) return;
-
     const fetchPostById = async () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_PORT}/api/posts/${postId}`);
         const data = await res.json();
-        if (res.ok) {
-          setHighlightedPost(data);
-        } else {
-          setHighlightedPost(null);
-        }
+        if (res.ok) setHighlightedPost(data);
+        else setHighlightedPost(null);
       } catch (err) {
-        console.error("Error fetching post by ID:", err);
         setHighlightedPost(null);
       }
     };
-
     fetchPostById();
   }, [postId]);
 
-  // Filter posts based on selected filters
-  const applyFilters = (post) => {
-    if (selectedFilters.jobs && selectedFilters.jobs !== "All Jobs") {
-      if (!post.category || !post.category.includes(selectedFilters.jobs)) return false;
-    }
-    if (selectedFilters.company && selectedFilters.company !== "Any") {
-      if (post.company !== selectedFilters.company) return false;
-    }
-    if (selectedFilters.easyApply) {
-      if (!post.easyApply) return false;
-    }
-    if (selectedFilters.under10) {
-      if (!post.applicants || post.applicants >= 10) return false;
-    }
-    // Implement datePosted filtering as needed based on your post data
-    return true;
-  };
+  function handleFilterSearch() {
+    setPage(1);
+  }
 
-  const filteredPosts = posts.filter(applyFilters);
+  // Determine which posts to show (filtered has priority)
+  const postsToShow = filteredPosts !== null ? filteredPosts : communityPosts;
 
   return (
     <>
@@ -123,7 +148,11 @@ const Community = () => {
         </div>
 
         {/* Filter Bar */}
-      {/* <FilterBar selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} /> */}
+        <PostFilter
+          selectedFilters={selectedFilters}
+          setSelectedFilters={setSelectedFilters}
+          onSearch={handleFilterSearch}
+        />
 
         {/* Posts */}
         <div className="space-y-6">
@@ -139,25 +168,18 @@ const Community = () => {
 
           {loading ? (
             <div className="text-center text-gray-500 py-10">Loading posts...</div>
-          ) : filteredPosts.length > 0 ? (
-            filteredPosts.map((post, index) => (
-              <motion.div
-                key={post._id || post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
+          ) : postsToShow.length > 0 ? (
+            postsToShow.map((post, index) => (
+              <motion.div key={post._id || post.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
                 <PostCard
                   post={post}
-                  onUpdate={(updatedPost) =>
-                    setPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)))
-                  }
-                  onDelete={(id) => setPosts((prev) => prev.filter((p) => p._id !== id))}
+                  onUpdate={updatedPost => setPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)))}
+                  onDelete={id => setPosts(prev => prev.filter(p => p._id !== id))}
                 />
               </motion.div>
             ))
           ) : (
-            <div className="text-center text-gray-500 py-10">No posts to display in this community.</div>
+            <div className="text-center text-gray-500 py-10">No posts to display.</div>
           )}
         </div>
 
@@ -165,23 +187,11 @@ const Community = () => {
         {!loading && totalPages > 1 && (
           <div className="flex justify-center items-center space-x-2 mt-6">
             {page > 1 && (
-              <button
-                onClick={() => setPage((prev) => prev - 1)}
-                className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-              >
-                Prev
-              </button>
+              <button onClick={() => setPage(prev => prev - 1)} className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700">Prev</button>
             )}
-
             <span className="px-3 py-1 rounded-lg bg-[#79e708] !text-black font-medium">{page}</span>
-
             {page < totalPages && (
-              <button
-                onClick={() => setPage((prev) => prev + 1)}
-                className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700"
-              >
-                Next
-              </button>
+              <button onClick={() => setPage(prev => prev + 1)} className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700">Next</button>
             )}
           </div>
         )}

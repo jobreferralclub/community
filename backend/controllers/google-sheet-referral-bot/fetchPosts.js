@@ -79,22 +79,26 @@ async function fetchData(spreadsheetId, range) {
   });
 }
 
-async function createPost(title, content, job_description, community, maxRetries = 3) {
+// Salary parser for typical Indian salary strings
+function parseSalary(salaryRange) {
+  if (!salaryRange) return null;
+  const matches = salaryRange.match(/(\d[\d,]*)/g);
+  if (matches && matches.length > 0) {
+    // Use highest value if there's a range, as max salary
+    return parseInt(matches[matches.length - 1].replace(/,/g, ''), 10);
+  }
+  return null;
+}
+
+async function createPost(postData, maxRetries = 3) {
   let attempt = 0;
   const delay = ms => new Promise(res => setTimeout(res, ms));
   while (attempt < maxRetries) {
     try {
-      const response = await axios.post('http://localhost:5000/api/posts/', {
-        title,
-        content,
-        userId: '68983120b0b01c3a69f54851',
-        community,
-        job_description,
-        type: "job-posting",
-      }, {
+      const response = await axios.post('http://localhost:5000/api/posts/', postData, {
         timeout: 10000
       });
-      console.log(`[POST SUCCESS] ${community}: JobID ${response.data._id}`);
+      console.log(`[POST SUCCESS] ${postData.community}: JobID ${response.data._id}`);
       return true;
     } catch (error) {
       attempt++;
@@ -118,27 +122,27 @@ async function createPost(title, content, job_description, community, maxRetries
 }
 
 const sheetsToProcess = [
-  { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
-  { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
-  { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
-  { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
-  { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
-  { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
-  { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
-  { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
-  { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
-  { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
+  // { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
+  // { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
+  // { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
+  // { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
+  // { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
+  // { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
+  // { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
+  // { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
+  // { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
+  // { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
   { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" },
-  { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
-  { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
-  { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
-  { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
-  { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
-  { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
-  { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
-  { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
-  { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
-  { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
+  // { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
+  // { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
+  // { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
+  // { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
+  // { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
+  // { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
+  // { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
+  // { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
+  // { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
+  // { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -175,11 +179,7 @@ export async function generatePostsAll() {
         continue;
       }
 
-      if (sheet.community === "Freshers - India") {
-        console.log(`[DEBUG] Freshers - Checking JobID: "${jobId}" vs Last: "${lastJobIdLog[sheet.community]}"`);
-        console.log(`[DEBUG] Freshers - isJobIdNewer result: ${isJobIdNewer(jobId, lastJobIdLog[sheet.community])}`);
-      }
-
+      // Build message content and description
       const title = 'Job Referral Opportunity';
       const job_description = row['About the Job'] || row['Job Description'] || '';
       const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
@@ -192,7 +192,7 @@ export async function generatePostsAll() {
       ) ? yearsOfExpRaw : null;
 
       const yearsExpText = yearsOfExp
-        ? `<p><strong>Years of experience:</strong> ${yearsOfExp} years</p>`
+        ? `<p><strong>Years of experience:</strong> ${yearsOfExp}</p>`
         : '';
 
       const hiringManagerName = row["Hiring Manager's Name"];
@@ -234,8 +234,53 @@ export async function generatePostsAll() {
             <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
           `;
 
+      // === Extract filter fields from row ===
+      const location = row['Location']?.trim() || null;
+      const companyName = row['Company Name']?.trim() || null;
+      const salary = parseSalary(row['Salary Range']);
+      const jobType = (() => {
+        let jt = (row['Job Type'] || '').toLowerCase();
+        if (!jt) {
+          const jobTitle = (row['Job Title'] || '').toLowerCase();
+          if (jobTitle.includes('intern')) return 'internship';
+          if (jobTitle.includes('contract')) return 'contract';
+          if (jobTitle.includes('freelance')) return 'freelance';
+          if (jobTitle.includes('part-time')) return 'part-time';
+          return 'full-time';
+        }
+        return jt;
+      })();
+      const experienceLevel = (() => {
+  const exp = (row['Years of experience'] || '').toLowerCase();
+
+  if (exp.includes('intern') || exp.includes('fresher') || exp.includes('0')) return 'intern';
+  if (exp.includes('entry')) return 'entry';
+  if (exp.includes('mid')) return 'mid';
+  if (exp.includes('senior')) return 'senior';
+  if (exp.includes('director')) return 'director';
+
+  // Default fallback if no match found
+  return "Not Disclosed";
+})();
+
+
+      // Build object to send to backend
+      const postData = {
+        title,
+        content: message,
+        job_description,
+        community: sheet.community,
+        userId: '68983120b0b01c3a69f54851',
+        type: "job-posting",
+        location,
+        companyName,
+        salary,
+        jobType,
+        experienceLevel,
+      };
+
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
-      const success = await createPost(title, message, job_description, sheet.community);
+      const success = await createPost(postData);
 
       console.log(`[RESULT] Post for JobID ${jobId} (${sheet.community}) => ${success}`);
 
@@ -251,4 +296,5 @@ export async function generatePostsAll() {
   }
 }
 
-//generatePostsAll();
+// To run the import: uncomment below
+generatePostsAll();
