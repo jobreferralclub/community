@@ -460,35 +460,38 @@ const Navigation = () => {
                   <span className="text-gray-300 font-medium">{user.name}</span>
                   <AnimatePresence>
                     {profileOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute right-0 top-0 mt-12 bg-black border border-gray-800 w-48 shadow-lg z-50 rounded-lg overflow-hidden"
-                      >
-                        <a
-                          href="/community"
-                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
-                        >
-                          Continue to Community
-                        </a>
-                        <a
-                          href="/profile"
-                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
-                        >
-                          My Profile
-                        </a>
-                        <button
-                          onClick={() => {
-                            logout();
-                            auth0logout({ returnTo: "/" });
-                          }}
-                          className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
-                        >
-                          Log Out
-                        </button>
-                      </motion.div>
-                    )}
+  <motion.div
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+    className="absolute right-0 top-0 mt-12 bg-black border border-gray-800 w-48 shadow-lg z-50 rounded-lg overflow-hidden"
+  >
+    {!isCommunityPage && (
+      <a
+        href="/community"
+        className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
+      >
+        Continue to Community
+      </a>
+    )}
+    <a
+      href="/profile"
+      className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors duration-300"
+    >
+      My Profile
+    </a>
+    <button
+      onClick={() => {
+        logout();
+        auth0logout({ returnTo: "/" });
+      }}
+      className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors duration-300"
+    >
+      Log Out
+    </button>
+  </motion.div>
+)}
+
                   </AnimatePresence>
                 </div>
               ) : (
