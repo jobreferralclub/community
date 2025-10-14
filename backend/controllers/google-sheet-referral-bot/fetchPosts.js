@@ -122,27 +122,27 @@ async function createPost(postData, maxRetries = 3) {
 }
 
 const sheetsToProcess = [
-   { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
-   { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
-   { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
-   { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
-   { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
-   { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
-   { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
+  //  { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
+  //  { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
+  //  { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
+  //  { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
+  //  { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
+  //  { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
+  //  { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
    { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
    { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
-   { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
-   { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" },
-   { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
-   { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
-   { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
-   { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
-   { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
-   { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
-   { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
-   { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
-   { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
-   { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
+  //  { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
+  //  { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" },
+  //  { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
+  //  { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
+  //  { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
+  //  { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
+  //  { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
+  //  { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
+  //  { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
+  //  { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
+  //  { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
+  //  { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -297,4 +297,4 @@ export async function generatePostsAll() {
 }
 
 // To run the import: uncomment below
-//generatePostsAll();
+generatePostsAll();
