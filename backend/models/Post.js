@@ -82,7 +82,11 @@ const PostSchema = new mongoose.Schema({
   salary: {
     type: Number, // Annual salary in smallest currency unit (e.g. paise, cents)
     default: null
-  }
+  },
+  jobTitle: {
+  type: String,
+  default: null
+}
 });
 
 // Create index for better search performance on tags & type

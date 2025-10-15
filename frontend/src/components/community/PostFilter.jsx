@@ -37,7 +37,7 @@ export default function PostFilter({ selectedFilters, setSelectedFilters, onSear
     name="keyword"
     value={selectedFilters.keyword || ""}
     onChange={handleChange}
-    placeholder="Keyword / Job Title"
+    placeholder="Job Title/ Keyword"
     className="px-4 py-2 rounded-lg bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#79e708] transition-shadow"
   />
   <input

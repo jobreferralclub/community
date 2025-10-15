@@ -145,6 +145,7 @@ const sheetsToProcess = [
   { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
+
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 export async function generatePostsAll() {
@@ -183,6 +184,7 @@ export async function generatePostsAll() {
       const title = 'Job Referral Opportunity';
       const job_description = row['About the Job'] || row['Job Description'] || '';
       const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
+      const jobTitle = row['Job Title']?.trim() || null;
       const yearsOfExpRaw = row['Years of experience'];
       const yearsOfExp = (
         yearsOfExpRaw !== undefined &&
@@ -277,6 +279,7 @@ export async function generatePostsAll() {
         salary,
         jobType,
         experienceLevel,
+        jobTitle,
       };
 
       console.log(`[CREATE] Creating post for Job ID: ${jobId} in community: ${sheet.community}`);
