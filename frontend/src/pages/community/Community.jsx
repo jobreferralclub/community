@@ -174,7 +174,15 @@ const Community = () => {
                 <PostCard
                   post={post}
                   onUpdate={updatedPost => setPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)))}
-                  onDelete={id => setPosts(prev => prev.filter(p => p._id !== id))}
+                  onDelete={id => {
+  if (filteredPosts !== null) {
+    setFilteredPosts(prev => prev.filter(p => p._id !== id));
+  } else {
+    setCommunityPosts(prev => prev.filter(p => p._id !== id));
+  }
+  if (highlightedPost && highlightedPost._id === id) setHighlightedPost(null);
+}}
+
                 />
               </motion.div>
             ))
@@ -211,4 +219,3 @@ const Community = () => {
 };
 
 export default Community;
-
