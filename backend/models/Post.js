@@ -66,15 +66,16 @@ const PostSchema = new mongoose.Schema({
     default: null
   },
   experienceLevel: {
-    type: String,
-    enum: ['intern', 'entry', 'mid', 'senior', 'director','Not Disclosed'],
-    default: null
-  },
+  type: String,
+  enum: ['intern', 'entry', 'mid', 'senior', 'director', 'Not Disclosed'],
+  default: 'Not Disclosed'
+},
   jobType: {
-    type: String,
-    enum: ['full-time', 'part-time', 'contract', 'internship', 'freelance'],
-    default: null
-  },
+  type: String,
+  enum: ['full-time', 'part-time', 'contract', 'internship', 'freelance', 'Not Disclosed'],
+  default: 'Not Disclosed'
+},
+
   companyName: {
     type: String,
     default: null
