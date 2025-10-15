@@ -278,3 +278,20 @@ input[type="date"]::-webkit-clear-button {
 .neon-underline.active::after {
   transform: scaleX(1);
 }
+/* Prevent browser autofill/focus from changing input bg/text-color */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  background-color: #27272a !important;   /* Tailwind's bg-zinc-900 or bg-gray-800 */
+  color: #d1d5db !important;              /* Tailwind's text-gray-300 */
+  -webkit-box-shadow: 0 0 0 30px #27272a inset !important;
+  -webkit-text-fill-color: #d1d5db !important;
+  caret-color: #d1d5db !important;
+}
+
+input,
+input:focus,
+input[type="search"],
+input:active {
+  background-color: #27272a !important;
+  color: #d1d5db !important;
+}
