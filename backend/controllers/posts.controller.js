@@ -36,10 +36,24 @@ export const getAllPosts = async (req, res) => {
     if (jobType) filter.jobType = jobType;
     if (companyName) filter.companyName = { $regex: companyName, $options: "i" };
     if (salaryMin || salaryMax) {
-      filter.salary = {};
-      if (salaryMin) filter.salary.$gte = Number(salaryMin);
-      if (salaryMax) filter.salary.$lte = Number(salaryMax);
+  filter.salary = {};
+  if (salaryMin) filter.salary.$gte = Number(salaryMin);
+  if (salaryMax) filter.salary.$lte = Number(salaryMax);
+}
+
+   /*
+    if (salaryMin || salaryMax) {
+    filter.$or = [
+    { 
+      salaryMin: { ...(salaryMin && { $gte: Number(salaryMin) }), ...(salaryMax && { $lte: Number(salaryMax) }) } 
+    },
+    { 
+      salaryMax: { ...(salaryMin && { $gte: Number(salaryMin) }), ...(salaryMax && { $lte: Number(salaryMax) }) } 
     }
+  ];
+}
+  */
+
 
     // Pagination calculation
     const skip = (Number(page) - 1) * Number(limit);

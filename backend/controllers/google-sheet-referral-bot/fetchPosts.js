@@ -301,3 +301,239 @@ export async function generatePostsAll() {
 
 // To run the import: uncomment below
 //generatePostsAll();
+
+
+/*
+import axios from 'axios';
+import { google } from 'googleapis';
+import path from 'path';
+import fs from 'fs/promises';
+import {
+  FRESHERS_INDIA_SHEET_ID,
+  SHEET_RANGE,
+} from './config.mjs';
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// for __dirname replacement in ES module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const keyPath = path.join(__dirname, 'job-details-google-credentials.json');
+const LOG_FILE_PATH = path.join(__dirname, 'lastJobIdLog.json');
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: keyPath,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+});
+
+async function loadLastJobIdLog() {
+  try {
+    const data = await fs.readFile(LOG_FILE_PATH, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') return {};
+    throw error;
+  }
+}
+
+async function saveLastJobIdLog(log) {
+  await fs.writeFile(LOG_FILE_PATH, JSON.stringify(log, null, 2), 'utf-8');
+}
+
+function isJobIdNewer(current, last) {
+  if (!last) return true;
+  return current.localeCompare(last) > 0;
+}
+
+async function fetchData(spreadsheetId, range) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+  const result = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
+  });
+  const [headers, ...rows] = result.data.values;
+  return rows.map(row => {
+    let obj = {};
+    headers.forEach((header, i) => (obj[header.trim()] = row[i] || ""));
+    return obj;
+  });
+}
+
+function parseSalary(salaryRange) {
+  if (!salaryRange) return null;
+  const matches = salaryRange.match(/(\d[\d,]*)/g);
+  if (matches && matches.length > 0) {
+    // Use highest value if there's a range, as max salary
+    return parseInt(matches[matches.length - 1].replace(/,/g, ''), 10);
+  }
+  return null;
+}
+
+function parseSalaryNumber(str) {
+  if (!str) return null;
+  const num = parseInt(str.replace(/,/g, ""), 10);
+  return isNaN(num) ? null : num;
+}
+
+async function createPost(postData, maxRetries = 3) {
+  let attempt = 0;
+  const delay = ms => new Promise(res => setTimeout(res, ms));
+  while (attempt < maxRetries) {
+    try {
+      const response = await axios.post('http://localhost:5000/api/posts/', postData, {
+        timeout: 10000
+      });
+      return true;
+    } catch (error) {
+      attempt++;
+      if (attempt < maxRetries) {
+        const backoff = 500 * Math.pow(2, attempt);
+        await delay(backoff);
+      } else {
+        return false;
+      }
+    }
+  }
+}
+
+const sheetsToProcess = [
+  { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" }
+];
+
+export async function generatePostsAll() {
+  const lastJobIdLog = await loadLastJobIdLog();
+
+  for (const sheet of sheetsToProcess) {
+    const data = await fetchData(sheet.id, SHEET_RANGE);
+    if (!lastJobIdLog[sheet.community]) lastJobIdLog[sheet.community] = null;
+
+    for (const row of data) {
+      const jobIdKey = Object.keys(row).find(
+        k => k.replace(/\s/g, '').toLowerCase() === 'jobid'
+      );
+      const jobId = jobIdKey ? (row[jobIdKey] || '').trim() : '';
+      if (!jobId) continue;
+
+      if (!isJobIdNewer(jobId, lastJobIdLog[sheet.community])) {
+        continue;
+      }
+
+      const title = 'Job Referral Opportunity';
+      const job_description = row['About the Job'] || row['Job Description'] || '';
+      const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
+      const salaryMin = parseSalaryNumber(row['Salary Min'] || '');
+      const salaryMax = parseSalaryNumber(row['Salary Max'] || '');
+      const salary = parseSalary(salaryRange);
+      const jobTitle = row['Job Title']?.trim() || null;
+      const yearsOfExpRaw = row['Years of experience'];
+      const yearsOfExp = (
+        yearsOfExpRaw !== undefined &&
+        yearsOfExpRaw !== null &&
+        yearsOfExpRaw !== '' &&
+        yearsOfExpRaw.toString().toLowerCase() !== 'null'
+      ) ? yearsOfExpRaw : null;
+
+      const yearsExpText = yearsOfExp
+        ? `<p><strong>Years of experience:</strong> ${yearsOfExp}</p>`
+        : '';
+
+      const hiringManagerName = row["Hiring Manager's Name"];
+      const isHiringManagerMissing =
+        hiringManagerName === undefined ||
+        hiringManagerName === null ||
+        hiringManagerName === "" ||
+        hiringManagerName.toString().toLowerCase() === "null";
+
+      const jobLink = row['Job Link'];
+
+      const message = isHiringManagerMissing
+        ? `<p><strong>Job ID:</strong> ${jobId}</p>
+            <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+            <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
+            <p><strong>Location:</strong> ${row['Location']}</p>
+            ${yearsExpText}
+            ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
+            <p>Refer the 
+              <a href="${jobLink}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
+                Job Description
+              </a> 
+              for more details and apply.</p>`
+        : `
+            <p><strong>Job ID:</strong> ${jobId}</p>
+            <p><strong>Company Name:</strong> ${row['Company Name']}</p>
+            <p><strong>Job Role:</strong> ${row['Job Title'] || ''}</p>
+            <p><strong>Location:</strong> ${row['Location']}</p>
+            ${yearsExpText}
+            ${salaryRange ? `<p><strong>Salary Range:</strong> ${salaryRange}</p>` : ''}
+            <p>${hiringManagerName} is hiring for <strong>${row['Job Title'] || ''}</strong> at <strong>${row['Company Name']}</strong>.</p>
+            <p>Refer the 
+              <a href="${jobLink}" target="_blank" rel="noopener noreferrer" style="color:#79E708;font-weight:600;text-decoration:underline;">
+                Job Description
+              </a> 
+              for more details. If you find this role relevant and are interested to be referred, please send your CV to 
+              <a href="mailto:support@jobreferral.club">support@jobreferral.club</a> mentioning <strong>Job ID: ${jobId}</strong> in the subject line. We will refer on your behalf.
+            </p>
+            <p><em><a href="https://jobreferral.club/community/club-guidelines" target="_blank" rel="noopener noreferrer">T&amp;C applied.</a></em></p>
+         `;
+
+      const location = row['Location']?.trim() || null;
+      const companyName = row['Company Name']?.trim() || null;
+      const jobType = (() => {
+        let jt = (row['Job Type'] || '').toLowerCase();
+        if (!jt) {
+          const jobTitle = (row['Job Title'] || '').toLowerCase();
+          if (jobTitle.includes('intern')) return 'internship';
+          if (jobTitle.includes('contract')) return 'contract';
+          if (jobTitle.includes('freelance')) return 'freelance';
+          if (jobTitle.includes('part-time')) return 'part-time';
+          return 'full-time';
+        }
+        return jt;
+      })();
+
+      const experienceLevel = (() => {
+        const exp = (row['Years of experience'] || '').toLowerCase();
+        if (exp.includes('intern') || exp.includes('fresher') || exp.includes('0')) return 'intern';
+        if (exp.includes('entry')) return 'entry';
+        if (exp.includes('mid')) return 'mid';
+        if (exp.includes('senior')) return 'senior';
+        if (exp.includes('director')) return 'director';
+        return "Not Disclosed";
+      })();
+
+      const postData = {
+        title,
+        content: message,
+        job_description,
+        community: sheet.community,
+        userId: '68983120b0b01c3a69f54851',
+        type: "job-posting",
+        location,
+        companyName,
+        salary,
+        salaryMin,
+        salaryMax,
+        jobType,
+        experienceLevel,
+        jobTitle,
+      };
+
+      const success = await createPost(postData);
+
+      if (success) {
+        lastJobIdLog[sheet.community] = jobId;
+        await saveLastJobIdLog(lastJobIdLog);
+        // Only this log (concise)
+        console.log(`[SAVED] Updated lastJobId for "${sheet.community}" => ${jobId}`);
+      }
+    }
+  }
+}
+
+// To run the import:
+generatePostsAll();
+
+*/
