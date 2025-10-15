@@ -115,11 +115,21 @@ export default function PostFilter({
       </select>
       <button
         type="submit"
-        className="bg-[#79e708] p-2 rounded-full flex items-center justify-center border-2 border-[#5da106] shadow-md hover:brightness-110 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#5da106] transition-all duration-150"
+        className="
+          p-2 rounded-xl flex items-center justify-center 
+          bg-gradient-to-br from-[#486a56] via-[#5a8452] to-[#3b5c41]
+          border border-[#4d6a4d]
+          shadow-[0_0_8px_2px_rgba(121,231,8,0.4)]
+          hover:shadow-[0_0_12px_4px_rgba(121,231,8,0.6)]
+          backdrop-blur-md
+          transition-all duration-200 ease-in-out
+          hover:scale-105
+          focus:outline-none focus:ring-2 focus:ring-[#79e708]
+        "
         title="Search"
         aria-label="Search"
       >
-        <FiSearch className="w-5 h-5 text-black" />
+        <FiSearch className="w-5 h-5 text-[#d4f38f]" />
       </button>
     </form>
   );
