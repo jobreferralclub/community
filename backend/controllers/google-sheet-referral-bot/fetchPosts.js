@@ -262,7 +262,7 @@ export async function generatePostsAll() {
   if (exp.includes('director')) return 'director';
 
   // Default fallback if no match found
-  return "Not Disclosed";
+  return "entry";
 })();
 
 
