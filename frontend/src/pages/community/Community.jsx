@@ -119,6 +119,14 @@ const Community = () => {
     };
     fetchPostById();
   }, [postId]);
+  const setPosts = (updater) => {
+  if (filteredPosts !== null) {
+    setFilteredPosts(updater);
+  } else {
+    setCommunityPosts(updater);
+  }
+};
+
 
   function handleFilterSearch() {
     setPage(1);
