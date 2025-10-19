@@ -2,13 +2,11 @@ import React from "react";
 import * as FiIcons from "react-icons/fi";
 const { FiSearch } = FiIcons;
 
-const experienceLevels = ["intern", "entry", "mid", "senior", "director"];
+const experienceLevels = ["intern", "entry", "mid", "senior"];
 const jobTypes = [
   "full-time",
   "part-time",
-  "contract",
   "internship",
-  "freelance",
 ];
 const salaryRanges = [
   { label: "₹0–₹5L", min: 0, max: 500000 },
