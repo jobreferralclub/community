@@ -84,8 +84,8 @@ const PostSchema = new mongoose.Schema({
     type: Number, // Annual salary in smallest currency unit (e.g. paise, cents)
     default: null
   },
- // salaryMin: Number, // new field
- // salaryMax: Number, // new field
+salaryMin: Number, // new field
+salaryMax: Number, // new field
   jobTitle: {
   type: String,
   default: null

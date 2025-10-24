@@ -10,10 +10,9 @@ import Footer from "../../components/landing/Footer";
 import PostFilter from "../../components/community/PostFilter";
 
 const salaryRanges = [
-  { label: "₹0–₹5L", min: 0, max: 500000 },
-  { label: "₹5L–₹10L", min: 500000, max: 1000000 },
-  { label: "₹10L–₹20L", min: 1000000, max: 2000000 },
-  { label: "₹20L+", min: 2000000, max: null },
+  { label: "₹0–₹4L", min: 0, max: 400000 },
+  { label: "₹4L–₹10L", min: 400000, max: 1000000 },
+  { label: "₹10L+", min: 1000000, max: null },
 ];
 const { FiPlus } = FiIcons;
 

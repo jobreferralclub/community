@@ -3,28 +3,29 @@ import { google } from 'googleapis';
 import path from 'path';
 import fs from 'fs/promises';
 import {
-  OPERATIONS_INDIA_SHEET_ID,
-  PROGRAM_AND_PROJECT_INDIA_SHEET_ID,
-  PRODUCT_INDIA_SHEET_ID,
-  MARKETING_INDIA_SHEET_ID,
-  CATEGORY_AND_VENDOR_INDIA_SHEET_ID,
-  SALES_AND_ACCOUNT_SHEET_ID,
-  FINANCE_INDIA_SHEET_ID,
-  HUMAN_RESOURCES_INDIA_SHEET_ID,
-  ANALYTICS_INDIA_SHEET_ID,
-  STRATEGY_INDIA_SHEET_ID,
+  // OPERATIONS_INDIA_SHEET_ID,
+  // PROGRAM_AND_PROJECT_INDIA_SHEET_ID,
+  // PRODUCT_INDIA_SHEET_ID,
+  // MARKETING_INDIA_SHEET_ID,
+  // CATEGORY_AND_VENDOR_INDIA_SHEET_ID,
+  // SALES_AND_ACCOUNT_SHEET_ID,
+  // FINANCE_INDIA_SHEET_ID,
+  // HUMAN_RESOURCES_INDIA_SHEET_ID,
+  // ANALYTICS_INDIA_SHEET_ID,
+  // STRATEGY_INDIA_SHEET_ID,
+
   FRESHERS_INDIA_SHEET_ID,
 
-  OPERATIONS_US_SHEET_ID,
-  PROGRAM_AND_PROJECT_US_SHEET_ID,
-  PRODUCT_US_SHEET_ID,
-  MARKETING_US_SHEET_ID,
-  CATEGORY_AND_VENDOR_US_SHEET_ID,
-  SALES_AND_ACCOUNT_US_SHEET_ID,
-  FINANCE_US_SHEET_ID,
-  HUMAN_RESOURCES_US_SHEET_ID,
-  ANALYTICS_US_SHEET_ID,
-  STRATEGY_US_SHEET_ID,
+  // OPERATIONS_US_SHEET_ID,
+  // PROGRAM_AND_PROJECT_US_SHEET_ID,
+  // PRODUCT_US_SHEET_ID,
+  // MARKETING_US_SHEET_ID,
+  // CATEGORY_AND_VENDOR_US_SHEET_ID,
+  // SALES_AND_ACCOUNT_US_SHEET_ID,
+  // FINANCE_US_SHEET_ID,
+  // HUMAN_RESOURCES_US_SHEET_ID,
+  // ANALYTICS_US_SHEET_ID,
+  // STRATEGY_US_SHEET_ID,
   SHEET_RANGE,
 } from './config.mjs';
 
@@ -122,27 +123,27 @@ async function createPost(postData, maxRetries = 3) {
 }
 
 const sheetsToProcess = [
-  { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
-  { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
-  { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
-  { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
-  { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
-  { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
-  { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
-  { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
-  { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
-  { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
+  // { id: OPERATIONS_INDIA_SHEET_ID, community: "Operations & Supply Chain - India" },
+  // { id: PROGRAM_AND_PROJECT_INDIA_SHEET_ID, community: "Program & Project Management - India" },
+  // { id: PRODUCT_INDIA_SHEET_ID, community: "Product Management - India" },
+  // { id: MARKETING_INDIA_SHEET_ID, community: "Marketing Management - India" },
+  // { id: CATEGORY_AND_VENDOR_INDIA_SHEET_ID, community: "Category and Vendor Management - India" },
+  // { id: SALES_AND_ACCOUNT_SHEET_ID, community: "Sales and Account Management - India" },
+  // { id: FINANCE_INDIA_SHEET_ID, community: "Finance - India" },
+  // { id: HUMAN_RESOURCES_INDIA_SHEET_ID, community: "Human Resources - India" },
+  // { id: ANALYTICS_INDIA_SHEET_ID, community: "Analytics - India" },
+  // { id: STRATEGY_INDIA_SHEET_ID, community: "Strategy and Consulting - India" },
   { id: FRESHERS_INDIA_SHEET_ID, community: "Freshers - India" },
-  { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
-  { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
-  { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
-  { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
-  { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
-  { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
-  { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
-  { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
-  { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
-  { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
+  // { id: OPERATIONS_US_SHEET_ID, community: "Operations & Supply Chain - US" },
+  // { id: PROGRAM_AND_PROJECT_US_SHEET_ID, community: "Program & Project Management - US" },
+  // { id: PRODUCT_US_SHEET_ID, community: "Product Management - US" },
+  // { id: MARKETING_US_SHEET_ID, community: "Marketing Management - US" },
+  // { id: CATEGORY_AND_VENDOR_US_SHEET_ID, community: "Category and Vendor Management - US" },
+  // { id: SALES_AND_ACCOUNT_US_SHEET_ID, community: "Sales and Account Management - US" },
+  // { id: FINANCE_US_SHEET_ID, community: "Finance - US" },
+  // { id: HUMAN_RESOURCES_US_SHEET_ID, community: "Human Resources - US" },
+  // { id: ANALYTICS_US_SHEET_ID, community: "Analytics - US" },
+  // { id: STRATEGY_US_SHEET_ID, community: "Strategy and Consulting - US" },
 ];
 
 
@@ -184,6 +185,12 @@ export async function generatePostsAll() {
       const title = 'Job Referral Opportunity';
       const job_description = row['About the Job'] || row['Job Description'] || '';
       const salaryRange = row['Salary Range'] ? row['Salary Range'].trim() : '';
+
+  const salaryMinRaw = row['Salary Min'] || row['salary min'];
+  const salaryMaxRaw = row['Salary Max'] || row['salary max'];
+  const salaryMin = salaryMinRaw ? Number(salaryMinRaw) : null;
+  const salaryMax = salaryMaxRaw ? Number(salaryMaxRaw) : null;
+
       const jobTitle = row['Job Title']?.trim() || null;
       const yearsOfExpRaw = row['Years of experience'];
       const yearsOfExp = (
@@ -245,8 +252,8 @@ export async function generatePostsAll() {
         if (!jt) {
           const jobTitle = (row['Job Title'] || '').toLowerCase();
           if (jobTitle.includes('intern')) return 'internship';
-          if (jobTitle.includes('contract')) return 'contract';
-          if (jobTitle.includes('freelance')) return 'freelance';
+          // if (jobTitle.includes('contract')) return 'contract';
+          // if (jobTitle.includes('freelance')) return 'freelance';
           if (jobTitle.includes('part-time')) return 'part-time';
           return 'full-time';
         }
@@ -277,6 +284,8 @@ export async function generatePostsAll() {
         location,
         companyName,
         salary,
+        salaryMin,
+        salaryMax,
         jobType,
         experienceLevel,
         jobTitle,
@@ -300,7 +309,7 @@ export async function generatePostsAll() {
 }
 
 // To run the import: uncomment below
-//generatePostsAll();
+// generatePostsAll();
 
 
 /*
