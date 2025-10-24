@@ -46,6 +46,13 @@ export default function PostFilter({
     onSearch();
   }
 
+  function stripHTML(html) {
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
+
+
   async function handleDownload() {
     try {
       const params = new URLSearchParams();
@@ -80,7 +87,7 @@ export default function PostFilter({
             `"${post.jobType || ""}"`,
             `"${post.experienceLevel || ""}"`,
             `"${post.jobTitle || ""}"`,
-            `"${(post.job_description || "").replace(/"/g, '""').replace(/\n/g, ' ')}"`
+            `"${stripHTML(post.content || "").replace(/"/g, '""').replace(/\n/g, ' ')}"`
           ].join(",")
         )
       ];
