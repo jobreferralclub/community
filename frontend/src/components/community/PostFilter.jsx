@@ -1,6 +1,6 @@
 import React from "react";
 import * as FiIcons from "react-icons/fi";
-const { FiSearch } = FiIcons;
+const { FiSearch, FiDownload } = FiIcons;
 
 const experienceLevels = [
   { value: "intern", label: "Intern" },
@@ -18,6 +18,8 @@ const salaryRanges = [
   { label: "₹4L–₹10L", min: 400000, max: 1000000 },
   { label: "₹10L+", min: 1000000, max: null }
 ];
+
+const API_BASE_URL = import.meta.env.VITE_API_PORT;
 
 export default function PostFilter({
   selectedFilters,
@@ -38,6 +40,67 @@ export default function PostFilter({
   function handleSubmit(e) {
     e.preventDefault();
     onSearch();
+  }
+
+  // Download posts filtered by salary (as CSV)
+  async function handleDownload() {
+    try {
+      const params = new URLSearchParams();
+      if (selectedFilters.salaryRange)
+        params.append("salaryLabel", selectedFilters.salaryRange);
+
+      // Add other filters if needed here
+
+      const resp = await fetch(`${API_BASE_URL}/api/posts?${params.toString()}`);
+      const payload = await resp.json();
+      if (!payload.posts) return;
+
+      // Convert to CSV
+     const csvHeaders = [
+  "Company Name", 
+  "Location", 
+  "Salary Min", 
+  "Salary Max", 
+  "Job Type", 
+  "Experience Level",
+  "Job Title",
+  "Job Description"
+];
+
+const csvRows = [
+  csvHeaders.join(","),
+  ...payload.posts.map(post =>
+    [
+      `"${post.companyName || ""}"`,
+      `"${post.location || ""}"`,
+      post.salaryMin || "",
+      post.salaryMax || "",
+      `"${post.jobType || ""}"`,
+      `"${post.experienceLevel || ""}"`,
+      `"${post.jobTitle || ""}"`,
+      `"${(post.job_description || "").replace(/"/g, '""').replace(/\n/g, ' ')}"` // Escaped and single-line for CSV
+    ].join(",")
+  )
+];
+
+      const csvContent = csvRows.join("\n");
+
+      // Download CSV file
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "filtered_posts.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Download failed");
+      console.error(err);
+    }
   }
 
   return (
@@ -96,25 +159,37 @@ export default function PostFilter({
         placeholder="Company Name"
         className="flex-1 min-w-[110px] px-2 py-2 rounded-xl bg-gray-800 text-gray-300 border border-gray-700 focus:ring-[#79e708]"
       />
-      <select
-        name="salaryRange"
-        value={selectedFilters.salaryRange || ""}
-        onChange={handleSalaryChange}
-        className="min-w-[100px] px-2 py-2 rounded-xl bg-gray-800 text-gray-300 border border-gray-700 focus:ring-[#79e708]"
-      >
-        <option className="text-gray-300 bg-gray-800" value="">
-          Salary Range
-        </option>
-        {salaryRanges.map((sr) => (
-          <option
-            key={sr.label}
-            value={sr.label}
-            className="text-gray-300 bg-gray-800"
-          >
-            {sr.label}
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <select
+          name="salaryRange"
+          value={selectedFilters.salaryRange || ""}
+          onChange={handleSalaryChange}
+          className="min-w-[100px] px-2 py-2 rounded-xl bg-gray-800 text-gray-300 border border-gray-700 focus:ring-[#79e708]"
+        >
+          <option className="text-gray-300 bg-gray-800" value="">
+            Salary Range
           </option>
-        ))}
-      </select>
+          {salaryRanges.map((sr) => (
+            <option
+              key={sr.label}
+              value={sr.label}
+              className="text-gray-300 bg-gray-800"
+            >
+              {sr.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={handleDownload}
+          className="ml-2 px-2 py-2 rounded-xl flex items-center justify-center border border-[#4d6a4d] bg-[#2c3c2d] hover:bg-[#3b5c41] text-[#c5f07a] shadow"
+          title="Download matching posts"
+          aria-label="Download matching posts"
+          style={{ minWidth: 0 }}
+        >
+          <FiDownload className="w-5 h-5" />
+        </button>
+      </div>
       <button
         type="submit"
         className="
