@@ -112,7 +112,7 @@ const csvRows = [
         name="keyword"
         value={selectedFilters.keyword || ""}
         onChange={handleChange}
-        placeholder="Job Title / Keyword"
+        placeholder="Keyword"
         className="flex-1 min-w-[110px] px-2 py-2 rounded-xl bg-gray-800 text-gray-300 border border-gray-700 focus:ring-[#79e708]"
       />
       <input
