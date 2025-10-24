@@ -2,16 +2,21 @@ import React from "react";
 import * as FiIcons from "react-icons/fi";
 const { FiSearch } = FiIcons;
 
-const experienceLevels = ["intern", "entry", "mid", "senior"];
+const experienceLevels = [
+  { value: "intern", label: "Intern" },
+  { value: "entry", label: "Freshers" },
+  { value: "mid", label: "Mid" },
+  { value: "senior", label: "Senior" }
+];
 const jobTypes = [
-  "full-time",
-  "part-time",
-  "internship",
+  { value: "full-time", label: "Full-time" },
+  { value: "part-time", label: "Part-time" },
+  { value: "internship", label: "Internship" }
 ];
 const salaryRanges = [
   { label: "₹0–₹4L", min: 0, max: 400000 },
   { label: "₹4L–₹10L", min: 400000, max: 1000000 },
-  { label: "₹10L+", min: 1000000, max: null },
+  { label: "₹10L+", min: 1000000, max: null }
 ];
 
 export default function PostFilter({
@@ -63,9 +68,9 @@ export default function PostFilter({
         <option className="text-gray-300 bg-gray-800" value="">
           Experience Level
         </option>
-        {experienceLevels.map((lvl) => (
-          <option key={lvl} value={lvl} className="text-gray-300 bg-gray-800">
-            {lvl}
+        {experienceLevels.map(lvl => (
+          <option key={lvl.value} value={lvl.value} className="text-gray-300 bg-gray-800">
+            {lvl.label}
           </option>
         ))}
       </select>
@@ -78,9 +83,9 @@ export default function PostFilter({
         <option className="text-gray-300 bg-gray-800" value="">
           Job Type
         </option>
-        {jobTypes.map((type) => (
-          <option key={type} value={type} className="text-gray-300 bg-gray-800">
-            {type}
+        {jobTypes.map(type => (
+          <option key={type.value} value={type.value} className="text-gray-300 bg-gray-800">
+            {type.label}
           </option>
         ))}
       </select>
