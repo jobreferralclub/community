@@ -1,5 +1,6 @@
 import React from "react";
 import * as FiIcons from "react-icons/fi";
+import { useAuthStore } from "../../store/authStore";
 const { FiSearch, FiDownload } = FiIcons;
 
 const experienceLevels = [
@@ -26,6 +27,9 @@ export default function PostFilter({
   setSelectedFilters,
   onSearch,
 }) {
+  // Get the user role from auth store
+  const role = useAuthStore((state) => state.role);
+
   function handleChange(e) {
     setSelectedFilters((prev) => ({
       ...prev,
@@ -42,50 +46,47 @@ export default function PostFilter({
     onSearch();
   }
 
-  // Download posts filtered by salary (as CSV)
   async function handleDownload() {
     try {
       const params = new URLSearchParams();
       if (selectedFilters.salaryRange)
         params.append("salaryLabel", selectedFilters.salaryRange);
 
-      // Add other filters if needed here
+      // You can append other filters here similarly if needed
 
       const resp = await fetch(`${API_BASE_URL}/api/posts?${params.toString()}`);
       const payload = await resp.json();
       if (!payload.posts) return;
 
-      // Convert to CSV
-     const csvHeaders = [
-  "Company Name", 
-  "Location", 
-  "Salary Min", 
-  "Salary Max", 
-  "Job Type", 
-  "Experience Level",
-  "Job Title",
-  "Job Description"
-];
+      const csvHeaders = [
+        "Company Name",
+        "Location",
+        "Salary Min",
+        "Salary Max",
+        "Job Type",
+        "Experience Level",
+        "Job Title",
+        "Job Description"
+      ];
 
-const csvRows = [
-  csvHeaders.join(","),
-  ...payload.posts.map(post =>
-    [
-      `"${post.companyName || ""}"`,
-      `"${post.location || ""}"`,
-      post.salaryMin || "",
-      post.salaryMax || "",
-      `"${post.jobType || ""}"`,
-      `"${post.experienceLevel || ""}"`,
-      `"${post.jobTitle || ""}"`,
-      `"${(post.job_description || "").replace(/"/g, '""').replace(/\n/g, ' ')}"` // Escaped and single-line for CSV
-    ].join(",")
-  )
-];
+      const csvRows = [
+        csvHeaders.join(","),
+        ...payload.posts.map(post =>
+          [
+            `"${post.companyName || ""}"`,
+            `"${post.location || ""}"`,
+            post.salaryMin || "",
+            post.salaryMax || "",
+            `"${post.jobType || ""}"`,
+            `"${post.experienceLevel || ""}"`,
+            `"${post.jobTitle || ""}"`,
+            `"${(post.job_description || "").replace(/"/g, '""').replace(/\n/g, ' ')}"`
+          ].join(",")
+        )
+      ];
 
       const csvContent = csvRows.join("\n");
 
-      // Download CSV file
       const blob = new Blob([csvContent], { type: "text/csv" });
       const url = window.URL.createObjectURL(blob);
 
@@ -179,16 +180,18 @@ const csvRows = [
             </option>
           ))}
         </select>
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="ml-2 px-2 py-2 rounded-xl flex items-center justify-center border border-[#4d6a4d] bg-[#2c3c2d] hover:bg-[#3b5c41] text-[#c5f07a] shadow"
-          title="Download matching posts"
-          aria-label="Download matching posts"
-          style={{ minWidth: 0 }}
-        >
-          <FiDownload className="w-5 h-5" />
-        </button>
+        {role === "tpo" && (
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="ml-2 px-2 py-2 rounded-xl flex items-center justify-center border border-[#4d6a4d] bg-[#2c3c2d] hover:bg-[#3b5c41] text-[#c5f07a] shadow"
+            title="Download matching posts"
+            aria-label="Download matching posts"
+            style={{ minWidth: 0 }}
+          >
+            <FiDownload className="w-5 h-5" />
+          </button>
+        )}
       </div>
       <button
         type="submit"
