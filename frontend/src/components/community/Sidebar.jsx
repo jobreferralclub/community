@@ -219,7 +219,7 @@ const Sidebar = ({ open, setOpen }) => {
         
         {/* change start here */}
         <div className="px-4 border-t border-gray-200 dark:border-gray-700 flex flex-col gap-2">
-  {/* Download Job List for TPO */}
+  {/* Download Job List for TPO
   {role === "tpo" && (
     <a
       href="https://docs.google.com/spreadsheets/d/1c-olWTYEE0r80eoOuCr7dnU8bE4QGFOTWItEGmBP_fI/export?format=xlsx"
@@ -231,7 +231,7 @@ const Sidebar = ({ open, setOpen }) => {
       <SafeIcon icon={FiIcons.FiDownload} className="w-5 h-5 flex-shrink-0 text-white" />
       {open && <span className="ml-3 font-medium text-white">Download Job List</span>}
     </a>
-  )}
+  )} */}
 
   <NavLink
     to="/community/settings"

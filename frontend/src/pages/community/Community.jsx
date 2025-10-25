@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
@@ -25,6 +25,7 @@ const Community = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [highlightedPost, setHighlightedPost] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // NEW: Force refetch
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("postid");
@@ -36,14 +37,28 @@ const Community = () => {
       subtitle: "Connect, share, and grow together",
     };
 
-  // Reset page on community change or filter change
+  // FIXED: Reset page when community or filters change
   useEffect(() => {
     setPage(1);
-  }, [currentCommunity?.id, selectedFilters]);
+    setFilteredPosts(null); // Clear filtered posts when switching communities
+  }, [currentCommunity?.id]);
 
-  // Fetch community posts when community changes
+  // FIXED: Separate effect for filter changes
+  useEffect(() => {
+    if (Object.keys(selectedFilters).length > 0) {
+      setPage(1);
+    }
+  }, [selectedFilters]);
+
+  // FIXED: Fetch community posts with proper dependencies
   useEffect(() => {
     if (!currentCommunity?.id) return;
+    
+    // Only fetch if no filters applied
+    if (Object.keys(selectedFilters).length > 0) {
+      return;
+    }
+
     const fetchCommunityPosts = async () => {
       setLoading(true);
       try {
@@ -54,22 +69,22 @@ const Community = () => {
         const data = await res.json();
         setCommunityPosts(data.posts || []);
         setTotalPages(data.totalPages || 1);
+        setFilteredPosts(null);
       } catch (err) {
+        console.error("Error fetching community posts:", err);
         setCommunityPosts([]);
       } finally {
         setLoading(false);
       }
     };
-    // Only fetch community posts when no filter applied
-    if (Object.keys(selectedFilters).length === 0) {
-      fetchCommunityPosts();
-      setFilteredPosts(null);
-    }
-  }, [currentCommunity?.id, page, selectedFilters]);
 
-  // Fetch filtered posts independently of community
+    fetchCommunityPosts();
+  }, [currentCommunity?.id, page, selectedFilters, refreshTrigger]); // Added refreshTrigger
+
+  // FIXED: Fetch filtered posts with proper dependencies
   useEffect(() => {
-    if (Object.keys(selectedFilters).length === 0) return; // No filters, skip
+    if (Object.keys(selectedFilters).length === 0) return;
+
     const fetchFilteredPosts = async () => {
       setLoading(true);
       try {
@@ -95,13 +110,15 @@ const Community = () => {
         setFilteredPosts(data.posts || []);
         setTotalPages(data.totalPages || 1);
       } catch (err) {
+        console.error("Error fetching filtered posts:", err);
         setFilteredPosts([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchFilteredPosts();
-  }, [page, selectedFilters]);
+  }, [page, selectedFilters, refreshTrigger]); // Added refreshTrigger
 
   // Highlighted post fetch logic
   useEffect(() => {
@@ -113,26 +130,46 @@ const Community = () => {
         if (res.ok) setHighlightedPost(data);
         else setHighlightedPost(null);
       } catch (err) {
+        console.error("Error fetching highlighted post:", err);
         setHighlightedPost(null);
       }
     };
     fetchPostById();
   }, [postId]);
-  const setPosts = (updater) => {
-  if (filteredPosts !== null) {
-    setFilteredPosts(updater);
-  } else {
-    setCommunityPosts(updater);
-  }
-};
 
+  // FIXED: Use useCallback to prevent stale closures
+  const handlePostUpdate = useCallback((updatedPost) => {
+    if (Object.keys(selectedFilters).length > 0) {
+      setFilteredPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)));
+    } else {
+      setCommunityPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)));
+    }
+  }, [selectedFilters]);
+
+  const handlePostDelete = useCallback((id) => {
+    if (Object.keys(selectedFilters).length > 0) {
+      setFilteredPosts(prev => prev.filter(p => p._id !== id));
+    } else {
+      setCommunityPosts(prev => prev.filter(p => p._id !== id));
+    }
+    if (highlightedPost && highlightedPost._id === id) {
+      setHighlightedPost(null);
+    }
+  }, [selectedFilters, highlightedPost]);
 
   function handleFilterSearch() {
     setPage(1);
+    setRefreshTrigger(prev => prev + 1); // Force refetch
   }
 
-  // Determine which posts to show (filtered has priority)
-  const postsToShow = filteredPosts !== null ? filteredPosts : communityPosts;
+  // Determine which posts to show
+  const postsToShow = Object.keys(selectedFilters).length > 0 ? filteredPosts : communityPosts;
+
+  // FIXED: Handle page changes with scroll to top
+  const handlePageChange = useCallback((newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   return (
     <>
@@ -175,21 +212,13 @@ const Community = () => {
 
           {loading ? (
             <div className="text-center text-gray-500 py-10">Loading posts...</div>
-          ) : postsToShow.length > 0 ? (
+          ) : postsToShow && postsToShow.length > 0 ? (
             postsToShow.map((post, index) => (
               <motion.div key={post._id || post.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
                 <PostCard
                   post={post}
-                  onUpdate={updatedPost => setPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)))}
-                  onDelete={id => {
-  if (filteredPosts !== null) {
-    setFilteredPosts(prev => prev.filter(p => p._id !== id));
-  } else {
-    setCommunityPosts(prev => prev.filter(p => p._id !== id));
-  }
-  if (highlightedPost && highlightedPost._id === id) setHighlightedPost(null);
-}}
-
+                  onUpdate={handlePostUpdate}
+                  onDelete={handlePostDelete}
                 />
               </motion.div>
             ))
@@ -202,11 +231,23 @@ const Community = () => {
         {!loading && totalPages > 1 && (
           <div className="flex justify-center items-center space-x-2 mt-6">
             {page > 1 && (
-              <button onClick={() => setPage(prev => prev - 1)} className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700">Prev</button>
+              <button 
+                onClick={() => handlePageChange(page - 1)} 
+                className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
+              >
+                Prev
+              </button>
             )}
-            <span className="px-3 py-1 rounded-lg bg-[#79e708] !text-black font-medium">{page}</span>
+            <span className="px-3 py-1 rounded-lg bg-[#79e708] !text-black font-medium">
+              {page} / {totalPages}
+            </span>
             {page < totalPages && (
-              <button onClick={() => setPage(prev => prev + 1)} className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700">Next</button>
+              <button 
+                onClick={() => handlePageChange(page + 1)} 
+                className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
+              >
+                Next
+              </button>
             )}
           </div>
         )}
@@ -216,6 +257,7 @@ const Community = () => {
             onClose={() => {
               setShowCreatePost(false);
               setPage(1);
+              setRefreshTrigger(prev => prev + 1); // NEW: Force refetch after creating post
             }}
           />
         )}
