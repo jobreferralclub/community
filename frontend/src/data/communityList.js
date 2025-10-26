@@ -133,7 +133,7 @@ export const subCommunities = [
   {
     id: "68ac0495e4b95d75985eecf3",
     path: '/community/introductions',
-    title: 'Introductions',
+    title: 'Introductions and Discussions',
     subtitle: 'New members, introduce yourself and connect with everyone in the community.'
   },
   {
