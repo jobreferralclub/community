@@ -25,7 +25,7 @@ const Community = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [highlightedPost, setHighlightedPost] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState({});
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // NEW: Force refetch
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Force refetch
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("postid");
@@ -37,34 +37,36 @@ const Community = () => {
       subtitle: "Connect, share, and grow together",
     };
 
-  // FIXED: Reset page when community or filters change
+  // Consolidated function to reset pagination and refresh posts
+  const resetPaginationAndRefresh = () => {
+    setPage(1);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Reset page and filtered posts on community change
   useEffect(() => {
     setPage(1);
-    setFilteredPosts(null); // Clear filtered posts when switching communities
+    setFilteredPosts(null);
   }, [currentCommunity?.id]);
 
-  // FIXED: Separate effect for filter changes
+  // Reset page on filters change
   useEffect(() => {
     if (Object.keys(selectedFilters).length > 0) {
       setPage(1);
     }
   }, [selectedFilters]);
 
-  // FIXED: Fetch community posts with proper dependencies
+  // Fetch community posts ONLY when no filters present
   useEffect(() => {
     if (!currentCommunity?.id) return;
-    
-    // Only fetch if no filters applied
-    if (Object.keys(selectedFilters).length > 0) {
-      return;
-    }
+    if (Object.keys(selectedFilters).length > 0) return;
 
     const fetchCommunityPosts = async () => {
       setLoading(true);
       try {
         const res = await fetch(
           `${import.meta.env.VITE_API_PORT}/api/communities/${currentCommunity.id}/posts?page=${page}`,
-          { method: "GET", headers: { "Content-Type": "application/json" } }
+          { headers: { "Content-Type": "application/json" } }
         );
         const data = await res.json();
         setCommunityPosts(data.posts || []);
@@ -79,9 +81,9 @@ const Community = () => {
     };
 
     fetchCommunityPosts();
-  }, [currentCommunity?.id, page, selectedFilters, refreshTrigger]); // Added refreshTrigger
+  }, [currentCommunity?.id, page, refreshTrigger]);
 
-  // FIXED: Fetch filtered posts with proper dependencies
+  // Fetch filtered posts ONLY when filters present
   useEffect(() => {
     if (Object.keys(selectedFilters).length === 0) return;
 
@@ -101,10 +103,11 @@ const Community = () => {
             if (range.max !== null) params.salaryMax = range.max;
           }
         }
+
         const query = new URLSearchParams(params).toString();
         const res = await fetch(
           `${import.meta.env.VITE_API_PORT}/api/posts?${query}`,
-          { method: "GET", headers: { "Content-Type": "application/json" } }
+          { headers: { "Content-Type": "application/json" } }
         );
         const data = await res.json();
         setFilteredPosts(data.posts || []);
@@ -118,9 +121,9 @@ const Community = () => {
     };
 
     fetchFilteredPosts();
-  }, [page, selectedFilters, refreshTrigger]); // Added refreshTrigger
+  }, [page, selectedFilters, refreshTrigger]);
 
-  // Highlighted post fetch logic
+  // Fetch highlighted post if postId in URL
   useEffect(() => {
     if (!postId) return;
     const fetchPostById = async () => {
@@ -137,7 +140,6 @@ const Community = () => {
     fetchPostById();
   }, [postId]);
 
-  // FIXED: Use useCallback to prevent stale closures
   const handlePostUpdate = useCallback((updatedPost) => {
     if (Object.keys(selectedFilters).length > 0) {
       setFilteredPosts(prev => prev.map(p => (p._id === updatedPost._id ? updatedPost : p)));
@@ -158,18 +160,22 @@ const Community = () => {
   }, [selectedFilters, highlightedPost]);
 
   function handleFilterSearch() {
-    setPage(1);
-    setRefreshTrigger(prev => prev + 1); // Force refetch
+    resetPaginationAndRefresh();
   }
 
-  // Determine which posts to show
+  // Determine posts to show based on filters
   const postsToShow = Object.keys(selectedFilters).length > 0 ? filteredPosts : communityPosts;
 
-  // FIXED: Handle page changes with scroll to top
   const handlePageChange = useCallback((newPage) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // After creating a post, reset pagination and refetch posts
+  const onCreatePostClose = () => {
+    setShowCreatePost(false);
+    resetPaginationAndRefresh();
+  };
 
   return (
     <>
@@ -231,8 +237,8 @@ const Community = () => {
         {!loading && totalPages > 1 && (
           <div className="flex justify-center items-center space-x-2 mt-6">
             {page > 1 && (
-              <button 
-                onClick={() => handlePageChange(page - 1)} 
+              <button
+                onClick={() => handlePageChange(page - 1)}
                 className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
               >
                 Prev
@@ -242,8 +248,8 @@ const Community = () => {
               {page} / {totalPages}
             </span>
             {page < totalPages && (
-              <button 
-                onClick={() => handlePageChange(page + 1)} 
+              <button
+                onClick={() => handlePageChange(page + 1)}
                 className="px-3 py-1 rounded-lg bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
               >
                 Next
@@ -254,11 +260,7 @@ const Community = () => {
 
         {showCreatePost && (
           <CreatePost
-            onClose={() => {
-              setShowCreatePost(false);
-              setPage(1);
-              setRefreshTrigger(prev => prev + 1); // NEW: Force refetch after creating post
-            }}
+            onClose={onCreatePostClose}
           />
         )}
       </div>
