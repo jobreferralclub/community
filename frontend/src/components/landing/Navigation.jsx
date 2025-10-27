@@ -8,25 +8,39 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import SafeIcon from "../../common/SafeIcon";
 import * as FiIcons from "react-icons/fi";
 import { subCommunities } from "../../data/communityList";
+import { menuItems, adminOnly } from "../../data/menuList";
 import ProductsDropdown from "./ProductsDropdown";
 
 const { FiMenu, FiSearch, FiHelpCircle, FiBookOpen, FiBell } = FiIcons;
 
 const Navigation = () => {
-  const { user, logout } = useAuthStore();
+  const [openMenus, setOpenMenus] = useState([]);
+  const [openRegions, setOpenRegions] = useState([]);
+  
+  const toggleMenu = (name) => {
+    setOpenMenus((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  const toggleRegion = (name) => {
+    setOpenRegions((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  const { user, logout, role, location: userLocation } = useAuthStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-
   const [profileOpen, setProfileOpen] = useState(false);
-
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [seenAcknowledged, setSeenAcknowledged] = useState(false);
 
   const notifications = user?.notifications || [];
   const hasUnseen = notifications.some((n) => !n.seen);
 
-  // 🔹 Search states
+  // Search states
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState(false);
@@ -46,7 +60,7 @@ const Navigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🔹 Fetch posts when Enter is pressed
+  // Fetch posts when Enter is pressed
   useEffect(() => {
     if (!searchSubmitted || !searchTerm.trim()) return;
     async function fetchPosts() {
@@ -69,7 +83,7 @@ const Navigation = () => {
     if (e.key === "Enter") setSearchSubmitted(true);
   };
 
-  // 🔹 Base search dataset
+  // Base search dataset
   const baseSearchData = [
     { name: "Mock Interviewer", type: "Free Tools", url: "/mock-interviewer" },
     { name: "Resume Builder", type: "Free Tools", url: "/resume-builder" },
@@ -97,6 +111,24 @@ const Navigation = () => {
       item.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Filter menu based on role and location (like Sidebar)
+  const filteredMenu =
+    role === "admin"
+      ? menuItems
+      : menuItems.filter((item) => !adminOnly.includes(item.name));
+
+  const filteredCommunity = filteredMenu.map((item) => {
+    if (item.name === "Community") {
+      return {
+        ...item,
+        children: item.children?.filter(
+          (child) => !child.region || child.region === userLocation
+        ),
+      };
+    }
+    return item;
+  });
+
   const communityNavItems = [
     { label: "Jobs with Referrals", href: "/community/introductions" },
     { label: "Success Stories", href: "/#stories" },
@@ -109,6 +141,90 @@ const Navigation = () => {
     { label: "Success Stories", href: "/#stories" },
     { label: "Blogs", href: "/blogs" },
   ];
+
+  const renderMobileMenu = (menu) =>
+    menu.map((item) => {
+      // Skip submenu items that don't have children
+      if (item.isSubmenu && (!item.children || item.children.length === 0)) {
+        return null;
+      }
+
+      return (
+        <div key={item.name}>
+          {/* Top-level menu with icon and collapse arrow */}
+          <button
+            className="flex items-center justify-between w-full px-4 py-3 font-medium text-gray-100 hover:bg-gray-800"
+            onClick={() => {
+              if (item.isSubmenu && item.children && item.children.length) {
+                toggleMenu(item.name);
+              } else if (item.path) {
+                setMenuOpen(false);
+                navigate(item.path);
+              }
+            }}
+          >
+            <span className="flex items-center gap-2">
+              <SafeIcon icon={item.icon} className="w-5 h-5" />
+              {item.name}
+            </span>
+            {item.isSubmenu && item.children && item.children.length > 0 && (
+              <ChevronDown
+                className={`w-5 h-5 transform transition-transform ${
+                  openMenus.includes(item.name) ? "rotate-180" : ""
+                }`}
+              />
+            )}
+          </button>
+
+          {/* Nested regions/groups */}
+          {item.isSubmenu && item.children && item.children.length > 0 && openMenus.includes(item.name) && (
+            <div>
+              {item.children.map((region) => (
+                <div key={region.name}>
+                  <button
+                    onClick={() => {
+                      if (region.children && region.children.length) {
+                        toggleRegion(region.name);
+                      } else if (region.path) {
+                        setMenuOpen(false);
+                        navigate(region.path);
+                      }
+                    }}
+                    className="flex items-center justify-between w-full pl-8 pr-4 py-2 text-gray-200 font-semibold hover:bg-gray-800"
+                  >
+                    {region.name}
+                    {region.children && region.children.length > 0 && (
+                      <ChevronDown
+                        className={`w-4 h-4 transform transition-transform ${
+                          openRegions.includes(region.name) ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </button>
+                  {/* Final children */}
+                  {region.children && region.children.length > 0 && openRegions.includes(region.name) && (
+                    <div>
+                      {region.children.map((sub) => (
+                        <button
+                          key={sub.name}
+                          onClick={() => {
+                            setMenuOpen(false);
+                            navigate(sub.path);
+                          }}
+                          className="block w-full text-left pl-14 pr-4 py-2 text-gray-300 hover:bg-gray-700"
+                        >
+                          {sub.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    });
 
   return (
     <nav
@@ -200,7 +316,7 @@ const Navigation = () => {
             </div>
           </div>
 
-          {/* 🔹 Search Bar (Before Profile) */}
+          {/* Search Bar */}
           <div className="hidden lg:flex flex-1 max-w-md mx-6 relative">
             <SafeIcon
               icon={FiSearch}
@@ -352,10 +468,9 @@ const Navigation = () => {
 
               {/* Tooltip */}
               <span
-                className={`absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-200 text-xs rounded px-2 py-1 transition-opacity pointer-events-none
-        ${
-          !notificationsOpen ? "opacity-0 group-hover:opacity-100" : "opacity-0"
-        }`}
+                className={`absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-gray-200 text-xs rounded px-2 py-1 transition-opacity pointer-events-none ${
+                  !notificationsOpen ? "opacity-0 group-hover:opacity-100" : "opacity-0"
+                }`}
               >
                 Notifications
               </span>
@@ -529,40 +644,102 @@ const Navigation = () => {
 
             {/* Mobile Menu Toggle */}
             <div className="lg:hidden">
+              {/* Overlay */}
               {menuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-16 right-4 w-56 bg-black border border-gray-800 rounded-lg shadow-lg z-50 overflow-hidden"
-                >
+                <div
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                  onClick={() => setMenuOpen(false)}
+                />
+              )}
+
+              {/* Side Menu */}
+              <motion.div
+                initial={false}
+                animate={{ x: menuOpen ? 0 : "100%" }}
+                transition={{ type: "tween", duration: 0.3 }}
+                className="fixed top-0 right-0 h-full w-80 bg-black border-l border-gray-800 shadow-2xl z-50 overflow-y-auto"
+              >
+                {/* Menu Header */}
+                <div className="flex items-center justify-between p-4 border-b border-gray-800">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/logo.jpg"
+                      alt="JobReferral.Club"
+                      className="w-10 h-10 rounded-full object-contain"
+                    />
+                    <div className="font-bold text-lg text-white">
+                      JobReferral<span className="text-primary-green">.Club</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    <X className="w-6 h-6 text-white" />
+                  </button>
+                </div>
+
+                {/* User Profile Section */}
+                {user && (
+                  <div className="p-4 border-b border-gray-800">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="w-12 h-12 rounded-full border-2 border-primary-green"
+                      />
+                      <div>
+                        <p className="text-white font-semibold">{user.name}</p>
+                        <p className="text-gray-400 text-sm">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* DYNAMIC COLLAPSIBLE MENU */}
+                <div className="p-2">
+                  {renderMobileMenu(filteredCommunity)}
+                </div>
+
+                {/* Divider */}
+                <hr className="border-t border-zinc-800 my-2" />
+
+                {/* USER PROFILE & QUICK LINKS */}
+                <div className="py-2">
                   {user ? (
                     <>
                       {!isCommunityPage && (
-                        <a
-                          href="/community"
-                          className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors"
-                          onClick={() => setMenuOpen(false)}
+                        <button
+                          onClick={() => {
+                            setMenuOpen(false);
+                            navigate("/community");
+                          }}
+                          className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors flex items-center gap-3"
                         >
-                          Continue to Community
-                        </a>
+                          <SafeIcon icon={FiIcons.FiUsers} className="w-5 h-5" />
+                          <span>Continue to Community</span>
+                        </button>
                       )}
-                      <a
-                        href="/profile"
-                        className="block px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors"
-                        onClick={() => setMenuOpen(false)}
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          navigate("/profile");
+                        }}
+                        className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors flex items-center gap-3"
                       >
-                        My Profile
-                      </a>
+                        <SafeIcon icon={FiIcons.FiUser} className="w-5 h-5" />
+                        <span>My Profile</span>
+                      </button>
 
                       <button
                         onClick={() => {
                           setMenuOpen(false);
                           navigate("/community/ask-the-community");
                         }}
-                        className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors"
+                        className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors flex items-center gap-3"
                       >
-                        Ask the Community
+                        <SafeIcon icon={FiHelpCircle} className="w-5 h-5" />
+                        <span>Ask the Community</span>
                       </button>
 
                       <button
@@ -570,25 +747,27 @@ const Navigation = () => {
                           setMenuOpen(false);
                           navigate("/community/announcements");
                         }}
-                        className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors"
+                        className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors flex items-center gap-3"
                       >
-                        Announcements
+                        <SafeIcon icon={FiIcons.FiVolume2} className="w-5 h-5" />
+                        <span>Announcements</span>
                       </button>
 
                       <button
                         onClick={() => {
                           setMenuOpen(false);
-                          // Optionally, you can add notification state toggle logic here or navigate somewhere
-                          navigate("/community/notifications"); // if you have a notifications page
-                          // else implement whatever logic to open notifications
+                          navigate("/community/notifications");
                         }}
-                        className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors"
+                        className="w-full text-left px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-primary-green transition-colors flex items-center gap-3"
                       >
-                        Notifications
+                        <SafeIcon icon={FiBell} className="w-5 h-5" />
+                        <span>Notifications</span>
                         {hasUnseen && (
-                          <span className="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                          <span className="ml-auto inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                         )}
                       </button>
+
+                      <hr className="border-t border-zinc-800 my-2" />
 
                       <button
                         onClick={() => {
@@ -596,9 +775,10 @@ const Navigation = () => {
                           auth0logout({ returnTo: "/" });
                           setMenuOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors"
+                        className="w-full text-left px-4 py-3 text-red-400 hover:bg-gray-800 hover:text-red-500 transition-colors flex items-center gap-3"
                       >
-                        Log Out
+                        <SafeIcon icon={FiIcons.FiLogOut} className="w-5 h-5" />
+                        <span>Log Out</span>
                       </button>
                     </>
                   ) : (
@@ -607,30 +787,26 @@ const Navigation = () => {
                         loginWithPopup();
                         setMenuOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-primary-green hover:bg-gray-800 transition-colors"
+                      className="w-full text-left px-4 py-3 text-primary-green hover:bg-gray-800 transition-colors flex items-center gap-3 font-semibold"
                     >
-                      Community Sign In / Up
+                      <SafeIcon icon={FiIcons.FiLogIn} className="w-5 h-5" />
+                      <span>Community Sign In / Up</span>
                     </button>
                   )}
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
 
-              {menuOpen ? (
-                <X
-                  className="w-6 h-6 text-white cursor-pointer"
-                  onClick={() => setMenuOpen(false)}
-                />
-              ) : (
-                <Menu
-                  className="w-6 h-6 text-white cursor-pointer"
-                  onClick={() => setMenuOpen(true)}
-                />
-              )}
+              {/* Hamburger Icon */}
+              <button
+                onClick={() => setMenuOpen(true)}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <Menu className="w-6 h-6 text-white" />
+              </button>
             </div>
           </div>
         </div>
       </div>
-      
     </nav>
   );
 };
