@@ -94,30 +94,30 @@ const CategoriesSection = () => {
     baseCategories.map((cat) => ({ ...cat, openRoles: 0 }))
   );
 
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const res = await fetch(import.meta.env.VITE_API_PORT + "/api/roleStats");
-        const data = await res.json();
+  // useEffect(() => {
+  //   const fetchCounts = async () => {
+  //     try {
+  //       const res = await fetch(import.meta.env.VITE_API_PORT + "/api/roleStats");
+  //       const data = await res.json();
 
-        const updated = baseCategories.map((category) => {
-          const match = data.openRoles.find(
-            (role) => role.title === category.title
-          );
-          return {
-            ...category,
-            openRoles: match ? match.count : 0,
-          };
-        });
+  //       const updated = baseCategories.map((category) => {
+  //         const match = data.openRoles.find(
+  //           (role) => role.title === category.title
+  //         );
+  //         return {
+  //           ...category,
+  //           openRoles: match ? match.count : 0,
+  //         };
+  //       });
 
-        setCategories(updated);
-      } catch (err) {
-        console.error("Failed to fetch role counts:", err);
-      }
-    };
+  //       setCategories(updated);
+  //     } catch (err) {
+  //       console.error("Failed to fetch role counts:", err);
+  //     }
+  //   };
 
-    fetchCounts();
-  }, []);
+  //   fetchCounts();
+  // }, []);
 
   return (
     <section className="section-padding bg-black">
