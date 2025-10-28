@@ -380,5 +380,5 @@ export async function generatePostsAll() {
 }
 
 // To run the import: uncomment below
-// generatePostsAll();
+generatePostsAll();
 

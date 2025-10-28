@@ -23,7 +23,7 @@ export const HUMAN_RESOURCES_US_SHEET_ID = '1wspialayhascMNhf0NBFAOddsDTroygU34r
 export const ANALYTICS_US_SHEET_ID = '1QrtUikquNmHM4it8R18vDYMptvDiDiLHOng5xD-z19k';
 export const STRATEGY_US_SHEET_ID = '1z3o-eh8fRap7wZr21-X6im9izuRhP-IdGhM75i48JQQ';
 
-export const SHEET_RANGE = 'Sheet1!A1:M200';
+export const SHEET_RANGE = 'Sheet1!A1:Q200';
 
 // export const FRESHERS_INDIA_SHEET_ID = '1dlCA59h-0Zi21uSKR2qtKVDGX2DBrdA9dvmizufwB1Q';
 // export const SHEET_RANGE = 'Sheet2!A1:Q100';
