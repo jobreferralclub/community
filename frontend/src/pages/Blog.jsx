@@ -16,7 +16,7 @@ const Blog = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/blogs");
+        const res = await axios.get(`${import.meta.env.VITE_API_PORT}/api/blogs`);
         setBlogs(res.data.sort((a, b) => new Date(b.date) - new Date(a.date)));
       } catch (err) {
         console.error("Failed to fetch blogs:", err);
@@ -48,7 +48,7 @@ const Blog = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/blogs/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_PORT}/api/blogs/${id}`);
       setBlogs((prev) => prev.filter((b) => b._id !== id));
       alert("Blog deleted successfully!");
     } catch (err) {
