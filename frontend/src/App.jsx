@@ -44,12 +44,16 @@ import SuccessStories from "./pages/SuccessStories";
 import Blog from "./pages/Blog";
 import BlogEditor from "./pages/Blog/BlogEditor";
 import BlogDetail from "./pages/Blog/BlogDetail";
+import useAnalyticsTracker from "./hooks/useAnalyticsTracker";
 
 function AppWrapper() {
   const { user, userId, login, setRole } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const { user: auth0user, isAuthenticated: auth0authenticated, loginWithPopup, logout: auth0logout } = useAuth0();
+  
+  // ✅ Track page views with Google Analytics
+  useAnalyticsTracker();
 
   useEffect(() => {
     const syncAuth0User = async () => {
